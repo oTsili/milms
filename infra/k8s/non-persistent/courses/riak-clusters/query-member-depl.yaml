@@ -1,0 +1,43 @@
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: courses-riak-query-member-depl
+# spec:
+#   replicas: 5
+#   selector:
+#     matchLabels:
+#       app: courses-riak-query-member
+#   template:
+#     metadata:
+#       labels:
+#         app: courses-riak-query-member
+#     spec:
+#       containers:
+#         - env:
+#             - name: CLUSTER_NAME
+#               value: courses-riak-query-cluster
+#             - name: COORDINATOR_NODE
+#               value: courses-riak-query-coordinator
+#           image: basho/riak-ts
+#           name: courses-riak-query-member
+#           ports:
+#             - containerPort: 8087
+#             - containerPort: 8098
+#       restartPolicy: Always
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: courses-riak-query-member-srv
+# spec:
+#   ports:
+#     - name: 'protobuf'
+#       port: 8087
+#       targetPort: 8087
+#     - name: 'http'
+#       port: 8098
+#       targetPort: 8098
+#   selector:
+#     service: member
+# status:
+#   loadBalancer: {}

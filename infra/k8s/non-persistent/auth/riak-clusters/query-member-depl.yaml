@@ -1,0 +1,43 @@
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: auth-riak-query-member-depl
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: auth-riak-query-member
+#   template:
+#     metadata:
+#       labels:
+#         app: auth-riak-query-member
+#     spec:
+#       containers:
+#         - env:
+#             - name: CLUSTER_NAME
+#               value: auth-riak-query-cluster
+#             - name: COORDINATOR_NODE
+#               value: auth-riak-query-coordinator
+#           image: basho/riak-ts
+#           name: auth-riak-query-member
+#           ports:
+#             - containerPort: 8087
+#             - containerPort: 8098
+#       restartPolicy: Always
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: auth-riak-query-member-srv
+# spec:
+#   ports:
+#     - name: 'protobuf'
+#       port: 8087
+#       targetPort: 8087
+#     - name: 'http'
+#       port: 8098
+#       targetPort: 8098
+#   selector:
+#     service: member
+# status:
+#   loadBalancer: {}

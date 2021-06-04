@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    com.basho.riak.cluster.name: riakts
+  labels:
+    io.kompose.service: coordinator
+  name: coordinator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: coordinator
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        com.basho.riak.cluster.name: riakts
+      labels:
+        io.kompose.service: coordinator
+    spec:
+      containers:
+        - env:
+            - name: CLUSTER_NAME
+              value: riakts
+          image: basho/riak-ts
+          name: coordinator
+          ports:
+            - containerPort: 8087
+            - containerPort: 8098
+          resources: {}
+          volumeMounts:
+            - mountPath: /etc/riak/schemas
+              name: riak-schemas
+      restartPolicy: Always
+      volumes:
+        - name: riak-schemas
+          persistentVolumeClaim:
+            claimName: riak-schemas
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    com.basho.riak.cluster.name: riakts
+  labels:
+    io.kompose.service: coordinator
+  name: coordinator
+spec:
+  ports:
+    - name: '8087'
+      port: 8087
+      targetPort: 8087
+    - name: '8098'
+      port: 8098
+      targetPort: 8098
+  selector:
+    io.kompose.service: coordinator
+status:
+  loadBalancer: {}

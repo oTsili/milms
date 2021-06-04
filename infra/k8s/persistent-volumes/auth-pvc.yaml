@@ -1,0 +1,59 @@
+###### Auth Mongo ######
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: auth-mongo-pv
+spec:
+  persistentVolumeReclaimPolicy: Delete
+  # persistentVolumeReclaimPolicy: Retain
+  storageClassName: auth-mongo-class
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: /mnt/milms/auth/mongo
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: auth-mongo-pvc
+  labels:
+    app: auth-mongo-pvc
+spec:
+  storageClassName: auth-mongo-class
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+---
+###### Auth Depl ######
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: auth-depl-pv
+spec:
+  persistentVolumeReclaimPolicy: Delete
+  # persistentVolumeReclaimPolicy: Retain
+  storageClassName: auth-depl-class
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: /mnt/milms/assignments/files
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: auth-depl-pvc
+  labels:
+    app: auth-depl-pvc
+spec:
+  storageClassName: auth-depl-class
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi

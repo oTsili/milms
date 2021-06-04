@@ -1,0 +1,26 @@
+{
+  "name": "conference",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "ts-node-dev src/index.ts",
+    "dev": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/cookie-session": "^2.0.42",
+    "@types/express": "^4.17.11",
+    "typescript": "^4.2.3"
+  },
+  "dependencies": {
+    "@otmilms/common": "^1.0.19",
+    "cookie-session": "^1.4.0",
+    "express": "^4.17.1",
+    "express-async-errors": "^3.1.1",
+    "socket.io": "^4.0.0",
+    "ts-node-dev": "^1.1.6"
+  }
+}

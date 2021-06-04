@@ -1,0 +1,11 @@
+FROM node:14-alpine AS deps
+
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm install --ignore-scripts
+
+FROM node:14-alpine
+WORKDIR /app
+COPY --from=deps app/node_modules node_modules
+COPY . .
+ENTRYPOINT ["npm", "run", "start", "--", "--disable-host-check", "--host", "0.0.0.0"]

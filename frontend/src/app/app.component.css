@@ -1,0 +1,22 @@
+main {
+  margin-top: 1rem;
+  overflow-y: auto;
+}
+.container {
+  min-width: 100%;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 0;
+}
+
+main {
+  flex-grow: 1;
+}
+
+app-header,
+main,
+app-footer {
+  flex-shrink: 0;
+}

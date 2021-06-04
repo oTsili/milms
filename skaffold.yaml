@@ -1,0 +1,64 @@
+apiVersion: skaffold/v2beta14
+kind: Config
+metadata:
+  name: non-persistent
+deploy:
+  kubectl:
+    manifests:
+      - ./infra/k8s/non-persistent/*
+build:
+  local:
+    push: false
+  artifacts:
+    - image: otsili/auth
+      context: backend/auth
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: 'src/**/*.ts'
+            dest: .
+    - image: otsili/frontend_v1
+      context: frontend
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        infer:
+          - src/**/*
+    - image: otsili/courses
+      context: backend/courses
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: 'src/**/*.ts'
+            dest: .
+    # - image: otsili/frontend
+    #   context: frontend
+    #   docker:
+    #     dockerfile: Dockerfile.prod
+    #   sync:
+    #     manual:
+    #       - src: '/dist/frontend/*.js'
+    #         dest: .
+    #       - src: 'src/**/*.ts'
+    #         dest: .
+    # - image: otsili/conference
+    #   context: backend/conference
+    #   docker:
+    #     dockerfile: Dockerfile
+    #   sync:
+    #     # infer:
+    #     #   - src/**/*
+    #     manual:
+    #       - src: 'src/**/*.ts'
+    #         dest: .
+---
+apiVersion: skaffold/v2beta11
+kind: Config
+metadata:
+  name: persistent
+deploy:
+  kubectl:
+    manifests:
+      - ./infra/k8s/persistent-volumes/*

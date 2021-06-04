@@ -1,0 +1,58 @@
+##### courses Mongo #####
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: courses-mongo-pv
+  labels:
+    app: courses-mongo-pv
+spec:
+  persistentVolumeReclaimPolicy: Delete
+  # persistentVolumeReclaimPolicy: Retain
+  storageClassName: courses-mongo-class
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /mnt/milms/courses/mongo
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: courses-mongo-pvc
+spec:
+  storageClassName: courses-mongo-class
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+##### courses Depl #####
+# apiVersion: v1
+# kind: PersistentVolume
+# metadata:
+#   name: courses-depl-pv
+# spec:
+#   persistentVolumeReclaimPolicy: Retain
+#   storageClassName: courses-depl-class
+#   capacity:
+#     storage: 1Gi
+#   accessModes:
+#     - ReadWriteMany
+#   hostPath:
+#     path: /mnt/milms/courses/files
+# ---
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: courses-depl-pvc
+#   labels:
+#     app: courses-depl-pvc
+# spec:
+#   storageClassName: courses-depl-class
+#   accessModes:
+#     - ReadWriteMany
+#   resources:
+#     requests:
+#       storage: 1Gi

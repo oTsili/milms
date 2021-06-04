@@ -1,0 +1,50 @@
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: conference-depl
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: conference
+#   template:
+#     metadata:
+#       labels:
+#         app: conference
+#     spec:
+#       # volumes:
+#       #   - name: conference-depl-storage
+#       ### for sync with the local machine ###
+#       # hostPath:
+#       #   path: /mnt/milms/conference/files
+#       # path: /hosthome/odysseas/mnt-milms/conference/files
+#       ### for sync with pvc on the local machine ###
+#       # persistentVolumeClaim:
+#       #   claimName: conference-depl-pvc
+#       containers:
+#         - name: conference
+#           image: otsili/conference
+#           # volumeMounts:
+#           #   - name: conference-depl-storage
+#           #     mountPath: /app/src/public/conference
+#           env:
+#             - name: WEB_RTC_PORT
+#               value: '3000'
+#             - name: JWT_KEY
+#               valueFrom:
+#                 secretKeyRef:
+#                   name: jwt-secret
+#                   key: JWT_KEY
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: vtc-srv
+# spec:
+#   selector:
+#     app: conference
+#   ports:
+#     - name: conference
+#       protocol: TCP
+#       port: 3000
+#       targetPort: 3000

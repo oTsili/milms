@@ -1,0 +1,11 @@
+backend/auth/.git
+backend/video-chat/node_modules
+backend/video-chat/.git
+backend/auth/node_modules
+backend/courses/.git
+backend/courses/node_modules
+frontend/.git
+frontend/node_modules
+common/.git
+common/node_modules
+skaffold

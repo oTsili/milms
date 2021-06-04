@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    com.basho.riak.cluster.name: riakts
+  labels:
+    io.kompose.service: member
+  name: member
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: member
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        com.basho.riak.cluster.name: riakts
+      labels:
+        io.kompose.service: member
+    spec:
+      containers:
+        - env:
+            - name: CLUSTER_NAME
+              value: riakts
+            - name: COORDINATOR_NODE
+              value: coordinator
+          image: basho/riak-ts
+          name: member
+          ports:
+            - containerPort: 8087
+            - containerPort: 8098
+          resources: {}
+      restartPolicy: Always
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    com.basho.riak.cluster.name: riakts
+  labels:
+    io.kompose.service: member
+  name: member
+spec:
+  ports:
+    - name: '8087'
+      port: 8087
+      targetPort: 8087
+    - name: '8098'
+      port: 8098
+      targetPort: 8098
+  selector:
+    io.kompose.service: member
+status:
+  loadBalancer: {}

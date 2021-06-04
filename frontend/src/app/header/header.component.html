@@ -1,0 +1,52 @@
+<mat-toolbar color="primary" *ngIf="headerIsVisible">
+  <span>
+    <a routerLink="/"
+      ><h2 class="logo">
+        <img src="/assets/images/logo.png" /><span>MILMS</span>
+      </h2></a
+    >
+  </span>
+  <span class="spacer"></span>
+  <ul>
+    <li *ngIf="!userIsAuthenticated">
+      <a mat-button routerLink="/login" routerLinkActive="mat-accent">Login</a>
+    </li>
+    <li *ngIf="!userIsAuthenticated">
+      <a mat-button routerLink="/signup" routerLinkActive="mat-accent"
+        >Signup</a
+      >
+    </li>
+
+    <li *ngIf="userIsAuthenticated">
+      <button mat-button routerLink="/courses" routerLinkActive="mat-accent">
+        Courses
+      </button>
+    </li>
+
+    <li *ngIf="userIsAuthenticated">
+      <a mat-button [matMenuTriggerFor]="personalOptions">
+        <img [src]="userPhotoSrc" alt="User photo" class="nav__user-img" />
+      </a>
+    </li>
+  </ul>
+</mat-toolbar>
+
+<mat-menu #personalOptions="matMenu">
+  <hr />
+  <div id="navPersonal">
+    <button mat-menu-item routerLink="/events" routerLinkActive="mat-accent">
+      Events
+    </button>
+    <button mat-menu-item [matMenuTriggerFor]="testPreferences">
+      Preferences
+    </button>
+    <button mat-menu-item (click)="onLogout()">Logout</button>
+  </div>
+</mat-menu>
+
+<mat-menu #testPreferences="matMenu">
+  <div>
+    <button mat-menu-item (click)="onUserRoleUpdate('admin')">Become Admin</button>
+    <button mat-menu-item (click)="onUserRoleUpdate('student')">Become Student</button>
+  </div>
+</mat-menu>

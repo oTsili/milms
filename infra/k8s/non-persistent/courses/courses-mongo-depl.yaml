@@ -1,0 +1,53 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: courses-mongo-depl
+spec:
+  # serviceName: courses-mongo-depl
+  replicas: 1
+  selector:
+    matchLabels:
+      app: courses-mongo
+  template:
+    metadata:
+      labels:
+        app: courses-mongo
+    spec:
+      securityContext:
+        runAsUser: 0
+      terminationGracePeriodSeconds: 10
+      volumes:
+        - name: courses-mongo-storage
+          persistentVolumeClaim:
+            claimName: courses-mongo-pvc
+      containers:
+        - name: courses-mongo
+          image: mongo
+          ports:
+            - containerPort: 27017
+          # volumeMounts:
+          #   - name: courses-mongo-storage
+          #     mountPath: /data/db
+      initContainers:
+        - name: volume-mount-hack
+          image: busybox
+          command: ['sh', '-c', 'chown -R 999:999 /data']
+          volumeMounts:
+            - name: courses-mongo-storage
+              mountPath: /data/db
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: courses-mongo-srv
+  labels:
+    service: courses-mongo-srv
+spec:
+  selector:
+    app: courses-mongo
+  ports:
+    - name: db
+      protocol: TCP
+      port: 27017
+      targetPort: 27017

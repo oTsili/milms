@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: courses-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: courses
+  template:
+    metadata:
+      labels:
+        app: courses
+    spec:
+      # volumes:
+      #   - name: courses-depl-storage
+      ### for sync with the local machine ###
+      # hostPath:
+      #   path: /mnt/milms/courses/files
+      # path: /hosthome/odysseas/mnt-milms/courses/files
+      ### for sync with pvc on the local machine ###
+      # persistentVolumeClaim:
+      #   claimName: courses-depl-pvc
+      containers:
+        - name: courses
+          image: otsili/courses
+          # volumeMounts:
+          #   - name: courses-depl-storage
+          #     mountPath: /app/src/public/courses
+          env:
+            - name: QUERY_RIAK_URI
+              value: 'courses-riak-query-coordinator-srv:8087'
+            - name: WRITE_RIAK_URI
+              value: 'courses-riak-write-srv:8087'
+            - name: MONGO_URI
+              value: 'mongodb://courses-mongo-srv:27017/courses'
+            - name: NATS_CLUSTER_ID
+              value: 'milms'
+            - name: NATS_CLIENT_ID
+              value: 'courses-pod'
+            - name: NATS_URL
+              value: 'http://nats-srv:4222'
+            - name: JWT_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret
+                  key: JWT_KEY
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: courses-srv
+spec:
+  selector:
+    app: courses
+  ports:
+    - name: courses
+      protocol: TCP
+      port: 3000
+      targetPort: 3000

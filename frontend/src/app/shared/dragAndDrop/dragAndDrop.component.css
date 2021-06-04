@@ -1,0 +1,8 @@
+#submit-button {
+  display: flex;
+  justify-content: flex-end;
+}
+
+::ng-deep .mat-tab-body {
+  padding-bottom: 3%;
+}

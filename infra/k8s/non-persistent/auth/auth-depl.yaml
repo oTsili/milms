@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth
+  template:
+    metadata:
+      labels:
+        app: auth
+    spec:
+      volumes:
+        - name: auth-depl-storage
+          ### for sync with the local machine ###
+          # hostPath:
+          #   path: /mnt/Data/milms/auth/files
+          # path: /hosthome/odysseas/mnt-milms/auth/files
+          ### for sync with pvc on the local machine ###
+          persistentVolumeClaim:
+            claimName: auth-depl-pvc
+      containers:
+        - name: auth
+          image: otsili/auth
+          volumeMounts:
+            - name: auth-depl-storage
+              mountPath: /app/src/public/img/users
+          env:
+            - name: QUERY_RIAK_URI
+              value: 'auth-riak-query-srv:8087'
+            - name: WRITE_RIAK_URI
+              value: 'auth-riak-write-srv:8087'
+            - name: MONGO_URI
+              value: 'mongodb://auth-mongo-srv:27017/auth'
+            - name: NATS_CLUSTER_ID
+              value: 'milms'
+            - name: NATS_CLIENT_ID
+              value: 'auth-pod'
+            - name: NATS_URL
+              value: 'http://nats-srv:4222'
+            - name: JWT_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret
+                  key: JWT_KEY
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-srv
+spec:
+  selector:
+    app: auth
+  ports:
+    - name: auth
+      protocol: TCP
+      port: 3000
+      targetPort: 3000

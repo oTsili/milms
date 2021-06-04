@@ -1,0 +1,268 @@
+:host {
+  display: block;
+  margin-top: 1rem;
+}
+
+.info-text {
+  text-align: center;
+}
+
+mat-accordion {
+  height: 100%;
+}
+
+/* .mat-expansion-panel-body,
+.course-details,
+.mat-action-row {
+  padding: 0 !important;
+}
+
+.mat-expansion-panel-content > .mat-expansion-panel-body {
+  padding: 0 !important;
+} */
+
+/* .course-details, */
+.mat-action-row {
+  padding: 0 !important;
+}
+
+.mat-expansion-panel {
+  max-height: 40%;
+  /* padding: 0; */
+  /* background-color: #ffeeee; */
+}
+
+mat-spinner {
+  margin: auto;
+}
+
+.course-file {
+  width: 100%;
+}
+
+.course-file img {
+  width: 50%;
+  margin-left: 25%;
+  box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
+}
+
+.message {
+  max-width: 400px;
+  margin: 2em auto;
+  /* text-align: center; */
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  align-self: center;
+}
+
+#add-button {
+  display: flex;
+  justify-content: center;
+  align-items: top;
+  /* align-self: center; */
+}
+
+.pdfThumbnail .mat-icon {
+  font-size: 15px;
+}
+
+mat-paginator {
+  margin-top: 1rem;
+}
+
+/* ******************** */
+
+.mat-button.mat-success,
+.mat-stroked-button.mat-success {
+  color: #28a745;
+}
+
+input[type='file'] {
+  visibility: hidden;
+}
+
+.action-buttons {
+  padding-bottom: 20px;
+}
+
+.headers-align .mat-expansion-panel-header-title,
+.example-headers-align .mat-expansion-panel-header-description {
+  flex-basis: 0;
+}
+
+.headers-align .mat-expansion-panel-header-description {
+  justify-content: space-between;
+  align-items: center;
+}
+
+.headers-align .mat-form-field + .mat-form-field {
+  margin-left: 8px;
+}
+
+.mat-form-field input {
+  cursor: auto;
+}
+
+/* .header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-basis: 0;
+}
+
+.header span {
+  width: 33%;
+  color: #2125297d;
+  font-size: 0.8rem;
+}
+
+.header span:first-child {
+  margin-left: 5%;
+} */
+
+.course-title {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-basis: 0;
+}
+
+.description-field {
+  width: 100%;
+  margin-left: 3%;
+}
+
+/* *********************** */
+
+.course-diagram {
+  min-width: 80px;
+  max-width: 110px;
+  border: 2px solid black;
+  padding: 0;
+  font-weight: lighter;
+  margin: 8px 0;
+  height: 70px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.course-diagram img {
+  height: 70%;
+  width: 70%;
+}
+.course-diagram mat-icon {
+  width: 40%;
+}
+
+.course-details-attribution {
+  opacity: 0.5;
+}
+
+.matLabel {
+  color: #a1a1a1;
+  font-size: 0.7rem;
+}
+
+/* sidenav */
+.page-container {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+
+.course-sidenav {
+  flex-grow: 1;
+  margin: auto 4% auto 4%;
+  font-size: 15px;
+}
+
+.course-content {
+  flex-grow: 5;
+}
+
+mat-radio-button {
+  margin-left: 1.5%;
+}
+
+mat-radio-group {
+  width: 120%;
+  margin-left: 5%;
+}
+
+.course-components,
+.courseTitle-field {
+  padding-left: 3% !important;
+}
+
+.course-components {
+  display: flex;
+  flex-direction: column;
+  padding-left: 3% !important;
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.flex-center-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+.flex-start-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+}
+.flex-space-between-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: -webkit-fill-available;
+}
+
+::ng-deep .mat-form-field-infix {
+  min-width: 100px !important;
+  width: auto !important;
+  /* width: 100% !important; */
+}
+
+::ng-deep .mat-expansion-panel-header.mat-expanded {
+  height: auto !important;
+}
+
+::ng-deep .mat-expansion-panel-header {
+  height: auto !important;
+  display: contents;
+}
+
+.course-row {
+  margin-top: 3%;
+  width: 100%;
+  margin-right: 3%;
+}
+
+.mat-header-flex {
+  display: flex;
+  justify-content: space-between;
+  align-content: stretch;
+}
+
+::ng-deep .mat-content {
+  display: contents !important;
+}
+
+.display-contents {
+  display: contents;
+}
+
+.mat-accordion .mat-expansion-panel {
+  margin-bottom: 10px;
+}
+
+::ng-deep .mat-paginator-container {
+  justify-content: space-between !important;
+}

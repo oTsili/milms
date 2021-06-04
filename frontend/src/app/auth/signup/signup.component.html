@@ -1,0 +1,108 @@
+<div class="signup-content">
+  <mat-card>
+    <mat-card-content>
+      <mat-spinner *ngIf="isLoading"></mat-spinner>
+      <form
+        [formGroup]="theSignupForm"
+        (submit)="onSignup(theSignupForm)"
+        *ngIf="!isLoading"
+      >
+        <mat-form-field>
+          <input
+            formControlName="email"
+            matInput
+            type="email"
+            placeholder="E-mail"
+            required
+            email
+          />
+          <mat-error *ngIf="theSignupForm.get('email').invalid"
+            >Please enter a valid email address</mat-error
+          >
+        </mat-form-field>
+        <mat-form-field>
+          <input
+            formControlName="firstName"
+            matInput
+            type="text"
+            placeholder="first name"
+            required
+          />
+          <mat-error *ngIf="theSignupForm.get('firstName').invalid"
+            >Please enter a valid name</mat-error
+          >
+        </mat-form-field>
+        <mat-form-field>
+          <input
+            formControlName="lastName"
+            matInput
+            type="text"
+            placeholder="last name"
+            required
+          />
+          <mat-error *ngIf="theSignupForm.get('lastName').invalid"
+            >Please enter a valid name</mat-error
+          >
+        </mat-form-field>
+
+        <div>
+          <button
+            mat-stroked-button
+            type="button"
+            (click)="imagePicker.click()"
+          >
+            Upload Image
+          </button>
+
+          <span
+            class="image-preview"
+            *ngIf="
+              imagePreview !== '' &&
+              imagePreview &&
+              theSignupForm.get('photoPath').valid
+            "
+          >
+            {{ fileTitle }}
+          </span>
+          <input type="file" #imagePicker (change)="onImagePicked($event)" />
+        </div>
+        <div formGroupName="passwordsForm">
+          <mat-form-field>
+            <input
+              formControlName="password"
+              matInput
+              type="password"
+              placeholder="Password"
+              required
+            />
+            <mat-error
+              *ngIf="theSignupForm.get('passwordsForm.password').invalid"
+              >Password must contain minimum eight characters, at least one
+              letter and one number</mat-error
+            >
+          </mat-form-field>
+          <mat-form-field>
+            <input
+              formControlName="passwordConfirm"
+              matInput
+              type="password"
+              placeholder="Password Confirm"
+              required
+            />
+            <mat-error
+              *ngIf="
+                theSignupForm.get('passwordsForm.passwordConfirm').errors
+                  ?.mismatch
+              "
+              >Passwords do not match</mat-error
+            >
+          </mat-form-field>
+        </div>
+
+        <div id="signupBtn">
+          <button mat-raised-button color="accent" type="submit">Signup</button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

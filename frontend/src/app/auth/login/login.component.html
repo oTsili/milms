@@ -1,0 +1,48 @@
+<div class="signin-content">
+  <mat-card>
+    <mat-card-content>
+      <mat-spinner *ngIf="isLoading"></mat-spinner>
+      <div *ngIf="!userIsAuthenticated">
+        <form
+          (submit)="onLogin(loginForm)"
+          #loginForm="ngForm"
+          *ngIf="!isLoading"
+        >
+          <mat-form-field>
+            <input
+              matInput
+              name="email"
+              ngModel
+              type="email"
+              placeholder="E-mail"
+              #emailInput="ngModel"
+              required
+              email
+            />
+            <mat-error *ngIf="emailInput.invalid"
+              >Please enter a valid email address</mat-error
+            >
+          </mat-form-field>
+          <mat-form-field>
+            <input
+              matInput
+              name="password"
+              ngModel
+              type="password"
+              placeholder="Password"
+              #passwordInput="ngModel"
+              required
+            />
+            <mat-error *ngIf="passwordInput.invalid"
+              >Please enter a valid password</mat-error
+            >
+          </mat-form-field>
+          <button mat-raised-button color="accent" type="submit">Login</button>
+        </form>
+      </div>
+      <div *ngIf="userIsAuthenticated">
+        <h1>You are already logged in as ###. Do you want to logout?</h1>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
