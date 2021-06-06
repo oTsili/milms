@@ -33,7 +33,8 @@ if (process.env.NODE_ENV === 'test') {
 app.use(
   cookieSession({
     signed: false,
-    secure: true,
+    // secure: true, // true to send only via https
+    secure: false,
     // secure: process.env.NODE_ENV !== 'test',
     // maxAge: parseInt(process.env.EXPIRATION_IN!),
   })

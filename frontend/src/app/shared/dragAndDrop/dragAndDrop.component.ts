@@ -36,8 +36,8 @@ export class DragAndDropComponent implements OnInit {
   assignmentId: string;
   studentId: string;
   currentAssignmentControl: FormControl;
-  studentDeliveriesControl: FormControl;
-  materialFormArray: FormArray;
+  studentDeliveriesForm: FormGroup;
+  currentStudentDeliveryControl: FormArray;
   assignmentsForm: FormGroup;
   emptyMaterial = {
     name: null,
@@ -84,6 +84,14 @@ export class DragAndDropComponent implements OnInit {
       }
     });
 
+    this.studentDeliveriesForm = this.formBuilder.group({
+      studentDeliveriesFormArray: this.formBuilder.array([]),
+    });
+
+    this.currentStudentDeliveryControl = this.studentDeliveriesForm.get(
+      'studentDeliveriesFormArray'
+    ) as FormArray;
+
     console.log(this.currentAssignmentControl);
     console.log(this.assingnmentIndex);
     console.log(this.assignmentsForm);
@@ -109,7 +117,6 @@ export class DragAndDropComponent implements OnInit {
         } else if (this.component === 'student-deliveries') {
           this.prepareStudentDeliveriesFileList($event);
           // deliveries update the deliveries control
-          console.log(this.studentDeliveriesControl);
         }
       });
   }
@@ -203,15 +210,13 @@ export class DragAndDropComponent implements OnInit {
       materials: this.currentAssignmentControl.value.materials,
     };
 
-    console.log(currentAssignment);
-    console.log(this.currentAssignmentControl);
-
     // throw error if user has clicked submit without selecting any files
-    if (this.studentDeliveriesControl.value.length < 1) {
+    if (this.currentStudentDeliveryControl.length < 1) {
       this.sharedService.throwError('Please add some files first!');
 
       return;
     }
+
     // 1) check if the assignment is saved in the db
     this.assignmentService
       .getAssignments(
@@ -220,68 +225,28 @@ export class DragAndDropComponent implements OnInit {
         currentAssignment.courseId as string
       )
       .subscribe((response) => {
-        console.log(response);
         // 1a) if no, throw an error message
         if (this.assingnmentIndex > response.maxAssignments - 1) {
           this.sharedService.throwError('Please save the assignment first!');
 
           return;
         }
-        //2) If yes, get it's delivery files
+
         this.studentDeliveriesService
-          .getMyStudentDeliveryFiles(
-            currentAssignment.courseId as string,
-            currentAssignment.id
+          .addStudentDeliveryFiles(
+            currentAssignment,
+            this.currentStudentDeliveryControl
           )
-          .subscribe((response) => {
-            console.log(response);
-
-            let studentDeliveryFiles: StudentDeliveryFile[] = [];
-            // 3) if there are allready delivery files in the db push the new to the existing
-            if (response.totalDeliveries > 0) {
-              console.log(response.studentDeliveryFiles);
-              studentDeliveryFiles = response.studentDeliveryFiles;
-
-              for (let i = 0; i < studentDeliveryFiles.length; i++) {
-                studentDeliveryFiles.push(
-                  this.studentDeliveriesControl.value[i]
-                );
-              }
-            } else {
-              // if there are not any previous delivery files, assign the new one
-              studentDeliveryFiles = this.studentDeliveriesControl.value;
-            }
-            console.log(studentDeliveryFiles);
-
-            this.isLoading = true;
-            this.studentDeliveriesService
-              .addStudentDeliveryFiles(
-                currentAssignment,
-                studentDeliveryFiles,
-                response.totalDeliveries
-              )
-              .subscribe((responseData) => {
-                console.log(responseData);
-
-                // change the form values with the new values for web view
-                this.studentDeliveriesControl.patchValue({
-                  studentDeliveries: responseData.studentDeliveryFiles,
-                });
-
-                // update and validate the image field value
-                this.studentDeliveriesControl.updateValueAndValidity();
-
-                this.studentDeliveriesService.onStudentDeliveriesUpdate(
-                  responseData.studentDeliveryFiles
-                );
-                this.deleteAllFiles();
-              });
-
-            this.isLoading = false;
+          .subscribe((responseData) => {
+            this.studentDeliveriesService.onStudentDeliveriesUpdate(
+              responseData.studentDeliveryFiles
+            );
+            this.deleteAllFiles();
           });
+
+        this.isLoading = false;
       });
   }
-
   /**
    * handle file from browsing
    */
@@ -309,8 +274,13 @@ export class DragAndDropComponent implements OnInit {
    * Delete file from files list
    * @param index (File index)
    */
-  deleteFile(index: number) {
+  deleteMaterialFile(index: number) {
     this.files.splice(index, 1);
+  }
+
+  deleteStudentDeliveryFile(index: number) {
+    this.files.splice(index, 1);
+    this.currentStudentDeliveryControl.removeAt(index);
   }
 
   deleteAllFiles() {
@@ -397,7 +367,7 @@ export class DragAndDropComponent implements OnInit {
    * @param files (Files List)
    */
   prepareStudentDeliveriesFileList(files: Array<any>) {
-    if (files.length > 3) {
+    if (files.length > 3 || this.currentStudentDeliveryControl.length >= 3) {
       this.sharedService.throwError(
         'Max number of files 3! Please consider deleting some.'
       );
@@ -409,49 +379,22 @@ export class DragAndDropComponent implements OnInit {
       this.files.push(item);
     }
 
-    let currentDeliveries: StudentDeliveryFile[] = [];
+    console.log(this.currentStudentDeliveryControl);
 
-    console.log(this.studentDeliveriesControl);
-
-    // if there pre-exist deliveries add the new
-    if (this.studentDeliveriesControl) {
-      currentDeliveries = this.studentDeliveriesControl.value.studentDeliveries;
-
-      for (let i = 0; i < files.length; i++) {
-        currentDeliveries.push({
-          name: files[i].name,
-          filePath: files[i],
-          fileType: files[i].type,
-          lastUpdate: this.sharedService.toHumanDateTime(new Date().toString()),
-        });
-      }
-
-      // change the value of a single form control with the name filePath
-      this.studentDeliveriesControl.patchValue({
-        studentDeliveries: currentDeliveries,
-      });
+    for (let i = 0; i < files.length; i++) {
+      let currentStudentDeliveryFile = {
+        name: files[i].name,
+        filePath: files[i],
+        fileType: files[i].type,
+        lastUpdate: this.sharedService.toHumanDateTime(new Date().toString()),
+      };
+      this.currentStudentDeliveryControl.push(
+        this.createStudentDelivery(currentStudentDeliveryFile)
+      );
 
       // update and validate the image field value
-      this.studentDeliveriesControl.updateValueAndValidity();
-    } else {
-      //or assign the new files
-      currentDeliveries = [];
-
-      for (let i = 0; i < files.length; i++) {
-        currentDeliveries.push({
-          name: files[i].name,
-          filePath: files[i],
-          fileType: files[i].type,
-          lastUpdate: this.sharedService.toHumanDateTime(new Date().toString()),
-        });
-      }
-
-      this.studentDeliveriesControl = new FormControl(currentDeliveries);
+      this.currentStudentDeliveryControl.updateValueAndValidity();
     }
-
-    console.log(currentDeliveries);
-
-    console.log(this.studentDeliveriesControl);
 
     this.uploadFilesSimulator(0);
   }
@@ -470,5 +413,17 @@ export class DragAndDropComponent implements OnInit {
     const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+  }
+
+  // initialize a form control
+  createStudentDelivery(studentDelivery: StudentDeliveryFile): FormGroup {
+    return this.formBuilder.group({
+      name: studentDelivery.name,
+      lastUpdate: studentDelivery.lastUpdate,
+      filePath: studentDelivery.filePath,
+      fileType: studentDelivery.fileType,
+      id: studentDelivery.id,
+      assignmentId: studentDelivery.assignmentId,
+    });
   }
 }

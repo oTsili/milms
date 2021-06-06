@@ -64,6 +64,10 @@ export class MyStudentDeliveryListComponent implements OnInit, OnDestroy {
     this.courseId = this.currentAssignmentControl.value.courseId;
     this.assignmentId = this.currentAssignmentControl.value.id;
 
+    this.currentAssignmentControl = (
+      this.assignmentsForm.get('assignmentsFormArray') as FormArray
+    ).get(`${this.assingnmentIndex}`) as FormControl;
+
     // if assignment hasn't saved on the db and thus does not have id throw an error
     if (!this.assignmentId) {
       console.log('Please save the assignment first!');
@@ -76,7 +80,6 @@ export class MyStudentDeliveryListComponent implements OnInit, OnDestroy {
     this.studentDeliveriesService
       .getMyStudentDeliveryFiles(this.courseId, this.assignmentId)
       .subscribe((response) => {
-        console.log(response);
         if (response) {
           this.studentDeliveryFiles = response.studentDeliveryFiles;
         }
@@ -94,36 +97,15 @@ export class MyStudentDeliveryListComponent implements OnInit, OnDestroy {
     studentDeliveryFile: StudentDeliveryFile,
     studentDeliveryFileIndex: number
   ) {
-    console.log('studentDeliveryFile: ', studentDeliveryFile);
-
-    this.currentAssignmentControl = (
-      this.assignmentsForm.get('assignmentsFormArray') as FormArray
-    ).get(`${this.assingnmentIndex}`) as FormControl;
-
-    console.log('this:', this.currentAssignmentControl);
-
     const courseId = this.currentAssignmentControl.value.courseId;
     const assignmentId = this.currentAssignmentControl.value.id;
-    const studentDeliveryAssignmentId =
-      this.currentAssignmentControl.get('studentDeliveries').value[
-        studentDeliveryFileIndex
-      ];
-    console.log(studentDeliveryAssignmentId);
 
     this.isLoading = true;
     this.studentDeliveriesService
-      .deleteStudentDeliveryFile(
-        courseId,
-        assignmentId,
-        studentDeliveryAssignmentId,
-        studentDeliveryFile
-      )
+      .deleteStudentDeliveryFile(courseId, assignmentId, studentDeliveryFile)
       .subscribe(
         (response) => {
-          console.log('response: ', response);
-          console.log(this.studentDeliveryFiles);
           this.studentDeliveryFiles.splice(studentDeliveryFileIndex, 1);
-          console.log(this.studentDeliveryFiles);
 
           this.isLoading = false;
         },
@@ -139,11 +121,12 @@ export class MyStudentDeliveryListComponent implements OnInit, OnDestroy {
     studentDeliveryAssignment: StudentDeliveryAssignment
   ) {
     this.isLoading = true;
+
+    const courseId = this.currentAssignmentControl.value.courseId;
+    const assignmentId = this.currentAssignmentControl.value.id;
+
     this.studentDeliveriesService
-      .downloadStudentDeliveryFile(
-        studentDeliveryFile,
-        studentDeliveryAssignment
-      )
+      .downloadStudentDeliveryFile(courseId, assignmentId, studentDeliveryFile)
       .subscribe((response: Blob) => {
         saveAs(response, studentDeliveryFile.name);
         this.isLoading = false;

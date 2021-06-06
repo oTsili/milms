@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose, { MongooseDocument } from 'mongoose';
 import validator from 'validator';
 import { User } from './models';
 import { GeneratePassword } from '../services/generate-password';
@@ -96,7 +96,7 @@ export const userSchema = new mongoose.Schema(
   }
 );
 
-userSchema.pre('save', async function (done) {
+userSchema.pre('save', async function(this: MongooseDocument, done) {
   if (this.isModified('password')) {
     const hashed = await GeneratePassword.toHash(this.get('password'));
     this.set('password', hashed);

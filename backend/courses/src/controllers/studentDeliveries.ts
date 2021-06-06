@@ -32,8 +32,6 @@ export const createStudentDelivery = catchAsync(
     // 2) fetch the assignment
     const currentAssignment = await Assignment.findById(assignmentId);
 
-    console.log('currentAssignment:', currentAssignment);
-
     // TODO: use fs.mkdir to create a directory of "courseName/assignmentName" instead of "courseName-assignmentName"
 
     // 3) fetch the studentDeliveryAssignment id for this assignmentId and studentId
@@ -45,11 +43,6 @@ export const createStudentDelivery = catchAsync(
 
     const currentStudentDeliveryAssignment =
       await studentDeliveryAssignmentQuery;
-
-    console.log(
-      'currentStudentDeliveryAssignment: ',
-      currentStudentDeliveryAssignment
-    );
 
     let updatedStudentDeliveryAssignment: StudentDeliveryAssignmentDoc;
     let studentDeliveryAssignmentId: string;
@@ -71,17 +64,9 @@ export const createStudentDelivery = catchAsync(
       updatedStudentDeliveryAssignment =
         await createdStudentDeliveryAssignment.save();
 
-      console.log(
-        'updatedStudentDeliveryAssignment: ',
-        updatedStudentDeliveryAssignment
-      );
-
       studentDeliveryAssignmentId = updatedStudentDeliveryAssignment!._id;
     }
 
-    console.log('studentDeliveryAssignmentId:', studentDeliveryAssignmentId);
-
-    console.log('req.files', req.files);
     // 4) create an array to keep account of the saved studentDeliveryFiles
     let studentDeliveryFiles: StudentDeliveryFileDoc[] = [];
 
@@ -107,12 +92,13 @@ export const createStudentDelivery = catchAsync(
       const updatedStudentDeliveryFile =
         await createdStudentDeliveryFile.save();
 
-      console.log('updatedStudentDeliveryFile: ', updatedStudentDeliveryFile);
-
       studentDeliveryFiles.push(updatedStudentDeliveryFile);
     }
 
-    console.log('studentDeliveryFiles: ', studentDeliveryFiles);
+    const fetchedStudentDeliveryFiles = await StudentDeliveryFile.find({
+      assignmentId,
+      studentId,
+    });
 
     // 6)  publish the event
     // // make the query again for getting the populated fields
@@ -133,6 +119,7 @@ export const createStudentDelivery = catchAsync(
     res.status(201).json({
       message: 'studentDeliveriesFiles added successfuly',
       studentDeliveryFiles,
+      fetchedStudentDeliveryFiles,
     });
   }
 );
@@ -218,29 +205,30 @@ export const getMyStudentDelivery = catchAsync(
 
     console.log(courseId, assignmentId, studentId);
 
-    const studentDeliveryFileQuery = StudentDeliveryFile.findOne({
+    const studentDeliveryFileQuery = StudentDeliveryFile.find({
       assignmentId,
-      courseId,
       studentId,
     });
 
-    const fetchedStudentDeliveryFiles = await studentDeliveryFileQuery
+    const fetchedMyStudentDeliveryFiles = await studentDeliveryFileQuery
       .populate('studentId')
       .populate('assignmentId')
       .populate('studentDeliveryAssignmentId');
     // .populate('studentId');
 
-    console.log('My fetched studentDeliveryFiles', fetchedStudentDeliveryFiles);
+    console.log(
+      'My fetched studentDeliveryFiles',
+      fetchedMyStudentDeliveryFiles
+    );
 
     const count = await StudentDeliveryFile.countDocuments({
       assignmentId,
-      courseId,
       studentId,
     });
 
     res.status(200).json({
       message: 'My student delivery fetched successfully!',
-      fetchedStudentDeliveryFiles,
+      fetchedMyStudentDeliveryFiles,
       maxDeliveryFiles: count,
     });
   }
@@ -249,23 +237,17 @@ export const getMyStudentDelivery = catchAsync(
 export const deleteStudentDelivery = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.currentUser!.id;
-    const studentDeliveryAssignmentId = req.params.studentDeliveryAssignmentId;
     const fileId = req.params.fileId;
-    const assignmentId = req.params.assignmentId;
-
-    const currentUser = await User.findById(userId);
 
     // 1) get the student id from the db
-    const studentDeliveryFile = await StudentDeliveryFile.findOne({
-      studentDeliveryAssignmentId,
-      assignmentId,
-      _id: fileId,
-    });
+    const studentDeliveryFile = await StudentDeliveryFile.findById(fileId);
+
     const studentId = studentDeliveryFile!.studentId as string;
 
     let result;
 
     // 2) approve deletion only for the admin or the student who uploaded it
+    const currentUser = await User.findById(userId);
     if (
       currentUser!.role === 'admin' ||
       (currentUser!.role === 'student' &&
@@ -285,12 +267,12 @@ export const deleteStudentDelivery = catchAsync(
   }
 );
 
-export const downloadAssignment = (req: Request, res: Response) => {
+export const downloadStudentDeliveryFile = (req: Request, res: Response) => {
   // const file = path.resolve(req.body.filePath);
   const file = path.join(
     __dirname,
     '..',
-    `/public/assignments/${req.body.filePath}`
+    `/public/student-deliveries/${req.body.filePath}`
   );
 
   res.download(file);

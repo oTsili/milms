@@ -32,7 +32,9 @@ if (process.env.NODE_ENV === 'test') {
 app.use(
   cookieSession({
     signed: false,
-    secure: process.env.NODE_ENV !== 'test',
+    // secure: process.env.NODE_ENV !== 'test',
+    // secure: true, // true to send only via https
+    secure: false,
   })
 );
 

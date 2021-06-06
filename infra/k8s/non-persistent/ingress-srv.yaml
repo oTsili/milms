@@ -12,7 +12,7 @@ spec:
   #       - milms.dev
   #     secretName: tls-jitsi
   rules:
-    - host: milms.dev
+    - host: snf-20230.ok-kno.grnetcloud.net
       http:
         paths:
           - path: /api/users/?(.*)

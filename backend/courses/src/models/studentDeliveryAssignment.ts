@@ -32,6 +32,7 @@ export interface StudentDeliveryAssignmentModel
 // An interface that describes the properties
 // that a StudentDelivery Document has
 export interface StudentDeliveryAssignmentDoc extends mongoose.Document {
+  _id: string;
   id?: string;
   name: string;
   lastUpdate?: string;

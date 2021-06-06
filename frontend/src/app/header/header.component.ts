@@ -1,3 +1,4 @@
+import { environment } from './../../environments/environment';
 import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Observable, Subscription, SubscriptionLike } from 'rxjs';
 
@@ -43,6 +44,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.userDataSubs = this.headerService
       .getUserDataSubs()
       .subscribe((response) => {
+        console.log(environment.ASSIGNMENT_BASE_URL);
         console.log(response);
         this.userPhotoSrc = response.photo;
         this.usrName = response.name;
@@ -70,6 +72,4 @@ export class HeaderComponent implements OnInit, OnDestroy {
       this.sharedService.onUserRoleUpdate(role);
     });
   }
-
-
 }

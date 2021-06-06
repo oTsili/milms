@@ -8,6 +8,7 @@ import {
   StudentDeliveryFile,
 } from 'src/app/models/student-delivery.model';
 import { Subject } from 'rxjs';
+import { FormArray, FormControl } from '@angular/forms';
 
 const BACKEND_URL = environment.ASSIGNMENT_BASE_URL + '/api/courses';
 
@@ -76,7 +77,7 @@ export class StudentDeliveriesService {
     return this.http
       .get<{
         message: string;
-        fetchedStudentDeliveryFiles: any;
+        fetchedMyStudentDeliveryFiles: StudentDeliveryFile[];
         maxDeliveryFiles: number;
       }>(
         `${BACKEND_URL}/${courseId}/assignments/${assignmentId}/my-student-delivery`,
@@ -88,30 +89,23 @@ export class StudentDeliveriesService {
         map((myStudentDeliveryFilesData) => {
           console.log(myStudentDeliveryFilesData);
 
-          if (myStudentDeliveryFilesData.fetchedStudentDeliveryFiles) {
-            return {
-              studentDeliveryFiles:
-                myStudentDeliveryFilesData.fetchedStudentDeliveryFiles.map(
-                  (deliveryFile) => {
-                    return {
-                      id: deliveryFile.id,
-                      name: deliveryFile.name,
-                      lastUpdate: deliveryFile.lastUpdate,
-                      filePath: deliveryFile.filePath,
-                      fileType: deliveryFile.fileType,
-                      assignmentId: deliveryFile.assignmentId,
-                      studentDeliveryAssignmentId:
-                        deliveryFile.studentDeliveryAssignmentId,
-                      studentId: deliveryFile.studentId,
-                    };
-                  }
-                ),
-              totalDeliveries: myStudentDeliveryFilesData.maxDeliveryFiles,
-            };
-          }
-          // if there are no any deliveries yet in the assigment
           return {
-            studentDeliveryFiles: null,
+            studentDeliveryFiles:
+              myStudentDeliveryFilesData.fetchedMyStudentDeliveryFiles.map(
+                (deliveryFile) => {
+                  return {
+                    id: deliveryFile.id,
+                    name: deliveryFile.name,
+                    lastUpdate: deliveryFile.lastUpdate,
+                    filePath: deliveryFile.filePath,
+                    fileType: deliveryFile.fileType,
+                    assignmentId: deliveryFile.assignmentId,
+                    studentDeliveryAssignmentId:
+                      deliveryFile.studentDeliveryAssignmentId,
+                    studentId: deliveryFile.studentId,
+                  };
+                }
+              ),
             totalDeliveries: myStudentDeliveryFilesData.maxDeliveryFiles,
           };
         })
@@ -120,29 +114,28 @@ export class StudentDeliveriesService {
 
   addStudentDeliveryFiles(
     currentAssignment: Assignment,
-    studentDeliveries: any,
-    totalDbDeliveries: number
+    currentStudentDeliveryControl: FormArray
   ) {
     console.log('currentAssignment', currentAssignment);
-    console.log('studentDeliveries', studentDeliveries);
+    console.log('studentDeliveries', currentStudentDeliveryControl);
 
     const { id, courseId, lastUpdate } = currentAssignment;
 
-    let studentDeliveriesLength: number;
-    let studentDeliveryFiles;
+    // let studentDeliveriesLength: number;
+    // let studentDeliveryFiles;
 
-    // when there are no any saved student delivery files in the db
-    if (studentDeliveries.length) {
-      studentDeliveriesLength = studentDeliveries.length;
-      studentDeliveryFiles = studentDeliveries;
-    } else {
-      // when there are saved student delivery files in the db
-      studentDeliveriesLength = studentDeliveries.studentDeliveries.length;
-      studentDeliveryFiles = studentDeliveries.studentDeliveries;
-    }
+    // // when there are no any saved student delivery files in the db
+    // if (studentDeliveries.length) {
+    //   studentDeliveriesLength = studentDeliveries.length;
+    //   studentDeliveryFiles = studentDeliveries;
+    // } else {
+    //   // when there are saved student delivery files in the db
+    //   studentDeliveriesLength = studentDeliveries.studentDeliveries.length;
+    //   studentDeliveryFiles = studentDeliveries.studentDeliveries;
+    // }
 
-    console.log('studentDeliveriesLength', studentDeliveriesLength);
-    console.log('totalDbDeliveries', totalDbDeliveries);
+    // console.log('studentDeliveriesLength', studentDeliveriesLength);
+    // console.log('totalDbDeliveries', totalDbDeliveries);
 
     const studentDeliveryData = new FormData();
 
@@ -151,28 +144,35 @@ export class StudentDeliveriesService {
     studentDeliveryData.append('lastUpdate', lastUpdate);
 
     // overpass the previously saved files in the db begining from the index of their number
-    for (let i = totalDbDeliveries; i < studentDeliveriesLength; i++) {
-      let studentDeliveryFile = studentDeliveryFiles[i];
+    for (let i = 0; i < currentStudentDeliveryControl.length; i++) {
+      let studentDeliveryFile = currentStudentDeliveryControl.value[i];
 
-      console.log('iii: ', i);
+      console.log('studentDeliveryFile', studentDeliveryFile);
 
-      studentDeliveryData.append(
-        'lastUpdates[]',
-        (studentDeliveryFile as StudentDeliveryFile).lastUpdate
-      );
-      studentDeliveryData.append(
-        'names[]',
-        (studentDeliveryFile as StudentDeliveryFile).name
-      );
-      studentDeliveryData.append(
-        'fileTypes[]',
-        (studentDeliveryFile as StudentDeliveryFile).fileType
-      );
-      studentDeliveryData.append(
-        'filePaths[]',
-        (studentDeliveryFile as StudentDeliveryFile).filePath,
-        studentDeliveryFile.name.split('.')[0]
-      );
+      console.log(!studentDeliveryFile.studentId);
+
+      if (!studentDeliveryFile.studentId) {
+        console.log('iii: ', i);
+        console.log(studentDeliveryFile);
+
+        studentDeliveryData.append(
+          'lastUpdates[]',
+          (studentDeliveryFile as StudentDeliveryFile).lastUpdate
+        );
+        studentDeliveryData.append(
+          'names[]',
+          (studentDeliveryFile as StudentDeliveryFile).name
+        );
+        studentDeliveryData.append(
+          'fileTypes[]',
+          (studentDeliveryFile as StudentDeliveryFile).fileType
+        );
+        studentDeliveryData.append(
+          'filePaths[]',
+          (studentDeliveryFile as StudentDeliveryFile).filePath,
+          studentDeliveryFile.name.split('.')[0]
+        );
+      }
     }
 
     console.log('studentDeliveryData: ', studentDeliveryData);
@@ -196,6 +196,27 @@ export class StudentDeliveriesService {
           studentDeliveryData,
           options
         )
+        .pipe(
+          map((studentDeliveryFileData) => {
+            console.log(studentDeliveryFileData);
+
+            return {
+              studentDeliveryFiles:
+                studentDeliveryFileData.studentDeliveryFiles.map(
+                  (deliveryFile) => {
+                    return {
+                      id: deliveryFile.id,
+                      name: deliveryFile.name,
+                      lastUpdate: deliveryFile.lastUpdate,
+                      filePath: deliveryFile.filePath,
+                      fileType: deliveryFile.fileType,
+                      assignmentId: deliveryFile.assignmentId,
+                    };
+                  }
+                ),
+            };
+          })
+        )
     );
   }
 
@@ -217,20 +238,13 @@ export class StudentDeliveriesService {
   deleteStudentDeliveryFile(
     courseId: string,
     assignmentId: string,
-    studentDeliveryAssignmentId: string | StudentDeliveryAssignment,
     studentDeliveryFile: StudentDeliveryFile
   ) {
     console.log('studentDelivery: ', studentDeliveryFile);
-    console.log('studentDeliveryAssignmentId', studentDeliveryAssignmentId);
-
-    if (typeof studentDeliveryAssignmentId === 'object') {
-      studentDeliveryAssignmentId = studentDeliveryAssignmentId.id;
-    }
 
     return this.http.delete(
       `${BACKEND_URL}/${courseId}/assignments
-      /${assignmentId}/student-deliveries
-      /${studentDeliveryAssignmentId}/files
+      /${assignmentId}/student-delivery-files
       /${studentDeliveryFile.id}`.replace(/\s/g, ''),
       {
         withCredentials: true,
@@ -239,16 +253,18 @@ export class StudentDeliveriesService {
   }
 
   downloadStudentDeliveryFile(
-    studentDeliveryFile: StudentDeliveryFile,
-    studentDeliveryAssignment: StudentDeliveryAssignment
+    courseId: string,
+    assignmentId: string,
+    studentDeliveryFile: StudentDeliveryFile
   ) {
     const filePath = (studentDeliveryFile.filePath as string)
       .split('/')
       .slice(-1)
       .pop();
+
     return this.http.post(
-      `${BACKEND_URL}/${studentDeliveryAssignment.courseId}/assignments
-      /${studentDeliveryAssignment.assignmentId}/student-deliveries
+      `${BACKEND_URL}/${courseId}/assignments
+      /${assignmentId}/student-delivery-files
       /${studentDeliveryFile.id}/dump`.replace(/\s/g, ''),
       { filePath },
       { responseType: 'blob' as 'json', withCredentials: true }

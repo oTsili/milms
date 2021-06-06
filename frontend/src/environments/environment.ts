@@ -9,6 +9,9 @@ export const environment = {
   AUTH_BASE_URL: 'http://localhost:3000',
   ASSIGNMENT_BASE_URL: 'http://localhost:4000',
   COURSES_BASE_URL: 'http://localhost:4000',
+  // AUTH_BASE_URL: 'http://localhost:3000',
+  // ASSIGNMENT_BASE_URL: 'http://localhost:4000',
+  // COURSES_BASE_URL: 'http://localhost:4000',
 };
 /*
  * For easier debugging in development mode, you can import the following file

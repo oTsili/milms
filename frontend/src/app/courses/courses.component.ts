@@ -108,6 +108,7 @@ export class CoursesComponent implements OnInit, OnDestroy {
     this.sharedService.getUserRole().subscribe((response) => {
       this.userRole = response.userRole;
       this.sharedService.onUserRoleUpdate(this.userRole);
+      this.isLoading = false;
     });
 
     // fetch the courses
