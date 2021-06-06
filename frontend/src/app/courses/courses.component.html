@@ -99,6 +99,18 @@
       (page)="onChangePage($event)"
       *ngIf="courses.length > 0"
     ></mat-paginator>
+    <section
+      matSort
+      (matSortChange)="sortData($event)"
+      class="mat-elevation-z2 mat-header-row"
+    >
+      <span class="mat-header-cell" mat-sort-header="title">Title</span>
+      <span class="mat-header-cell" mat-sort-header="year">Year</span>
+      <span class="mat-header-cell" mat-sort-header="semester">Semester</span>
+      <span class="mat-header-cell" mat-sort-header="instructor"
+        >Instructor</span
+      >
+    </section>
     <mat-accordion>
       <mat-spinner *ngIf="isLoading"></mat-spinner>
       <form [formGroup]="coursesForm">
@@ -123,14 +135,14 @@
                 <mat-expansion-panel-header class="flex-space-between-row">
                   <!-- start -->
                   <span>
-                    <mat-panel-title class="mat-cell">
+                    <mat-panel-title
+                      class="mat-cell"
+                      *ngIf="editableCourses[formControlIndex]"
+                    >
                       <mat-form-field
                         class="course-components"
                         (click)="$event.stopPropagation()"
                         (keydown)="$event.stopPropagation()"
-                        [style.display]="
-                          editableCourses[formControlIndex] ? 'block' : 'none'
-                        "
                         class="courseTitle-field"
                       >
                         <input
@@ -153,16 +165,20 @@
                           Please enter a title for the course.
                         </mat-error>
                       </mat-form-field>
-
-                      <span
-                        class="course-components"
-                        [style.display]="
-                          editableCourses[formControlIndex] ? 'none' : 'block'
-                        "
-                      >
-                        <mat-label class="matLabel">Title</mat-label>
+                    </mat-panel-title>
+                  </span>
+                  <span
+                    class="course-components line-header"
+                    *ngIf="!editableCourses[formControlIndex]"
+                  >
+                    <mat-panel-title>
+                      <span class="course-components">
                         <div>
-                          {{ courseTitleInput.value }}
+                          {{
+                            coursesForm.controls.coursesFormArray.at(
+                              formControlIndex
+                            ).value.courseTitle
+                          }}
                         </div>
                       </span>
                     </mat-panel-title>
@@ -170,18 +186,13 @@
                   <!-- end -->
 
                   <!-- start -->
-                  <span class="course-components">
-                    <mat-panel-title class="mat-cell">
+                  <span *ngIf="editableCourses[formControlIndex]">
+                    <mat-panel-title>
                       <mat-form-field
                         id="course-year"
                         appearance="fill"
                         (click)="$event.stopPropagation()"
                         (keydown)="$event.stopPropagation()"
-                        [style.display]="
-                          editableCourses[formControlIndex]
-                            ? 'inline-block'
-                            : 'none'
-                        "
                       >
                         <mat-label>Course year</mat-label>
                         <mat-select
@@ -209,15 +220,20 @@
                           Please select the course year.
                         </mat-error>
                       </mat-form-field>
-                      <span
-                        class="course-components"
-                        [style.display]="
-                          editableCourses[formControlIndex] ? 'none' : 'block'
-                        "
-                      >
-                        <mat-label class="matLabel">Year</mat-label>
+                    </mat-panel-title>
+                  </span>
+                  <span
+                    class="course-components line-header"
+                    *ngIf="!editableCourses[formControlIndex]"
+                  >
+                    <mat-panel-title>
+                      <span class="course-components">
                         <div>
-                          {{ yearInput.value }}
+                          {{
+                            coursesForm.controls.coursesFormArray.at(
+                              formControlIndex
+                            ).value.year
+                          }}
                         </div>
                       </span>
                     </mat-panel-title>
@@ -226,25 +242,12 @@
 
                   <!-- start -->
 
-                  <span class="course-components">
-                    <mat-panel-title class="mat-cell">
-                      <mat-label
-                        class="matLabel"
-                        [style.display]="
-                          editableCourses[formControlIndex]
-                            ? 'inline-block'
-                            : 'none'
-                        "
-                        >Semester</mat-label
-                      >
+                  <span *ngIf="editableCourses[formControlIndex]">
+                    <mat-panel-title>
+                      <mat-label class="matLabel">Semester</mat-label>
                       <mat-radio-group
                         (click)="$event.stopPropagation()"
                         (keydown)="$event.stopPropagation()"
-                        [style.display]="
-                          editableCourses[formControlIndex]
-                            ? 'inline-block'
-                            : 'none'
-                        "
                         #semesterInput
                         aria-label="Select an option"
                         name="semester"
@@ -266,31 +269,32 @@
                       >
                         Please select the course semester.
                       </mat-error>
-
-                      <span
-                        class="course-components"
-                        [style.display]="
-                          editableCourses[formControlIndex] ? 'none' : 'block'
-                        "
-                      >
-                        <mat-label class="matLabel">Semester</mat-label>
-                        <div class="flex-center-row">
-                          {{
-                            coursesForm.controls.coursesFormArray.at(
-                              formControlIndex
-                            ).value.semester
-                          }}
-                        </div>
-                      </span>
+                    </mat-panel-title>
+                  </span>
+                  <span
+                    class="course-components line-header"
+                    *ngIf="!editableCourses[formControlIndex]"
+                  >
+                    <mat-panel-title>
+                      <div class="flex-center-row">
+                        {{
+                          coursesForm.controls.coursesFormArray.at(
+                            formControlIndex
+                          ).value.semester
+                        }}
+                      </div>
                     </mat-panel-title>
                   </span>
                   <!-- end -->
 
-                  <span class="course-components">
+                  <span
+                    [ngClass]="{
+                      'course-components': !editableCourses[formControlIndex],
+                      'line-header': !editableCourses[formControlIndex]
+                    }"
+                  >
                     <mat-panel-title class="mat-cell">
-                      <div class="course-components">
-                        <mat-label class="matLabel">Instructor</mat-label>
-
+                      <div>
                         {{
                           coursesForm.controls.coursesFormArray.controls[
                             formControlIndex
@@ -301,6 +305,58 @@
                   </span>
                 </mat-expansion-panel-header>
                 <div class="flex-column">
+                  <mat-action-row class="flex-start-row">
+                    <div class="course-row">
+                      <mat-form-field
+                        class="description-field"
+                        [style.display]="
+                          editableCourses[formControlIndex]
+                            ? 'inline-block'
+                            : 'none'
+                        "
+                      >
+                        <mat-label>Description</mat-label>
+                        <textarea
+                          matInput
+                          formControlName="description"
+                          rows="2"
+                          #descriptionInput
+                        ></textarea>
+                        <mat-error
+                          *ngIf="
+                            coursesForm.controls.coursesFormArray.at(
+                              formControlIndex
+                            ).controls.description.invalid &&
+                            coursesForm.controls.coursesFormArray.at(
+                              formControlIndex
+                            ).controls.description.touched
+                          "
+                        >
+                          Please enter description for the course.
+                        </mat-error>
+                      </mat-form-field>
+                      <mat-label
+                        class="matLabel course-components"
+                        [style.display]="
+                          editableCourses[formControlIndex]
+                            ? 'none'
+                            : 'inline-block'
+                        "
+                        >Description</mat-label
+                      >
+                      <div
+                        class="description-field"
+                        [style.display]="
+                          editableCourses[formControlIndex]
+                            ? 'none'
+                            : 'inline-block'
+                        "
+                      >
+                        {{ descriptionInput.value }}
+                      </div>
+                    </div>
+                  </mat-action-row>
+                  <mat-divider></mat-divider>
                   <mat-action-row class="display-contents">
                     <div class="course-row flex-space-between-row">
                       <span class="course-components">
@@ -346,51 +402,6 @@
                           Lecture
                         </a>
                       </span>
-                    </div>
-                  </mat-action-row>
-                  <mat-action-row class="flex-start-row">
-                    <div class="course-row">
-                      <mat-form-field
-                        class="description-field"
-                        [style.display]="
-                          editableCourses[formControlIndex] ? 'block' : 'none'
-                        "
-                      >
-                        <mat-label>Description</mat-label>
-                        <textarea
-                          matInput
-                          formControlName="description"
-                          rows="2"
-                          #descriptionInput
-                        ></textarea>
-                        <mat-error
-                          *ngIf="
-                            coursesForm.controls.coursesFormArray.at(
-                              formControlIndex
-                            ).controls.description.invalid &&
-                            coursesForm.controls.coursesFormArray.at(
-                              formControlIndex
-                            ).controls.description.touched
-                          "
-                        >
-                          Please enter description for the course.
-                        </mat-error>
-                      </mat-form-field>
-                      <mat-label
-                        class="matLabel course-components"
-                        [style.display]="
-                          editableCourses[formControlIndex] ? 'none' : 'block'
-                        "
-                        >Description</mat-label
-                      >
-                      <div
-                        class="description-field"
-                        [style.display]="
-                          editableCourses[formControlIndex] ? 'none' : 'block'
-                        "
-                      >
-                        {{ descriptionInput.value }}
-                      </div>
                     </div>
                   </mat-action-row>
                   <div class="course-description-attribution">

@@ -2,8 +2,9 @@ import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
-import { ErrorComponent } from '../../error/error.component';
 import { MatDialog } from '@angular/material/dialog';
+import { ErrorComponent } from '../matDialog/error/error.component';
+import { NotificationComponent } from '../matDialog/notification/notification.component';
 
 @Injectable({ providedIn: 'root' })
 export class SharedService {
@@ -66,5 +67,13 @@ export class SharedService {
       },
     ];
     this.dialog.open(ErrorComponent, { data: currentError });
+  }
+  throwNotification(error: string) {
+    let currentError = [
+      {
+        message: error,
+      },
+    ];
+    this.dialog.open(NotificationComponent, { data: currentError });
   }
 }

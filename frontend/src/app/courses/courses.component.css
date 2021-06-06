@@ -199,7 +199,30 @@ mat-radio-group {
 .course-components {
   display: flex;
   flex-direction: column;
-  padding-left: 3% !important;
+
+  /* padding-left: 3% !important; */
+}
+
+/* .course-components:last-child {
+  margin: 0 0 0 7%;
+} */
+
+/* .course-components:not(:last-child) { */
+.line-header:not(:nth-child(2)) {
+  margin: auto auto auto 8%;
+}
+
+.line-header:first-child {
+  margin-left: 4%;
+}
+
+.line-mat-header {
+  margin: auto 6.6% !important;
+}
+
+.mat-header-row {
+  margin-bottom: 2%;
+  background: lavender;
 }
 
 .flex-column {
@@ -237,12 +260,12 @@ mat-radio-group {
 ::ng-deep .mat-expansion-panel-header {
   height: auto !important;
   display: contents;
+  min-height: 48px !important;
 }
 
 .course-row {
-  margin-top: 3%;
+  margin: 3% 3% 2% auto;
   width: 100%;
-  margin-right: 3%;
 }
 
 .mat-header-flex {
@@ -266,3 +289,7 @@ mat-radio-group {
 ::ng-deep .mat-paginator-container {
   justify-content: space-between !important;
 }
+/* 
+mat-divider {
+  margin-top: 2%;
+} */

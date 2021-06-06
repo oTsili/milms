@@ -105,10 +105,6 @@ export const deleteCourse = catchAsync(
 
     let result;
 
-    console.log(user);
-
-    console.log(`${user.id}` === `${userId}`);
-
     if (
       user.role === 'admin' ||
       (user.role === 'instructor' && `${user.id}` === `${userId}`)

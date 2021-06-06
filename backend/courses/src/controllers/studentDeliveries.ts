@@ -203,7 +203,6 @@ export const getMyStudentDelivery = catchAsync(
     const assignmentId = req.params.assignmentId;
     const studentId = req.currentUser!.id;
 
-    console.log(courseId, assignmentId, studentId);
 
     const studentDeliveryFileQuery = StudentDeliveryFile.find({
       assignmentId,
@@ -216,10 +215,7 @@ export const getMyStudentDelivery = catchAsync(
       .populate('studentDeliveryAssignmentId');
     // .populate('studentId');
 
-    console.log(
-      'My fetched studentDeliveryFiles',
-      fetchedMyStudentDeliveryFiles
-    );
+   
 
     const count = await StudentDeliveryFile.countDocuments({
       assignmentId,

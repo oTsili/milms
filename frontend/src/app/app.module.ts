@@ -22,7 +22,8 @@ import { AngularMaterialModule } from './angular-material.module';
 import { HomeComponent } from './home/home.component';
 import { LoginComponent } from './auth/login/login.component';
 import { SignupComponent } from './auth/signup/signup.component';
-import { ErrorComponent } from './error/error.component';
+import { ErrorComponent } from './shared/matDialog/error/error.component';
+import { NotificationComponent } from './shared/matDialog/notification/notification.component';
 import { AssignmentsModule } from './courses/assignments/assignments.module';
 import { FooterComponent } from './footer/footer.component';
 import { PdfViewerComponent } from './courses/assignments/assignment-list/pdf-viewer/pdf-viewer.component';
@@ -42,6 +43,7 @@ import { CoursesComponent } from './courses/courses.component';
     LoginComponent,
     SignupComponent,
     ErrorComponent,
+    NotificationComponent,
     PdfViewerComponent,
     DocViewerComponent,
     FooterComponent,
