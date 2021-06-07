@@ -31,7 +31,7 @@ export class MaterialsService {
   }
 
   onMaterialsUpdate(materials) {
-    this.materialsListener.next((this.materials = materials));
+    this.materialsListener.next(materials);
   }
 
   getMaterials(courseId: string, assignmentId: string) {
@@ -68,41 +68,48 @@ export class MaterialsService {
       );
   }
 
-  addMaterials(currentAssignment: Assignment) {
+  addMaterials(currentAssignment: Assignment, materialsControl: FormArray) {
     console.log('currentAssignment', currentAssignment);
+    console.log('materialsControl', materialsControl);
 
-    const { materials, id, courseId } = currentAssignment;
+    const { id, courseId, lastUpdate } = currentAssignment;
 
-    console.log(materials);
+    const materialsData = new FormData();
 
-    const materialData = new FormData();
+    materialsData.append('courseId', courseId as string);
+    materialsData.append('assignmentId', id);
+    materialsData.append('lastUpdate', lastUpdate);
 
-    // in the quotation marks "file", we refer to the name we assigned in multer single function
-    // the 3rd argument is the filename we pass to the backend
-    for (let i = 0; i < materials.length; i++) {
-      const material = materials[i];
+    // overpass the previously saved files in the db begining from the index of their number
+    for (let i = 0; i < materialsControl.length; i++) {
+      let materialFile = materialsControl.value[i];
 
-      // overpass the already previously saved materials
-      if (typeof material !== 'object') {
-        continue;
+      console.log('materialFile', materialFile);
+
+      console.log(!materialFile.creatorId);
+
+      if (!materialFile.creatorId) {
+        console.log('iii: ', i);
+        console.log(materialFile);
+
+        materialsData.append(
+          'lastUpdates[]',
+          (materialFile as Material).lastUpdate
+        );
+        materialsData.append('names[]', (materialFile as Material).name);
+        materialsData.append(
+          'fileTypes[]',
+          (materialFile as Material).fileType
+        );
+        materialsData.append(
+          'filePaths[]',
+          (materialFile as Material).filePath,
+          materialFile.name.split('.')[0]
+        );
       }
-
-      materialData.append('name[]', (material as Material).name);
-      materialData.append('lastUpdate[]', (material as Material).lastUpdate);
-      materialData.append('fileType[]', (material as Material).fileType);
-      materialData.append(
-        'assignmentId[]',
-        (material as Material).assignmentId
-      );
-      materialData.append('courseId[]', (material as Material).courseId);
-      materialData.append(
-        'filePath[]',
-        (material as Material).filePath,
-        material.name.split('.')[0]
-      );
     }
 
-    console.log(materialData);
+    console.log('materialsData: ', materialsData);
 
     // const params = new HttpParams();
 
@@ -115,10 +122,33 @@ export class MaterialsService {
     return (
       this.http
         // generic type definition, to define what is going to be returned from the http request
-        .post<{ message: string; updatedMaterials: Material[] }>(
+        .post<{
+          message: string;
+          fetchedMaterialFiles: Material[];
+        }>(
           `${BACKEND_URL}/${courseId}/assignments/${id}/materials`,
-          materialData,
+          materialsData,
           options
+        )
+        .pipe(
+          map((materialsFileData) => {
+            console.log(materialsFileData);
+
+            return {
+              materialFiles: materialsFileData.fetchedMaterialFiles.map(
+                (materialFile) => {
+                  return {
+                    id: materialFile.id,
+                    name: materialFile.name,
+                    lastUpdate: materialFile.lastUpdate,
+                    filePath: materialFile.filePath,
+                    fileType: materialFile.fileType,
+                    assignmentId: materialFile.assignmentId,
+                  };
+                }
+              ),
+            };
+          })
         )
     );
   }

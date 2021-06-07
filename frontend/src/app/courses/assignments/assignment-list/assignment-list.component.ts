@@ -190,7 +190,6 @@ export class AssignmentListComponent implements OnInit, OnDestroy {
       lastUpdate: [item.lastUpdate, Validators.required],
       userName: [item.userName, Validators.required],
       courseId: [this.courseId, Validators.required],
-      materials: [item.materials],
     });
   }
 
@@ -273,7 +272,6 @@ export class AssignmentListComponent implements OnInit, OnDestroy {
       fileType: assignment.value.fileType,
       lastUpdate: assignment.value.lastUpdate,
       userName: assignment.value.userName,
-      materials: assignment.value.materials,
     };
 
     console.log(currentAssignment);
@@ -407,7 +405,6 @@ export class AssignmentListComponent implements OnInit, OnDestroy {
       fileType: assignment.value.fileType,
       lastUpdate: assignment.value.lastUpdate,
       userName: assignment.value.userName,
-      materials: assignment.value.materials,
     };
 
     this.assignmentControls = this.assignmentsForm.get(

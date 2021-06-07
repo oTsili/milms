@@ -232,12 +232,12 @@ a {
   margin: 3% 7% 0 0;
 }
 
-.distance {
-  margin-top: 2%;
-}
-
 .course-description-attribution {
   padding: 1% 0 0 35%;
+}
+
+.course-description-attribution a {
+  margin-left: 6%;
 }
 
 mat-tab mat-label {

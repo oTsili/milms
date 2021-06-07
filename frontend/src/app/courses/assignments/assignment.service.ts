@@ -145,8 +145,7 @@ export class AssignmentsService {
   addAssignment(currentAssignment: Assignment) {
     console.log('currentAssignment', currentAssignment);
 
-    const { title, description, lastUpdate, filePath, materials } =
-      currentAssignment;
+    const { title, description, lastUpdate, filePath } = currentAssignment;
 
     const assignmentData: FormData = new FormData();
 
@@ -157,13 +156,6 @@ export class AssignmentsService {
     assignmentData.append('filePath', filePath as File, title);
     assignmentData.append('fileType', (filePath as File).type);
     assignmentData.append('lastUpdate', lastUpdate);
-    // assignmentData.append('materials', materials as FileList);
-    if (materials) {
-      for (let i = 0; i < (materials as FileList).length; i++) {
-        const material = (materials as FileList)[i];
-        assignmentData.append('materials[]', material, material.name);
-      }
-    }
 
     // const params = new HttpParams();
 
@@ -185,16 +177,8 @@ export class AssignmentsService {
   }
 
   updateAssignment(currentAssignment: Assignment) {
-    const {
-      id,
-      title,
-      description,
-      filePath,
-      fileType,
-      lastUpdate,
-      courseId,
-      materials,
-    } = currentAssignment;
+    const { id, title, description, filePath, fileType, lastUpdate, courseId } =
+      currentAssignment;
 
     let assignmentData: Assignment | FormData;
     // only the file has type object- if updating only the text inputs, the type will be string
@@ -208,12 +192,6 @@ export class AssignmentsService {
       }
       assignmentData.append('filePath', filePath, title);
       assignmentData.append('lastUpdate', lastUpdate);
-      if (materials) {
-        for (let i = 0; i < (materials as FileList).length; i++) {
-          const material = (materials as FileList)[i];
-          assignmentData.append('materials[]', material, material.name);
-        }
-      }
     } else {
       assignmentData = {
         id,
@@ -223,7 +201,6 @@ export class AssignmentsService {
         fileType,
         lastUpdate,
         courseId,
-        materials,
       };
     }
 

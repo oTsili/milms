@@ -38,6 +38,8 @@ export class DragAndDropComponent implements OnInit {
   currentAssignmentControl: FormControl;
   studentDeliveriesForm: FormGroup;
   currentStudentDeliveryControl: FormArray;
+  materialsForm: FormGroup;
+  materialsControl: FormArray;
   assignmentsForm: FormGroup;
   emptyMaterial = {
     name: null,
@@ -92,6 +94,14 @@ export class DragAndDropComponent implements OnInit {
       'studentDeliveriesFormArray'
     ) as FormArray;
 
+    this.materialsForm = this.formBuilder.group({
+      materialsFormArray: this.formBuilder.array([]),
+    });
+
+    this.materialsControl = this.materialsForm.get(
+      'materialsFormArray'
+    ) as FormArray;
+
     console.log(this.currentAssignmentControl);
     console.log(this.assingnmentIndex);
     console.log(this.assignmentsForm);
@@ -130,93 +140,15 @@ export class DragAndDropComponent implements OnInit {
       filePath: this.currentAssignmentControl.value.filePath,
       fileType: this.currentAssignmentControl.value.fileType,
       lastUpdate: this.currentAssignmentControl.value.lastUpdate,
-      materials: this.currentAssignmentControl.value.materials,
-    };
-
-    console.log(currentAssignment);
-    console.log(this.currentAssignmentControl);
-
-    if (!this.currentAssignmentControl.value.materials) {
-      this.sharedService.throwError('No materials to upload');
-
-      return;
-    }
-
-    this.assignmentService
-      .getAssignments(
-        this.assignmentsPerPage,
-        this.currentPage,
-        currentAssignment.courseId as string
-      )
-      .subscribe((response) => {
-        if (this.assingnmentIndex > response.maxAssignments - 1) {
-          this.sharedService.throwError('Please save the assignment first!');
-
-          return;
-        }
-
-        // if the assignment is saved and has gained an id from mongodb
-        this.materialsService
-          .getMaterials(
-            currentAssignment.courseId as string,
-            currentAssignment.id
-          )
-          .subscribe((fetchedMaterials) => {
-            if (fetchedMaterials) {
-              this.materials = fetchedMaterials.materials;
-              this.totalMaterials = fetchedMaterials.maxMaterials;
-
-              console.log(this.assingnmentIndex, this.totalMaterials);
-            }
-
-            this.isLoading = true;
-            this.materialsService
-              .addMaterials(currentAssignment)
-              .subscribe((responseData) => {
-                console.log(responseData);
-
-                const currentControl = (
-                  this.assignmentsForm.get('assignmentsFormArray') as FormArray
-                ).get(`${this.assingnmentIndex}`) as FormControl;
-
-                // change the form values with the new values for web view
-                currentControl.patchValue({
-                  materials: responseData.updatedMaterials,
-                });
-
-                // update and validate the image field value
-                currentControl.updateValueAndValidity();
-                this.deleteAllFiles();
-
-                this.materialsService.onMaterialsUpdate(
-                  responseData.updatedMaterials
-                );
-              });
-
-            this.isLoading = false;
-          });
-      });
-  }
-
-  onSubmitMyDelivery(event: Event) {
-    const currentAssignment: Assignment = {
-      courseId: this.currentAssignmentControl.value.courseId,
-      id: this.currentAssignmentControl.value.id,
-      title: this.currentAssignmentControl.value.title,
-      description: this.currentAssignmentControl.value.description,
-      filePath: this.currentAssignmentControl.value.filePath,
-      fileType: this.currentAssignmentControl.value.fileType,
-      lastUpdate: this.currentAssignmentControl.value.lastUpdate,
-      materials: this.currentAssignmentControl.value.materials,
     };
 
     // throw error if user has clicked submit without selecting any files
-    if (this.currentStudentDeliveryControl.length < 1) {
+    if (this.materialsControl.length < 1) {
       this.sharedService.throwError('Please add some files first!');
 
       return;
     }
-
+    this.isLoading = true;
     // 1) check if the assignment is saved in the db
     this.assignmentService
       .getAssignments(
@@ -232,6 +164,49 @@ export class DragAndDropComponent implements OnInit {
           return;
         }
 
+        this.materialsService
+          .addMaterials(currentAssignment, this.materialsControl)
+          .subscribe((responseData) => {
+            this.materialsService.onMaterialsUpdate(responseData.materialFiles);
+            this.deleteAllFiles();
+            this.isLoading = false;
+          });
+      });
+  }
+
+  onSubmitMyDelivery(event: Event) {
+    const currentAssignment: Assignment = {
+      courseId: this.currentAssignmentControl.value.courseId,
+      id: this.currentAssignmentControl.value.id,
+      title: this.currentAssignmentControl.value.title,
+      description: this.currentAssignmentControl.value.description,
+      filePath: this.currentAssignmentControl.value.filePath,
+      fileType: this.currentAssignmentControl.value.fileType,
+      lastUpdate: this.currentAssignmentControl.value.lastUpdate,
+    };
+
+    // throw error if user has clicked submit without selecting any files
+    if (this.currentStudentDeliveryControl.length < 1) {
+      this.sharedService.throwError('Please add some files first!');
+
+      return;
+    }
+    this.isLoading = true;
+
+    // 1) check if the assignment is saved in the db
+    this.assignmentService
+      .getAssignments(
+        this.assignmentsPerPage,
+        this.currentPage,
+        currentAssignment.courseId as string
+      )
+      .subscribe((response) => {
+        // 1a) if no, throw an error message
+        if (this.assingnmentIndex > response.maxAssignments - 1) {
+          this.sharedService.throwError('Please save the assignment first!');
+
+          return;
+        }
         this.studentDeliveriesService
           .addStudentDeliveryFiles(
             currentAssignment,
@@ -242,11 +217,11 @@ export class DragAndDropComponent implements OnInit {
               responseData.studentDeliveryFiles
             );
             this.deleteAllFiles();
+            this.isLoading = false;
           });
-
-        this.isLoading = false;
       });
   }
+
   /**
    * handle file from browsing
    */
@@ -311,61 +286,6 @@ export class DragAndDropComponent implements OnInit {
    * Convert Files list to normal array list
    * @param files (Files List)
    */
-  prepareMaterialFilesList(files: Array<any>) {
-    for (const item of files) {
-      item.progress = 0;
-      this.files.push(item);
-    }
-
-    let currentMaterials: Material[] =
-      this.currentAssignmentControl.value.materials;
-    console.log(currentMaterials);
-
-    // if there pre-exist materials add the new
-    if (currentMaterials) {
-      for (let i = 0; i < files.length; i++) {
-        currentMaterials.push({
-          name: files[i].name,
-          filePath: files[i],
-          fileType: files[i].type,
-          lastUpdate: this.sharedService.toHumanDateTime(new Date().toString()),
-          assignmentId: this.currentAssignmentControl.value.id,
-          courseId: this.currentAssignmentControl.value.courseId,
-        });
-      }
-    } else {
-      currentMaterials = [];
-
-      //or assign the new files
-      for (let i = 0; i < files.length; i++) {
-        currentMaterials.push({
-          name: files[i].name,
-          filePath: files[i],
-          fileType: files[i].type,
-          lastUpdate: this.sharedService.toHumanDateTime(new Date().toString()),
-          assignmentId: this.currentAssignmentControl.value.id,
-          courseId: this.currentAssignmentControl.value.courseId,
-        });
-      }
-    }
-
-    // change the value of a single form control with the name filePath
-    this.currentAssignmentControl.patchValue({
-      materials: currentMaterials,
-    });
-
-    // update and validate the image field value
-    this.currentAssignmentControl.updateValueAndValidity();
-
-    console.log(this.currentAssignmentControl);
-
-    this.uploadFilesSimulator(0);
-  }
-
-  /**
-   * Convert Files list to normal array list
-   * @param files (Files List)
-   */
   prepareStudentDeliveriesFileList(files: Array<any>) {
     if (files.length > 3 || this.currentStudentDeliveryControl.length >= 3) {
       this.sharedService.throwError(
@@ -400,6 +320,41 @@ export class DragAndDropComponent implements OnInit {
   }
 
   /**
+   * Convert Files list to normal array list
+   * @param files (Files List)
+   */
+  prepareMaterialFilesList(files: Array<any>) {
+    if (files.length > 3 || this.materialsControl.length >= 3) {
+      this.sharedService.throwError(
+        'Max number of files 3! Please consider deleting some.'
+      );
+      return;
+    }
+
+    for (const item of files) {
+      item.progress = 0;
+      this.files.push(item);
+    }
+
+    console.log(this.materialsControl);
+
+    for (let i = 0; i < files.length; i++) {
+      let currentMaterialFile = {
+        name: files[i].name,
+        filePath: files[i],
+        fileType: files[i].type,
+        lastUpdate: this.sharedService.toHumanDateTime(new Date().toString()),
+      };
+      this.materialsControl.push(this.createMaterial(currentMaterialFile));
+
+      // update and validate the image field value
+      this.materialsControl.updateValueAndValidity();
+    }
+
+    this.uploadFilesSimulator(0);
+  }
+
+  /**
    * format bytes
    * @param bytes (File size in bytes)
    * @param decimals (Decimals point)
@@ -424,6 +379,20 @@ export class DragAndDropComponent implements OnInit {
       fileType: studentDelivery.fileType,
       id: studentDelivery.id,
       assignmentId: studentDelivery.assignmentId,
+    });
+  }
+
+  // initialize a form control
+  createMaterial(material: Material): FormGroup {
+    return this.formBuilder.group({
+      name: material.name,
+      lastUpdate: material.lastUpdate,
+      filePath: material.filePath,
+      fileType: material.fileType,
+      id: material.id,
+      courseId: material.courseId,
+      assignmentId: material.assignmentId,
+      creatorId: material.creatorId,
     });
   }
 }

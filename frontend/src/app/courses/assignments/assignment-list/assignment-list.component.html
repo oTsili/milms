@@ -155,7 +155,8 @@
                       </div>
                       <mat-divider></mat-divider>
 
-                      <div class="course-row distance">
+                      <mat-label class="matLabel">Assignment</mat-label>
+                      <div class="course-row">
                         <span class="course-components">
                           <a
                             *ngIf="!editableAssignments[formControlIndex]"
@@ -163,7 +164,7 @@
                             (click)="onDownload(assignment, formControlIndex)"
                             matTooltip="Download the assignment"
                           >
-                            Download Assignment
+                            Download
                           </a>
                         </span>
 
@@ -186,36 +187,148 @@
                                 .value
                             ]"
                             matTooltip="Expand to web viewer"
-                            >View Assignment</a
+                            >Web Viewer</a
                           >
                         </span>
-                      </div>
-                      <div
-                        *ngIf="
-                          assignmentsForm.controls.assignmentsFormArray
-                            .controls[formControlIndex].controls.fileType
-                            .value !== 'application/pdf' &&
-                          !editableAssignments[formControlIndex]
-                        "
-                      >
-                        <a
-                          *ngIf="!filePickedAssignments[formControlIndex]"
-                          class="pdfThumbnail"
-                          (click)="
-                            print(
+                        <span
+                          *ngIf="
+                            assignmentsForm.controls.assignmentsFormArray
+                              .controls[formControlIndex].controls.fileType
+                              .value !== 'application/pdf' &&
+                            !editableAssignments[formControlIndex]
+                          "
+                        >
+                          <a
+                            *ngIf="!filePickedAssignments[formControlIndex]"
+                            class="pdfThumbnail"
+                            (click)="
+                              print(
+                                assignmentsForm.controls.assignmentsFormArray
+                                  .controls[formControlIndex].controls.filePath
+                              )
+                            "
+                            [routerLink]="[
+                              '/docViewer',
                               assignmentsForm.controls.assignmentsFormArray
                                 .controls[formControlIndex].controls.filePath
-                            )
+                                .value
+                            ]"
+                            matTooltip="Expand to web viewer"
+                            >Web Viewer</a
+                          >
+                        </span>
+                        <span
+                          *ngIf="
+                            userRole === 'instructor' || userRole === 'admin'
                           "
-                          [routerLink]="[
-                            '/docViewer',
-                            assignmentsForm.controls.assignmentsFormArray
-                              .controls[formControlIndex].controls.filePath
-                              .value
-                          ]"
-                          matTooltip="Expand to web viewer"
-                          >Web Viewer</a
                         >
+                          <mat-error
+                            *ngIf="
+                              (assignmentsForm.controls.assignmentsFormArray.at(
+                                formControlIndex
+                              ).controls.description.invalid &&
+                                assignmentsForm.controls.assignmentsFormArray.at(
+                                  formControlIndex
+                                ).controls.description.touched) ||
+                              (assignmentSubmitted[formControlIndex] &&
+                                assignmentsForm.controls.assignmentsFormArray.at(
+                                  formControlIndex
+                                ).controls.description.invalid)
+                            "
+                            style="font-size: smaller"
+                          >
+                            Please enter description for the assignment.
+                          </mat-error>
+                          <span
+                            class="
+                              course-description-attribution
+                              flex-center-row
+                            "
+                            *ngIf="filePickedAssignments[formControlIndex]"
+                            >{{
+                              assignmentsForm.controls.assignmentsFormArray
+                                .at(formControlIndex)
+                                .get('filePath').value.name
+                            }}</span
+                          >
+
+                          <a
+                            *ngIf="editableAssignments[formControlIndex]"
+                            mat-button
+                            color="warn"
+                            (click)="onCancel($event, formControlIndex)"
+                            matTooltip="Abort the changes"
+                          >
+                            Cancel
+                          </a>
+
+                          <a
+                            *ngIf="editableAssignments[formControlIndex]"
+                            mat-button
+                            color="theme"
+                            matTooltip="Upload assignment file"
+                            (click)="filePicker.click()"
+                          >
+                            Upload
+                          </a>
+
+                          <button
+                            *ngIf="editableAssignments[formControlIndex]"
+                            mat-button
+                            color="success"
+                            (click)="
+                              onSaveAssignment(
+                                $event,
+                                assignment,
+                                formControlIndex
+                              )
+                            "
+                            matTooltip="Save the changes"
+                          >
+                            Save
+                          </button>
+                          <mat-error
+                            *ngIf="
+                              (assignmentsForm.controls.assignmentsFormArray.at(
+                                formControlIndex
+                              ).controls.filePath.invalid &&
+                                assignmentsForm.controls.assignmentsFormArray.at(
+                                  formControlIndex
+                                ).controls.filePath.touched) ||
+                              (assignmentSubmitted[formControlIndex] &&
+                                assignmentsForm.controls.assignmentsFormArray.at(
+                                  formControlIndex
+                                ).controls.filePath.invalid)
+                            "
+                            style="font-size: smaller"
+                          >
+                            Please enter a file of type pdf/doc/docx.
+                          </mat-error>
+
+                          <a
+                            *ngIf="!editableAssignments[formControlIndex]"
+                            mat-button
+                            color="primary"
+                            (click)="permitEdit($event, formControlIndex)"
+                            matTooltip="Edit the assignment's information"
+                            >Edit</a
+                          >
+                          <a
+                            *ngIf="!editableAssignments[formControlIndex]"
+                            mat-button
+                            color="warn"
+                            (click)="onDelete(assignment, formControlIndex)"
+                            matTooltip="Delete the assignment"
+                          >
+                            Delete
+                          </a>
+
+                          <input
+                            type="file"
+                            #filePicker
+                            (change)="onFilePicked($event, formControlIndex)"
+                          />
+                        </span>
                       </div>
                     </mat-tab>
 
@@ -256,6 +369,7 @@
                       *ngIf="userRole === 'student'"
                       matTooltip="upload your assignment delivery"
                     >
+                 
                       <app-dragAndDrop
                         [formGroup]="assignmentsForm"
                         [assingnmentIndex]="formControlIndex"
@@ -275,107 +389,6 @@
                   </mat-tab-group>
                 </div>
                 <mat-divider></mat-divider>
-
-                <div
-                  class="course-description-attribution flex-center-row"
-                  *ngIf="userRole === 'instructor' || userRole === 'admin'"
-                >
-                  <mat-error
-                    *ngIf="
-                      (assignmentsForm.controls.assignmentsFormArray.at(
-                        formControlIndex
-                      ).controls.description.invalid &&
-                        assignmentsForm.controls.assignmentsFormArray.at(
-                          formControlIndex
-                        ).controls.description.touched) ||
-                      (assignmentSubmitted[formControlIndex] &&
-                        assignmentsForm.controls.assignmentsFormArray.at(
-                          formControlIndex
-                        ).controls.description.invalid)
-                    "
-                    style="font-size: smaller"
-                  >
-                    Please enter description for the assignment.
-                  </mat-error>
-                  <span *ngIf="filePickedAssignments[formControlIndex]">{{
-                    assignmentsForm.controls.assignmentsFormArray
-                      .at(formControlIndex)
-                      .get('filePath').value.name
-                  }}</span>
-
-                  <a
-                    *ngIf="editableAssignments[formControlIndex]"
-                    mat-button
-                    color="warn"
-                    (click)="onCancel($event, formControlIndex)"
-                    matTooltip="Abort the changes"
-                  >
-                    <mat-icon>cancel</mat-icon>
-                  </a>
-
-                  <a
-                    *ngIf="editableAssignments[formControlIndex]"
-                    mat-button
-                    color="theme"
-                    matTooltip="Upload assignment file"
-                    (click)="filePicker.click()"
-                  >
-                    <mat-icon> attach_file</mat-icon>
-                  </a>
-
-                  <button
-                    *ngIf="editableAssignments[formControlIndex]"
-                    mat-button
-                    color="success"
-                    (click)="
-                      onSaveAssignment($event, assignment, formControlIndex)
-                    "
-                    matTooltip="Save the changes"
-                  >
-                    <mat-icon>check_circle</mat-icon>
-                  </button>
-                  <mat-error
-                    *ngIf="
-                      (assignmentsForm.controls.assignmentsFormArray.at(
-                        formControlIndex
-                      ).controls.filePath.invalid &&
-                        assignmentsForm.controls.assignmentsFormArray.at(
-                          formControlIndex
-                        ).controls.filePath.touched) ||
-                      (assignmentSubmitted[formControlIndex] &&
-                        assignmentsForm.controls.assignmentsFormArray.at(
-                          formControlIndex
-                        ).controls.filePath.invalid)
-                    "
-                    style="font-size: smaller"
-                  >
-                    Please enter a file of type pdf/doc/docx.
-                  </mat-error>
-
-                  <a
-                    *ngIf="!editableAssignments[formControlIndex]"
-                    mat-button
-                    color="primary"
-                    (click)="permitEdit($event, formControlIndex)"
-                    matTooltip="Edit the assignment's information"
-                    ><mat-icon>create</mat-icon></a
-                  >
-                  <a
-                    *ngIf="!editableAssignments[formControlIndex]"
-                    mat-button
-                    color="warn"
-                    (click)="onDelete(assignment, formControlIndex)"
-                    matTooltip="Delete the assignment"
-                  >
-                    <mat-icon>delete</mat-icon>
-                  </a>
-
-                  <input
-                    type="file"
-                    #filePicker
-                    (change)="onFilePicked($event, formControlIndex)"
-                  />
-                </div>
               </div>
             </mat-expansion-panel>
           </ng-container>

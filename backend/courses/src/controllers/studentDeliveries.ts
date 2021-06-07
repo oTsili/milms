@@ -124,50 +124,6 @@ export const createStudentDelivery = catchAsync(
   }
 );
 
-// export const updateStudentDelivery = catchAsync(
-//   async (req: Request, res: Response, next: NextFunction) => {
-//     let newFilePath = req.body.filePath;
-//     let fileType = req.body.fileType;
-//     const userId = req.currentUser!.id;
-
-//     if (req.file) {
-//       // the path of files folder and filename
-//       newFilePath = `api/courses/public/student-deliveries/${req.file.filename}`;
-
-//       fileType = `${req.file.mimetype}`;
-//     }
-
-//     // create an assignment instance
-//     const updatedAssignment = new StudentDeliveryAssignment({
-//       _id: req.params.studentDeliveryId,
-//       rank: req.body.rank,
-//       lastUpdate: req.body.lastUpdate,
-//       assignmentId: req.body.assignmentId,
-//       courseId: req.body.courseId,
-//       studentId: userId,
-//       graderId: req.body.graderId,
-//       filePath: newFilePath,
-//       fileType: fileType,
-//       comment: req.body.comment,
-//     });
-
-//     await Assignment.updateOne(
-//       // matching requirements
-//       {
-//         _id: req.params.studentDeliveryId,
-//         creatorId: userId,
-//       },
-//       // the new values of assigment object
-//       updatedAssignment
-//     );
-
-//     res.status(200).json({
-//       message: 'update successful!',
-//       updatedAssignment,
-//     });
-//   }
-// );
-
 export const getAllStudentDeliveries = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const courseId = req.params.courseId;
@@ -203,7 +159,6 @@ export const getMyStudentDelivery = catchAsync(
     const assignmentId = req.params.assignmentId;
     const studentId = req.currentUser!.id;
 
-
     const studentDeliveryFileQuery = StudentDeliveryFile.find({
       assignmentId,
       studentId,
@@ -214,8 +169,6 @@ export const getMyStudentDelivery = catchAsync(
       .populate('assignmentId')
       .populate('studentDeliveryAssignmentId');
     // .populate('studentId');
-
-   
 
     const count = await StudentDeliveryFile.countDocuments({
       assignmentId,

@@ -42,10 +42,17 @@ app.use(
   '/api/courses/public/assignments',
   express.static(path.join(__dirname, '/public/assignments'))
 );
+
 app.use(
-  '/api/courses/public/materials',
-  express.static(path.join(__dirname, '/public/materials'))
+  '/api/courses/public/course-materials',
+  express.static(path.join(__dirname, '/public/course-materials'))
 );
+
+app.use(
+  '/api/courses/public/assignment-materials',
+  express.static(path.join(__dirname, '/public/assignment-materials'))
+);
+
 app.use(
   '/api/courses/public/student-deliveries',
   express.static(path.join(__dirname, '/public/student-deliveries'))

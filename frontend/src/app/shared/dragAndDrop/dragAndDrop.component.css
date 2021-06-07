@@ -3,9 +3,9 @@
   justify-content: flex-end;
 }
 
-::ng-deep .mat-tab-body {
+/* ::ng-deep .mat-tab-body {
   padding-bottom: 3%;
-}
+} */
 
 /* .input {
   width: 100%;

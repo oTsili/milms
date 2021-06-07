@@ -15,28 +15,35 @@ import { natsWrapper } from '../nats-wrapper';
 import { access, constants, mkdir } from 'fs';
 
 import { riakWrapper } from '../riak-wrapper';
+import { MaterialDoc } from '../models/material';
 
 export const createMaterials = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const courseId = req.params.courseId;
     const assignmentId = req.params.assignmentId;
-
     const creatorId = req.currentUser!.id;
 
-    const assignmentQuery = Assignment.findOne({
-      _id: assignmentId,
-      courseId: courseId,
-    });
+    // 1) fetch the student's details
+    const instructor = await User.findById(creatorId);
 
-    const currentAssignment = await assignmentQuery.populate('materials');
+    // 2) fetch the assignment
+    const currentAssignment = await Assignment.findById(assignmentId);
+
+    // TODO: use fs.mkdir to create a directory of "courseName/assignmentName" instead of "courseName-assignmentName"
+
+    // 4) create an array to keep account of the saved materialFiles
+    let materialFiles: MaterialDoc[] = [];
+
+    // 5) iterate through the files and build a db model for each
+    const { names, lastUpdates, fileTypes } = req.body;
 
     for (let i = 0; i < req.files.length; i++) {
-      const name = req.body.name[i];
-      const lastUpdate = req.body.lastUpdate[i];
-      const filePath = `api/courses/public/materials/${req.files[i].filename}`;
-      const fileType = req.body.fileType[i];
+      const name = names[i];
+      const lastUpdate = lastUpdates[i];
+      const filePath = `api/courses/public/student-deliveries/${req.files[i].filename}`;
+      const fileType = fileTypes[i];
 
-      const createdMaterial = Material.build({
+      const createdStudentDeliveryFile = Material.build({
         name,
         filePath,
         fileType,
@@ -46,21 +53,20 @@ export const createMaterials = catchAsync(
         creatorId,
       });
 
-      const updatedMaterial = await createdMaterial.save();
+      const updatedStudentDeliveryFile =
+        await createdStudentDeliveryFile.save();
 
-      currentAssignment!.materials!.push(updatedMaterial);
-
-      await currentAssignment!.save();
+      materialFiles.push(updatedStudentDeliveryFile);
     }
 
-    const materialsQuery = Material.find({
-      assignmentId: assignmentId,
-      courseId: courseId,
+    const fetchedMaterialFiles = await Material.find({
+      assignmentId,
+      creatorId,
     });
 
-    const updatedMaterials = await materialsQuery;
-
-    const updatedAssignment = await assignmentQuery.populate('materials');
+    // 6)  publish the event
+    // // make the query again for getting the populated fields
+    // let updatedAssignment = await assignmentQuery;
 
     // if (createdAssignment.id && createdAssignment.description) {
     //   await new AssignmentCreatedPublisher(natsWrapper.client).publish({
@@ -68,19 +74,17 @@ export const createMaterials = catchAsync(
     //     title: createdAssignment.title,
     //     description: createdAssignment.description!,
     //     lastUpdate: createdAssignment.lastUpdate.toString(),
-    //     // rank: createdAssignment.rank!, // TODO: delete the rank, update the common lib, and make a subject assignment-delivery
+    //     rank: createdAssignment.rank!,
     //     time: new Date(),
     //   });
     // }
 
-    res.status(200).json({
-      message: 'Materials added successfuly',
-      updatedMaterials,
-      updatedAssignment,
+    // 7) seng the response
+    res.status(201).json({
+      message: 'studentDeliveriesFiles added successfuly',
+      materialFiles,
+      fetchedMaterialFiles,
     });
-
-    // populate the user's information
-    // await Assignment.populate(assignment, { path: 'creatorId' });
   }
 );
 

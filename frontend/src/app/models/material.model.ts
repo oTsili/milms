@@ -4,6 +4,7 @@ export interface Material {
   filePath: File | string;
   fileType: string;
   lastUpdate: string;
-  assignmentId: string;
-  courseId: string;
+  assignmentId?: string;
+  courseId?: string;
+  creatorId?: string;
 }

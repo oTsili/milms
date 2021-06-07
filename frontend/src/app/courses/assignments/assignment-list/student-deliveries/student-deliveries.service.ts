@@ -24,8 +24,6 @@ export class StudentDeliveriesService {
   }
 
   onStudentDeliveriesUpdate(studentDeliveries) {
-    console.log('updated deliveries', studentDeliveries);
-
     this.studentDeliveriesListener.next(studentDeliveries);
   }
 
@@ -116,26 +114,7 @@ export class StudentDeliveriesService {
     currentAssignment: Assignment,
     currentStudentDeliveryControl: FormArray
   ) {
-    console.log('currentAssignment', currentAssignment);
-    console.log('studentDeliveries', currentStudentDeliveryControl);
-
     const { id, courseId, lastUpdate } = currentAssignment;
-
-    // let studentDeliveriesLength: number;
-    // let studentDeliveryFiles;
-
-    // // when there are no any saved student delivery files in the db
-    // if (studentDeliveries.length) {
-    //   studentDeliveriesLength = studentDeliveries.length;
-    //   studentDeliveryFiles = studentDeliveries;
-    // } else {
-    //   // when there are saved student delivery files in the db
-    //   studentDeliveriesLength = studentDeliveries.studentDeliveries.length;
-    //   studentDeliveryFiles = studentDeliveries.studentDeliveries;
-    // }
-
-    // console.log('studentDeliveriesLength', studentDeliveriesLength);
-    // console.log('totalDbDeliveries', totalDbDeliveries);
 
     const studentDeliveryData = new FormData();
 
@@ -147,14 +126,7 @@ export class StudentDeliveriesService {
     for (let i = 0; i < currentStudentDeliveryControl.length; i++) {
       let studentDeliveryFile = currentStudentDeliveryControl.value[i];
 
-      console.log('studentDeliveryFile', studentDeliveryFile);
-
-      console.log(!studentDeliveryFile.studentId);
-
       if (!studentDeliveryFile.studentId) {
-        console.log('iii: ', i);
-        console.log(studentDeliveryFile);
-
         studentDeliveryData.append(
           'lastUpdates[]',
           (studentDeliveryFile as StudentDeliveryFile).lastUpdate
@@ -174,8 +146,6 @@ export class StudentDeliveriesService {
         );
       }
     }
-
-    console.log('studentDeliveryData: ', studentDeliveryData);
 
     // const params = new HttpParams();
 
@@ -198,8 +168,6 @@ export class StudentDeliveriesService {
         )
         .pipe(
           map((studentDeliveryFileData) => {
-            console.log(studentDeliveryFileData);
-
             return {
               studentDeliveryFiles:
                 studentDeliveryFileData.studentDeliveryFiles.map(

@@ -1,4 +1,7 @@
 <div class="out-container">
+  <mat-spinner *ngIf="isLoading"></mat-spinner>
+</div>
+<div class="out-container" *ngIf="!isLoading">
   <div class="container" appDnd (fileDropped)="onFileDropped($event)">
     <input
       type="file"

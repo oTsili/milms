@@ -1,6 +1,4 @@
-import { StudentDeliveryAssignment } from './student-delivery.model';
 import { Course } from './course.model';
-import { Material } from './material.model';
 
 export interface Assignment {
   title: string;
@@ -12,5 +10,4 @@ export interface Assignment {
   userName?: string;
   rank?: number;
   courseId: string | Course;
-  materials?: Material[] | File[] | FileList;
 }

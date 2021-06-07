@@ -76,7 +76,11 @@ router.get(
 
 router.post(
   '/:courseId/assignments/:assignmentId/materials',
-  extractMultipleFiles(MIME_TYPE_MAP, 'src/public/materials', 'filePath[]'),
+  extractMultipleFiles(
+    MIME_TYPE_MAP,
+    'src/public/assignment-materials',
+    'filePaths[]'
+  ),
   currentUser,
   requireAuth,
   MaterialsController.createMaterials
