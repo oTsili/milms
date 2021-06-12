@@ -28,3 +28,12 @@ export interface StudentDeliveryFile {
   studentDeliveryAssignmentId?: string | StudentDeliveryAssignment;
   studentId?: string | User;
 }
+
+export interface TableDelivery {
+  id: string;
+  studentName: string;
+  assignmentName: string;
+  deliveryName: string;
+  lastUpdate: string;
+  rank: number;
+}

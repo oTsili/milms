@@ -76,7 +76,7 @@ export class MyStudentDeliveryListComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // fetch the materials
+    // fetch the student deliveries
     this.studentDeliveriesService
       .getMyStudentDeliveryFiles(this.courseId, this.assignmentId)
       .subscribe((response) => {
@@ -116,10 +116,7 @@ export class MyStudentDeliveryListComponent implements OnInit, OnDestroy {
       );
   }
 
-  ondDownloadStudentDeliveryFile(
-    studentDeliveryFile: StudentDeliveryFile,
-    studentDeliveryAssignment: StudentDeliveryAssignment
-  ) {
+  ondDownloadStudentDeliveryFile(studentDeliveryFile: StudentDeliveryFile) {
     this.isLoading = true;
 
     const courseId = this.currentAssignmentControl.value.courseId;

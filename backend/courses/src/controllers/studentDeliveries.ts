@@ -84,6 +84,7 @@ export const createStudentDelivery = catchAsync(
         filePath,
         fileType,
         lastUpdate,
+        courseId,
         assignmentId,
         studentDeliveryAssignmentId,
         studentId,
@@ -96,9 +97,12 @@ export const createStudentDelivery = catchAsync(
     }
 
     const fetchedStudentDeliveryFiles = await StudentDeliveryFile.find({
-      assignmentId,
+      courseId,
+      // assignmentId,
       studentId,
     });
+
+    console.log(fetchedStudentDeliveryFiles);
 
     // 6)  publish the event
     // // make the query again for getting the populated fields

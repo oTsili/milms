@@ -7,7 +7,6 @@ import { AssignmentListComponent } from './assignment-list/assignment-list.compo
 import { AngularMaterialModule } from '../../angular-material.module';
 import { DragAndDropModule } from '../../shared/dragAndDrop/dragAndDrop.module';
 import { MaterialListComponent } from './assignment-list/material-list/material-list.component';
-import { StudentDeliveriesComponent } from './assignment-list/student-deliveries/student-deliveries.component';
 import { MyStudentDeliveryListComponent } from './assignment-list/student-deliveries/my-student-delivery-list/my-student-delivery-list.component';
 import { AllStudentDeliveriesListComponent } from './assignment-list/student-deliveries/all-student-deliveries-list/all-student-deliveries-list.component';
 
@@ -15,7 +14,6 @@ import { AllStudentDeliveriesListComponent } from './assignment-list/student-del
   declarations: [
     AssignmentListComponent,
     MaterialListComponent,
-    StudentDeliveriesComponent,
     MyStudentDeliveryListComponent,
     AllStudentDeliveriesListComponent,
   ],

@@ -9,14 +9,14 @@ import {
   ControlContainer,
 } from '@angular/forms';
 
-import { AssignmentsService } from '../../courses/assignments/assignment.service';
+import { AssignmentsService } from '../../courses.old/assignments/assignment.service';
 import { assignmentMimeType } from '../validators/assignment-mime-type.validator';
 import { Material } from '../../models/material.model';
 import { Assignment } from '../../models/assignment.model';
-import { MaterialsService } from '../../courses/assignments/assignment-list/material-list/materials.service';
+import { MaterialsService } from '../../courses.old/assignments/assignment-list/material-list/materials.service';
 import { SharedService } from '../services/shared.service';
 import { StudentDeliveryFile } from 'src/app/models/student-delivery.model';
-import { StudentDeliveriesService } from '../../courses/assignments/assignment-list/student-deliveries/student-deliveries.service';
+import { StudentDeliveriesService } from '../../courses.old/assignments/assignment-list/student-deliveries/student-deliveries.service';
 import { StudentDeliveryAssignment } from '../../models/student-delivery.model';
 
 @Component({
@@ -167,7 +167,9 @@ export class DragAndDropComponent implements OnInit {
         this.materialsService
           .addMaterials(currentAssignment, this.materialsControl)
           .subscribe((responseData) => {
-            this.materialsService.onMaterialsUpdate(responseData.materialFiles);
+            this.materialsService.onMaterialsUpdate(
+              responseData.fetchedMaterialFiles
+            );
             this.deleteAllFiles();
             this.isLoading = false;
           });
@@ -214,7 +216,7 @@ export class DragAndDropComponent implements OnInit {
           )
           .subscribe((responseData) => {
             this.studentDeliveriesService.onStudentDeliveriesUpdate(
-              responseData.studentDeliveryFiles
+              responseData.fetchedStudentDeliveryFiles
             );
             this.deleteAllFiles();
             this.isLoading = false;
@@ -270,14 +272,14 @@ export class DragAndDropComponent implements OnInit {
       if (index === this.files.length) {
         return;
       } else {
-        const progressInterval = setInterval(() => {
-          if (this.files[index].progress === 100) {
-            clearInterval(progressInterval);
-            this.uploadFilesSimulator(index + 1);
-          } else {
-            this.files[index].progress += 5;
-          }
-        }, 200);
+        // const progressInterval = setInterval(() => {
+        //   if (this.files[index].progress === 100) {
+        //     clearInterval(progressInterval);
+        //     this.uploadFilesSimulator(index + 1);
+        //   } else {
+        //     this.files[index].progress += 5;
+        //   }
+        // }, 200);
       }
     }, 1000);
   }
@@ -295,7 +297,7 @@ export class DragAndDropComponent implements OnInit {
     }
 
     for (const item of files) {
-      item.progress = 0;
+      // item.progress = 0;
       this.files.push(item);
     }
 
@@ -332,7 +334,7 @@ export class DragAndDropComponent implements OnInit {
     }
 
     for (const item of files) {
-      item.progress = 0;
+      // item.progress = 0;
       this.files.push(item);
     }
 

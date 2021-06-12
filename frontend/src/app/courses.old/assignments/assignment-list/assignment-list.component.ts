@@ -124,11 +124,6 @@ export class AssignmentListComponent implements OnInit, OnDestroy {
         this.userRole = response;
       });
 
-    this.sharedService.getUserRole().subscribe((response) => {
-      this.userRole = response.userRole;
-      this.sharedService.onUserRoleUpdate(this.userRole);
-    });
-
     this.editButtonSub = this.assignmentService
       .getEditListener()
       .subscribe((currentEditableAssignments: boolean[]) => {

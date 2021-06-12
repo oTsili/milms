@@ -11,28 +11,24 @@ mat-accordion {
   height: 100%;
 }
 
-.mat-expansion-panel-body,
-.assignment-details,
+/* .mat-expansion-panel-body,
+.course-details,
 .mat-action-row {
-  padding-bottom: 0 !important;
+  padding: 0 !important;
 }
 
-.assignment-details,
-.mat-action-row {
-  padding-top: 0 !important;
-}
+.mat-expansion-panel-content > .mat-expansion-panel-body {
+  padding: 0 !important;
+} */
 
-mat-action-row.mat-action-row {
-  /* justify-content: center;
-   */
-  display: flex;
-  justify-content: center;
-  padding-left: 30%;
+/* .course-details, */
+.mat-action-row {
+  padding: 0 !important;
 }
 
 .mat-expansion-panel {
   max-height: 40%;
-  padding: 0;
+  /* padding: 0; */
   /* background-color: #ffeeee; */
 }
 
@@ -40,11 +36,11 @@ mat-spinner {
   margin: auto;
 }
 
-.assignment-file {
+.course-file {
   width: 100%;
 }
 
-.assignment-file img {
+.course-file img {
   width: 50%;
   margin-left: 25%;
   box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
@@ -125,7 +121,7 @@ input[type='file'] {
   margin-left: 5%;
 } */
 
-.assignment-title {
+.course-title {
   display: flex;
   justify-content: flex-start;
   align-items: center;
@@ -134,11 +130,12 @@ input[type='file'] {
 
 .description-field {
   width: 100%;
+  margin-left: 3%;
 }
 
 /* *********************** */
 
-.assignment-diagram {
+.course-diagram {
   min-width: 80px;
   max-width: 110px;
   border: 2px solid black;
@@ -151,15 +148,15 @@ input[type='file'] {
   align-items: center;
 }
 
-.assignment-diagram img {
+.course-diagram img {
   height: 70%;
   width: 70%;
 }
-.assignment-diagram mat-icon {
+.course-diagram mat-icon {
   width: 40%;
 }
 
-.assignment-details-attribution {
+.course-details-attribution {
   opacity: 0.5;
 }
 
@@ -168,17 +165,68 @@ input[type='file'] {
   font-size: 0.7rem;
 }
 
+#linksMatLabel {
+  margin-left: 3%;
+}
+
+/* sidenav */
 .page-container {
-  margin: auto 5% auto 5%;
+  display: flex;
+  flex-direction: row;
+  width: 100%;
 }
 
-.mat-expansion-panel-header {
-  display: flex !important;
-  min-height: 48px !important;
+.course-sidenav {
+  flex-grow: 1;
+  margin: auto 4% auto 4%;
+  font-size: 15px;
 }
 
-.mat-accordion .mat-expansion-panel {
-  margin-bottom: 10px;
+.course-content {
+  flex-grow: 5;
+}
+
+mat-radio-button {
+  margin-left: 1.5%;
+}
+
+mat-radio-group {
+  width: 120%;
+  margin-left: 5%;
+}
+
+.course-components,
+.courseTitle-field {
+  padding-left: 3% !important;
+}
+
+.course-components {
+  display: flex;
+  flex-direction: column;
+
+  /* padding-left: 3% !important; */
+}
+
+/* .course-components:last-child {
+  margin: 0 0 0 7%;
+} */
+
+/* .course-components:not(:last-child) { */
+.line-header:not(:nth-child(2)) {
+  margin: auto auto auto 8%;
+}
+
+.line-header:first-child {
+  margin-left: 4%;
+}
+
+.line-mat-header {
+  margin: auto 6.6% !important;
+}
+
+.mat-header-row {
+  margin-bottom: 2%;
+  background: lavender;
 }
 
 .flex-column {
@@ -195,55 +243,57 @@ input[type='file'] {
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
-  /* height: 48px; */
-  align-items: center;
-  margin-bottom: 3%;
 }
 .flex-space-between-row {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   width: -webkit-fill-available;
-  height: 48px;
-  align-items: center;
 }
 
-.flex-start-row span {
-  margin: 0 5% 0 -2%;
+::ng-deep .mat-form-field-infix {
+  min-width: 100px !important;
+  width: auto !important;
+  /* width: 100% !important; */
 }
 
-a {
-  cursor: pointer;
+::ng-deep .mat-expansion-panel-header.mat-expanded {
+  height: auto !important;
 }
 
-/* .course-components:not(:first-child) {
-  margin: 3% 5% 0 -2%;
+::ng-deep .mat-expansion-panel-header {
+  height: auto !important;
+  display: contents;
+  min-height: 48px !important;
+}
+
+.course-row {
+  margin: auto 3% 2% auto;
+  width: 100%;
+}
+
+.mat-header-flex {
+  display: flex;
+  justify-content: space-between;
+  align-content: stretch;
+}
+
+::ng-deep .mat-content {
+  display: contents !important;
+}
+
+.display-contents {
+  display: contents;
+}
+
+.mat-accordion .mat-expansion-panel {
+  margin-bottom: 10px;
+}
+
+::ng-deep .mat-paginator-container {
+  justify-content: space-between !important;
+}
+/* 
+mat-divider {
+  margin-top: 2%;
 } */
-
-.course-components {
-  margin: 3% 5% 0 -2%;
-}
-
-.course-componentts a {
-  margin-bottom: 3%;
-}
-
-.course-components:first-child {
-  margin: 3% 7% 0 0;
-}
-
-.course-description-attribution {
-  padding: 1% 0 0 35%;
-}
-
-.course-description-attribution a {
-  margin-left: 6%;
-}
-
-mat-tab mat-label {
-  margin-top: 3%;
-}
-
-#assignment-links {
-  margin-bottom: 2%;
-}

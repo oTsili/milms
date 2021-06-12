@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import { StudentDeliveryFile } from './models';
 import { AssignmentDoc } from './assignment';
 import { UserDoc } from './user';
+import { CourseDoc } from './course';
 
 // An interface that describes the properties
 // that are requried to create a new StudentDelivery
@@ -12,6 +13,7 @@ export interface StudentDeliveryFileAttrs {
   lastUpdate?: string;
   filePath?: string;
   fileType?: string;
+  courseId?: string | CourseDoc;
   assignmentId?: string | AssignmentDoc;
   studentDeliveryAssignmentId?: string | StudentDeliveryFileDoc;
   studentId?: string | UserDoc;
@@ -32,6 +34,7 @@ export interface StudentDeliveryFileDoc extends mongoose.Document {
   lastUpdate?: string;
   filePath?: string;
   fileType?: string;
+  courseId?: string | CourseDoc;
   assignmentId?: string | AssignmentDoc;
   studentDeliveryAssignmentId?: string | StudentDeliveryFileDoc;
   studentId?: string | UserDoc;
@@ -53,6 +56,10 @@ export const StudentDeliveryFileSchema = new mongoose.Schema(
     fileType: {
       type: String,
       // required: true,
+    },
+    courseId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Course',
     },
     assignmentId: {
       type: mongoose.Schema.Types.ObjectId,

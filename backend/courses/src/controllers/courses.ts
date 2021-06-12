@@ -29,7 +29,7 @@ export const getCourses = catchAsync(
         courseQuery = courseQuery.sort([[sortObj.active, -1]]);
       }
     } else {
-      courseQuery = courseQuery.sort([['courseTitle', 1]]);
+      courseQuery = courseQuery.sort([['title', 1]]);
     }
 
     let fetchedCourses: CourseDoc[];
@@ -37,7 +37,8 @@ export const getCourses = catchAsync(
     fetchedCourses = await courseQuery
       // .populate({ path: 'assignments', model: 'Assignment', key: 'id' })
       .populate('instructorId')
-      .populate('creatorId')
+      .populate('assignments')
+      .populate('studentId')
       .skip(pageSize * (currentPage - 1))
       .limit(pageSize);
 
@@ -62,11 +63,11 @@ export const createCourse = catchAsync(
       throw new Error('Instructor not found');
     }
 
-    let { courseTitle, description, semester, year, createdAt, instructor } =
+    let { title, description, semester, year, createdAt, instructor } =
       req.body;
 
     const course = Course.build({
-      courseTitle,
+      title,
       description,
       semester,
       year,

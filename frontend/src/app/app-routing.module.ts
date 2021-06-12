@@ -4,14 +4,13 @@ import { RouterModule, Routes } from '@angular/router';
 import { HomeComponent } from './home/home.component';
 import { SignupComponent } from './auth/signup/signup.component';
 import { LoginComponent } from './auth/login/login.component';
-import { AssignmentListComponent } from './courses/assignments/assignment-list/assignment-list.component';
 import { AuthGuard } from './auth/auth.guard';
 import { NotFoundComponent } from './not-found/not-found.component';
-import { PdfViewerComponent } from './courses/assignments/assignment-list/pdf-viewer/pdf-viewer.component';
 // import { ConferenceComponent } from './conference/conference.component';
-import { CallDashComponent } from './conference/call-dash/call-dash.component';
+// import { CallDashComponent } from './conference/call-dash/call-dash.component';
 import { JitsiMeetComponent } from './conference/jitsi-meet/jitsi-meet.componenet';
 import { EventsComponent } from './events/events.component';
+import { PdfViewerComponent } from './shared/pdf-viewer/pdf-viewer.component';
 import { CoursesComponent } from './courses/courses.component';
 
 const routes: Routes = [
@@ -29,51 +28,20 @@ const routes: Routes = [
         },
       ],
     },
-    children: [
-      {
-        path: ':courseId/assignments',
-        redirectTo: 'courses/:courseId/assignments',
-        pathMatch: 'full',
-      },
-    ],
-  },
-  {
-    path: 'courses/:courseId/assignments',
-    component: AssignmentListComponent,
-    canActivate: [AuthGuard],
-    data: {
-      title: 'assignments',
-      breadcrumb: [
-        {
-          label: 'Courses',
-          url: 'courses',
-        },
-        {
-          label: 'Assignments',
-          url: 'courses/:courseId/assignments',
-        },
-      ],
-    },
     // children: [
-    //   // {
-    //   //   path: ':assignmentId/studentDeliveries',
-    //   //   redirectTo:
-    //   //     'courses/{{courseId}}/assignments/:assignmentId/studentDeliveries',
-    //   // },
     //   {
-    //     path: ':assignmentId/studentDeliveries',
-    //     component: StudentDeliveriesComponent,
-    //     canActivate: [AuthGuard],
-
+    //     path: ':courseId/assignments',
+    //     redirectTo: 'courses/:courseId/assignments',
+    //     pathMatch: 'full',
     //   },
     // ],
   },
   // {
-  //   path: 'courses/:courseId/assignments/:assignmentId/studentDeliveries',
-  //   component: StudentDeliveriesComponent,
+  //   path: 'courses/:courseId/assignments',
+  //   component: AssignmentListComponent,
   //   canActivate: [AuthGuard],
   //   data: {
-  //     title: 'studentDeliveries',
+  //     title: 'assignments',
   //     breadcrumb: [
   //       {
   //         label: 'Courses',
@@ -82,11 +50,6 @@ const routes: Routes = [
   //       {
   //         label: 'Assignments',
   //         url: 'courses/:courseId/assignments',
-  //       },
-  //       {
-  //         // label: '{{dynamicText}}',
-  //         label: 'Student Deliveries',
-  //         url: 'courses/:courseId/assignments/:assignmentId/studentDeliveries',
   //       },
   //     ],
   //   },

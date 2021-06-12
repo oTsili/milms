@@ -1,0 +1,35 @@
+<h1 mat-dialog-title>New Table Line</h1>
+<div mat-dialog-content>
+  <mat-form-field>
+    <mat-label>Title</mat-label>
+    <input matInput [(ngModel)]="data.title" />
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Description</mat-label>
+    <input matInput [(ngModel)]="data.description" />
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Semester</mat-label>
+    <input matInput [(ngModel)]="data.semester" />
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Year</mat-label>
+    <input matInput [(ngModel)]="data.year" />
+  </mat-form-field>
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="onNoClick()">Cancel</button>
+  <button
+    mat-button
+    [mat-dialog-close]="{
+      title: data.title,
+      description: data.description,
+      semester: data.semester,
+      year: data.year,
+      createdAt: data.createdAt
+    }"
+    cdkFocusInitial
+  >
+    Ok
+  </button>
+</div>

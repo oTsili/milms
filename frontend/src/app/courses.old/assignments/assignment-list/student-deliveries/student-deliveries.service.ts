@@ -9,6 +9,8 @@ import {
 } from 'src/app/models/student-delivery.model';
 import { Subject } from 'rxjs';
 import { FormArray, FormControl } from '@angular/forms';
+import { User } from 'src/app/models/auth-data.model';
+import { TableDelivery } from '../../../../models/student-delivery.model';
 
 const BACKEND_URL = environment.ASSIGNMENT_BASE_URL + '/api/courses';
 
@@ -16,6 +18,7 @@ const BACKEND_URL = environment.ASSIGNMENT_BASE_URL + '/api/courses';
 export class StudentDeliveriesService {
   private studentDeliveries: StudentDeliveryAssignment[] = [];
   private studentDeliveriesListener = new Subject<StudentDeliveryFile[]>();
+  private tableStudentDeliveriesListener = new Subject<TableDelivery[]>();
 
   constructor(private http: HttpClient) {}
 
@@ -25,6 +28,14 @@ export class StudentDeliveriesService {
 
   onStudentDeliveriesUpdate(studentDeliveries) {
     this.studentDeliveriesListener.next(studentDeliveries);
+  }
+
+  getTableStudentDeliveries() {
+    return this.tableStudentDeliveriesListener.asObservable();
+  }
+
+  onTableStudentDeliveriesUpdate(studentDeliveries) {
+    this.tableStudentDeliveriesListener.next(studentDeliveries);
   }
 
   getAssignmentStudentDeliveriesFiles(courseId: string, assignmentId: string) {
@@ -110,6 +121,70 @@ export class StudentDeliveriesService {
       );
   }
 
+  getAllStudentDeliveryFiles(
+    courseId: string,
+    assignmentId: string,
+    sort: string = ''
+  ) {
+    console.log(courseId, assignmentId);
+    return this.http
+      .get<{
+        message: string;
+        fetchedMyStudentDeliveryFiles: StudentDeliveryFile[];
+        maxDeliveryFiles: number;
+      }>(
+        `${BACKEND_URL}/${courseId}/assignments/${assignmentId}/my-student-delivery?sort=${sort}`,
+        {
+          withCredentials: true,
+        }
+      )
+      .pipe(
+        map((myStudentDeliveryFilesData) => {
+          console.log(myStudentDeliveryFilesData);
+
+          return {
+            studentDeliveryFiles:
+              myStudentDeliveryFilesData.fetchedMyStudentDeliveryFiles.map(
+                (deliveryFile) => {
+                  let studentName = `${
+                    (deliveryFile.studentId as User).firstName
+                  } ${(deliveryFile.studentId as User).lastName}`;
+                  let assignmentName = (deliveryFile.assignmentId as Assignment)
+                    .title;
+                  let rank = (
+                    deliveryFile.studentDeliveryAssignmentId as StudentDeliveryAssignment
+                  ).rank;
+                  let assignmentFilePath = (
+                    deliveryFile.assignmentId as Assignment
+                  ).filePath;
+                  let assignmentFileType = (
+                    deliveryFile.assignmentId as Assignment
+                  ).fileType;
+                  let deliveryFilePath = (deliveryFile as StudentDeliveryFile)
+                    .filePath;
+                  let deliveryFileType = (deliveryFile as StudentDeliveryFile)
+                    .fileType;
+
+                  return {
+                    id: deliveryFile.id,
+                    studentName,
+                    assignmentName,
+                    deliveryName: deliveryFile.name,
+                    lastUpdate: deliveryFile.lastUpdate,
+                    rank,
+                    assignmentFilePath,
+                    assignmentFileType,
+                    deliveryFilePath,
+                    deliveryFileType,
+                  };
+                }
+              ),
+            totalDeliveries: myStudentDeliveryFilesData.maxDeliveryFiles,
+          };
+        })
+      );
+  }
+
   addStudentDeliveryFiles(
     currentAssignment: Assignment,
     currentStudentDeliveryControl: FormArray
@@ -160,7 +235,8 @@ export class StudentDeliveriesService {
         // generic type definition, to define what is going to be returned from the http request
         .post<{
           message: string;
-          studentDeliveryFiles: StudentDeliveryFile[];
+          // studentDeliveryFiles: StudentDeliveryFile[];
+          fetchedStudentDeliveryFiles: StudentDeliveryFile[];
         }>(
           `${BACKEND_URL}/${courseId}/assignments/${id}/student-deliveries`,
           studentDeliveryData,
@@ -168,9 +244,10 @@ export class StudentDeliveriesService {
         )
         .pipe(
           map((studentDeliveryFileData) => {
+            console.log(studentDeliveryFileData);
             return {
-              studentDeliveryFiles:
-                studentDeliveryFileData.studentDeliveryFiles.map(
+              fetchedStudentDeliveryFiles:
+                studentDeliveryFileData.fetchedStudentDeliveryFiles.map(
                   (deliveryFile) => {
                     return {
                       id: deliveryFile.id,
@@ -223,12 +300,22 @@ export class StudentDeliveriesService {
   downloadStudentDeliveryFile(
     courseId: string,
     assignmentId: string,
-    studentDeliveryFile: StudentDeliveryFile
+    studentDeliveryFile: any
   ) {
-    const filePath = (studentDeliveryFile.filePath as string)
-      .split('/')
-      .slice(-1)
-      .pop();
+    console.log(studentDeliveryFile);
+    let filePath;
+
+    if (studentDeliveryFile.filePath) {
+      filePath = (studentDeliveryFile.filePath as string)
+        .split('/')
+        .slice(-1)
+        .pop();
+    } else {
+      filePath = (studentDeliveryFile.deliveryFilePath as string)
+        .split('/')
+        .slice(-1)
+        .pop();
+    }
 
     return this.http.post(
       `${BACKEND_URL}/${courseId}/assignments

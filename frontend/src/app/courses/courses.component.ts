@@ -1,20 +1,17 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
-import { SharedService } from '../shared/services/shared.service';
-import { Sort } from '@angular/material/sort';
-import { Course, Task, Year } from '../models/course.model';
-import { CoursesService } from './courses.service';
-import {
-  FormArray,
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  NgForm,
-  Validators,
-} from '@angular/forms';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { MatSort } from '@angular/material/sort';
 import { Subscription } from 'rxjs';
-import { Router } from '@angular/router';
-import { MediaMatcher } from '@angular/cdk/layout';
+import { Sort } from '@angular/material/sort';
+import { FormGroup, FormBuilder, FormArray, Validators } from '@angular/forms';
+import { MatTableDataSource } from '@angular/material/table';
+import { MatDialog } from '@angular/material/dialog';
+
+import { CoursesService } from './courses.service';
+import { Course } from '../models/course.model';
+import { SharedService } from '../shared/services/shared.service';
+import { NewTableLineComponent } from 'src/app/shared/matDialog/newTableLine/newTableLine.component';
 import { HeaderService } from '../header/header.service';
+import { PageEvent } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-courses',
@@ -22,203 +19,119 @@ import { HeaderService } from '../header/header.service';
   styleUrls: ['./courses.component.css', './courses.component.scss'],
 })
 export class CoursesComponent implements OnInit, OnDestroy {
-  userRole: string;
-  mobileQuery: MediaQueryList;
-  private editButtonSub: Subscription;
-  private userRoleSub: Subscription;
-  editableCourses: boolean[] = [false];
-  matPanelStep: boolean[] = [false];
-  courses: Course[] = [];
-  courseControls;
-  coursesForm: FormGroup;
-  panelOpenState = false;
-  emptyCourse = {
+  @ViewChild(MatSort) sort: MatSort;
+  dataSource;
+  displayedColumns: string[] = [
+    'position',
+    'title',
+    'description',
+    'instructor',
+    'navigate',
+  ];
+  emptyAssignment: Course = {
     id: null,
-    courseTitle: null,
+    title: null,
     description: null,
     semester: null,
     year: null,
     createdAt: null,
     instructor: null,
   };
-  currentCourse = {
+
+  currentAssignment: Course = {
     id: null,
-    courseTitle: null,
+    title: null,
     description: null,
     semester: null,
     year: null,
     createdAt: null,
     instructor: null,
   };
-  mode: string = 'create';
+  user: {
+    userPhotoPath: string;
+    userName: string;
+  };
   addButtonClicked = false;
-  isLoading: boolean = false;
-  pageSizeOptions: number[] = [5, 10, 25, 100];
+  matPanelStep: boolean[] = [false];
+  private coursesUpdateSubscription: Subscription;
+  private userRoleSubscription: Subscription;
+  courses: Course[];
+  courseControls: FormArray;
+  userRole: string;
+  coursesCount: number;
+  coursesForm: FormGroup;
+  isLoading = false;
   totalCourses = 0;
   coursesPerPage = 5;
   currentPage = 1;
-  allYearComplete: boolean = false;
-  allSemesterComplete: boolean = false;
 
   constructor(
-    private sharedService: SharedService,
     private coursesService: CoursesService,
+    private sharedService: SharedService,
     private headerService: HeaderService,
     private formBuilder: FormBuilder,
-    private router: Router,
-    changeDetectorRef: ChangeDetectorRef,
-    media: MediaMatcher
+    public dialog: MatDialog
   ) {
-    this.mobileQuery = media.matchMedia('(max-width: 600px)');
-    this._mobileQueryListener = () => changeDetectorRef.detectChanges();
-    this.mobileQuery.addListener(this._mobileQueryListener);
+    this.sharedService.getUserRole().subscribe((response) => {
+      this.userRole = response.userRole;
+    });
   }
 
-  ngOnInit() {
-    this.sharedService.enableBreadcrumb(true);
-
-    // initialize the boolean custom attributes of control array
-    for (let i = 1; i < this.coursesPerPage - 1; i++) {
-      this.editableCourses.push(false);
-      this.matPanelStep.push(false);
-    }
-
+  ngOnInit(): void {
     // update the null values of the current user to be used in new assignments
-    const user = this.headerService.getUserData();
-    this.currentCourse.instructor = user.userName;
+    this.user = this.headerService.getUserData();
+    // define custom subscriptions
+    this.coursesUpdateSubscription = this.coursesService
+      .getCoursesListener()
+      .subscribe((response) => {
+        console.log('courses updated');
+        this.courses = response.courses;
+        this.coursesCount = response.coursesCount;
+      });
+
+    this.userRoleSubscription = this.sharedService
+      .getUserRoleListener()
+      .subscribe((response) => {
+        console.log(response);
+        this.userRole = response;
+      });
 
     // define and initialize the form group and formArray
     this.coursesForm = this.formBuilder.group({
       coursesFormArray: this.formBuilder.array([]),
     });
 
-    this.isLoading = true;
-    this.editButtonSub = this.coursesService
-      .getEditListener()
-      .subscribe((currentEditablecourses: boolean[]) => {
-        this.editableCourses = currentEditablecourses;
-      });
-
-    this.userRoleSub = this.sharedService
-      .getUserRoleListener()
-      .subscribe((response) => {
-        this.userRole = response;
-      });
-
-    this.sharedService.getUserRole().subscribe((response) => {
-      this.userRole = response.userRole;
-      this.sharedService.onUserRoleUpdate(this.userRole);
-      this.isLoading = false;
-    });
-
     // fetch the courses
     this.coursesService
       .getCourses(this.coursesPerPage, this.currentPage)
-      .subscribe((fetchedcourses) => {
-        this.courses = fetchedcourses.courses;
-        this.totalCourses = fetchedcourses.maxCourses;
+      .subscribe((response) => {
+        console.log(response);
+        this.courses = response.courses;
+        this.totalCourses = response.maxCourses;
+
         if (this.totalCourses > 0) {
           for (let course of this.courses) {
             this.addItem(course);
           }
         }
+        this.dataSource = new MatTableDataSource(this.courses);
+        console.log(this.dataSource);
         this.isLoading = false;
       });
+
+    this.courseControls = this.coursesForm.get('coursesFormArray') as FormArray;
   }
 
   ngOnDestroy(): void {
-    this.mobileQuery.removeListener(this._mobileQueryListener);
-    this.userRoleSub.unsubscribe();
+    this.coursesUpdateSubscription.unsubscribe();
   }
 
-  years: Year[] = [
-    { value: '2018', viewValue: '2018' },
-    { value: '2019', viewValue: '2019' },
-    { value: '2020', viewValue: '2020' },
-    { value: '2021', viewValue: '2021' },
-  ];
-
-  // year checkbox
-  yearTask: Task = {
-    name: 'Year',
-    completed: false,
-    color: 'primary',
-    subtasks: [
-      { name: '2018', completed: false, color: 'primary' },
-      { name: '2019', completed: false, color: 'primary' },
-      { name: '2020', completed: false, color: 'primary' },
-      { name: '2021', completed: false, color: 'primary' },
-    ],
-  };
-
-  updateYearAllComplete() {
-    this.allYearComplete =
-      this.yearTask.subtasks != null &&
-      this.yearTask.subtasks.every((t) => t.completed);
+  applyFilter(event: Event) {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.dataSource.filter = filterValue.trim().toLowerCase();
   }
 
-  someYearComplete(): boolean {
-    if (this.yearTask.subtasks == null) {
-      return false;
-    }
-    return (
-      this.yearTask.subtasks.filter((t) => t.completed).length > 0 &&
-      !this.allYearComplete
-    );
-  }
-
-  setYearAll(completed: boolean) {
-    this.allYearComplete = completed;
-    if (this.yearTask.subtasks == null) {
-      return;
-    }
-    this.yearTask.subtasks.forEach((t) => (t.completed = completed));
-  }
-
-  // semester checkbox
-
-  semesterTask: Task = {
-    name: 'Semester',
-    completed: false,
-    color: 'primary',
-    subtasks: [
-      { name: 'a', completed: false, color: 'primary' },
-      { name: 'b', completed: false, color: 'primary' },
-    ],
-  };
-
-  updateSemesterAllComplete() {
-    this.allSemesterComplete =
-      this.semesterTask.subtasks != null &&
-      this.semesterTask.subtasks.every((t) => t.completed);
-  }
-
-  someSemesterComplete(): boolean {
-    if (this.semesterTask.subtasks == null) {
-      return false;
-    }
-    return (
-      this.semesterTask.subtasks.filter((t) => t.completed).length > 0 &&
-      !this.allSemesterComplete
-    );
-  }
-
-  setSemesterAll(completed: boolean) {
-    this.allSemesterComplete = completed;
-    if (this.semesterTask.subtasks == null) {
-      return;
-    }
-    this.semesterTask.subtasks.forEach((t) => (t.completed = completed));
-  }
-  // end checkbox
-
-  onCoursesUpdate(form: NgForm) {
-    console.log(form);
-  }
-
-  private _mobileQueryListener: () => void;
-
-  // fetches the courses sorted with regard the 'sort.active' value
+  // fetches the assignments sorted with regard the 'sort.active' value
   sortData(sort: Sort) {
     if (!sort.active || sort.direction === '') {
       this.courses = this.courses.slice();
@@ -228,41 +141,90 @@ export class CoursesComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     this.coursesService
       .getCourses(this.coursesPerPage, this.currentPage, JSON.stringify(sort))
-      .subscribe((fetchedCourses) => {
-        this.courses = fetchedCourses.courses;
-        this.coursesService.clearFormArray(this.courseControls);
-        for (let i = 0; i < this.courses.length; i++) {
-          this.addItem(this.courses[i]);
-        }
+      .subscribe((response) => {
+        this.courses = response.courses;
+        // this.clearFormArray(this.assignmentControls);
+        // for (let i = 0; i < this.assignments.length; i++) {
+        //   this.addItem(this.assignments[i]);
+        // }
         this.isLoading = false;
       });
   }
 
+  openDialog(): void {
+    const dialogRef = this.dialog.open(NewTableLineComponent, {
+      width: '350px',
+      data: {
+        title: null,
+        description: null,
+        semester: null,
+        year: null,
+      },
+    });
+
+    // on clicking save to the dialog
+    dialogRef.afterClosed().subscribe((result) => {
+      console.log('The dialog was closed');
+      console.log(result);
+      this.addItem(result);
+      let unsavedControlIndex = this.courseControls.length - 1;
+      this.saveCourse(unsavedControlIndex, result);
+      this.dataSource = new MatTableDataSource(this.courseControls.value);
+    });
+  }
+
   // adds a control in the controlArray
-  addItem(
-    item: Course = this.emptyCourse,
-    courseControlIndex: number = null
-  ): void {
+  addItem(item: Course = this.emptyAssignment): void {
     this.addButtonClicked = true;
-
-    this.courseControls = this.coursesForm.get('coursesFormArray') as FormArray;
-
     this.courseControls.push(this.createItem(item));
-
     this.courseControls.updateValueAndValidity();
+  }
 
-    // expand each other mat-expansion-panel
-    if (courseControlIndex === this.courseControls.length - 1) {
-      this.permitEdit(null, courseControlIndex);
-      this.setMatPanelStep(courseControlIndex);
+  // saves the new course to the db
+  saveCourse(index: number, item: Course): void {
+    let newControl = this.courseControls.get(`${index}`);
+    newControl.patchValue({
+      createdAt: new Date().toString(),
+    });
+
+    newControl.patchValue({
+      instructor: this.user.userName,
+    });
+
+    // check specific controls, to be regarded valid
+    const formIsValid = (): boolean => {
+      if (
+        newControl.get('title').valid &&
+        newControl.get('description').valid &&
+        newControl.get('semester').valid &&
+        newControl.get('year').valid
+      ) {
+        return true;
+      }
+
+      return false;
+    };
+
+    if (!formIsValid()) {
+      console.log('Invalid form');
+      this.sharedService.throwError('Invalid input!');
+      return;
     }
+
+    this.isLoading = true;
+    this.coursesService.addCourse(item).subscribe((response) => {
+      newControl.patchValue({
+        id: response.currentCourse.id,
+        createdAt: response.currentCourse.createdAt,
+      });
+    });
   }
 
   // initialize a form control
   createItem(item: Course): FormGroup {
     return this.formBuilder.group({
       id: [item.id, Validators.required],
-      courseTitle: [item.courseTitle, Validators.required],
+      title: [item.title, Validators.required],
       description: [item.description, Validators.required],
       semester: [item.semester, Validators.required],
       year: [item.year, Validators.required],
@@ -276,178 +238,20 @@ export class CoursesComponent implements OnInit, OnDestroy {
     this.courseControls = this.coursesForm.get('coursesFormArray') as FormArray;
 
     if (this.courseControls.get(`${courseIndex}`)) {
-      this.coursesService.enableEdit(courseIndex, this.courses.length);
+      this.coursesService.onEditEnable(courseIndex, this.courses.length);
     }
   }
 
-  // expands the specific mat-expansion-panel
-  setMatPanelStep(index: number) {
-    this.matPanelStep[index] = true;
-  }
-
-  // collapses all the mat-expansion-panels
-  resetMatPanelStep() {
-    this.matPanelStep = [false];
-  }
-
-  // collapses a specific mat-expansion-panel
-  collapseMatPanelStep(index: number) {
-    this.matPanelStep[index] = false;
-  }
-
-  // saves the changes (update of an course or the creation of a new course)
-  onSaveCourse(event: Event, course: FormControl, formControlIndex: number) {
-    course.patchValue({
-      createdAt: new Date().toString(),
-    });
-
-    course.updateValueAndValidity();
-
-    const currentCourse: Course = {
-      id: course.value.id,
-      courseTitle: course.value.courseTitle,
-      description: course.value.description,
-      semester: course.value.semester,
-      year: course.value.year,
-      createdAt: course.value.createdAt,
-      instructor: course.value.instructor,
-    };
-
-    // inform the app for the sumbmission
-    this.coursesService.onSubmitted(formControlIndex);
-
-    // check specific controls, to be regarded valid
-    const formIsValid = (): boolean => {
-      if (
-        course.get('courseTitle').valid &&
-        course.get('description').valid &&
-        course.get('semester').valid &&
-        course.get('year').valid &&
-        course.get('createdAt').valid
-      ) {
-        return true;
-      }
-
-      return false;
-    };
-
-    if (!formIsValid()) {
-      console.log('Invalid form');
-      // TODO: throw an Error, not just console.log
-      return;
-    }
-
+  // fetches the assignments of the corresponding page of the pagination
+  onChangePage(pageData: PageEvent) {
+    this.isLoading = true;
+    this.currentPage = pageData.pageIndex + 1;
+    this.coursesPerPage = pageData.pageSize;
     this.coursesService
       .getCourses(this.coursesPerPage, this.currentPage)
-      .subscribe((fetchedCourses) => {
-        this.courses = fetchedCourses.courses;
-        this.totalCourses = fetchedCourses.maxCourses;
-
-        // this.addItem(course);
-        // this.courseSubmitted[] = true;
-        this.coursesService.onSubmitted(formControlIndex);
-
-        if (formControlIndex <= this.totalCourses - 1) {
-          this.mode = 'edit';
-        } else {
-          this.mode = 'create';
-        }
-
-        this.isLoading = true;
-        if (this.mode === 'create') {
-          this.coursesService
-            .addCourse(currentCourse)
-            .subscribe((responseData) => {
-              console.log(responseData);
-
-              let currentControl = (
-                this.coursesForm.get('coursesFormArray') as FormArray
-              ).get(`${formControlIndex}`);
-
-              // change the value of a single form control with the name filePath
-              currentControl.patchValue({
-                id: responseData.currentCourse.id,
-                courseTitle: responseData.currentCourse.courseTitle,
-                description: responseData.currentCourse.description,
-                semester: responseData.currentCourse.semester,
-                year: responseData.currentCourse.year,
-                createdAt: responseData.currentCourse.createdAt,
-              });
-
-              // update and validate the image field value
-              currentControl.updateValueAndValidity();
-
-              this.router.navigate(['/courses']);
-            });
-        } else {
-          currentCourse.id = this.courses[formControlIndex].id;
-          this.coursesService
-            .updateCourse(currentCourse)
-            .subscribe((responseData) => {
-              this.router.navigate(['/courses']);
-            });
-        }
-
-        this.coursesService.disableEdit(formControlIndex, this.courses.length);
-        this.coursesService.disableSubmit(formControlIndex);
-
+      .subscribe((response) => {
+        this.dataSource = new MatTableDataSource(response.courses);
         this.isLoading = false;
-      });
-  }
-
-  // deletes a course with regard it's index
-  onDelete(formControlIndex: number) {
-    this.courseControls = this.coursesForm.get('coursesFormArray') as FormArray;
-
-    this.coursesService
-      .getCourses(this.coursesPerPage, this.currentPage)
-      .subscribe((fetchedCourses) => {
-        this.courses = fetchedCourses.courses;
-        this.totalCourses = fetchedCourses.maxCourses;
-        this.isLoading = true;
-
-        this.coursesService
-          .deleteCourse(this.courseControls.get(`${formControlIndex}`).value.id)
-          .subscribe(
-            () => {
-              this.courseControls.removeAt(this.courseControls.length - 1);
-
-              this.isLoading = false;
-            },
-            () => {
-              this.isLoading = false;
-            }
-          );
-      });
-  }
-
-  onCancel(event: Event, formControlIndex: number) {
-    this.courseControls = this.coursesForm.get('coursesFormArray') as FormArray;
-
-    this.coursesService
-      .getCourses(this.coursesPerPage, this.currentPage)
-      .subscribe((fetchedCourses) => {
-        this.courses = fetchedCourses.courses;
-        this.totalCourses = fetchedCourses.maxCourses;
-        this.isLoading = true;
-
-        if (formControlIndex <= this.totalCourses - 1) {
-          this.mode = 'edit';
-        } else {
-          this.mode = 'create';
-        }
-
-        if (this.mode === 'create') {
-          this.courseControls.removeAt(this.courseControls.length - 1);
-          this.isLoading = false;
-        } else {
-          this.coursesService.disableEdit(
-            formControlIndex,
-            this.courses.length
-          );
-          this.collapseMatPanelStep(formControlIndex);
-          this.isLoading = false;
-        }
       });
   }
 }

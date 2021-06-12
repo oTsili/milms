@@ -8,10 +8,7 @@ import {
   HashLocationStrategy,
   LocationStrategy,
 } from '@angular/common';
-import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
-import { NgxDocViewerModule } from 'ngx-doc-viewer';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-
 import { AppComponent } from './app.component';
 import { httpsInterceptor } from './shared/interceptors/https.interceptor';
 import { ErrorInterceptor } from './shared/interceptors/error-interceptor';
@@ -22,16 +19,12 @@ import { AngularMaterialModule } from './angular-material.module';
 import { HomeComponent } from './home/home.component';
 import { LoginComponent } from './auth/login/login.component';
 import { SignupComponent } from './auth/signup/signup.component';
-import { ErrorComponent } from './shared/matDialog/error/error.component';
-import { NotificationComponent } from './shared/matDialog/notification/notification.component';
-import { AssignmentsModule } from './courses/assignments/assignments.module';
 import { FooterComponent } from './footer/footer.component';
-import { PdfViewerComponent } from './courses/assignments/assignment-list/pdf-viewer/pdf-viewer.component';
-import { DocViewerComponent } from './courses/assignments/assignment-list/doc-viewer/doc-viewer.component';
 import { JitsiMeetComponent } from './conference/jitsi-meet/jitsi-meet.componenet';
 import { EventsComponent } from './events/events.component';
+import { SharedModule } from './shared/shared.module';
 import { CoursesComponent } from './courses/courses.component';
-
+import { NewTableLineComponent } from './shared/matDialog/newTableLine/newTableLine.component';
 // import { CallDashComponent } from './conference/call-dash/call-dash.component';
 // import { ConferenceComponent } from './conference/conference.component';
 
@@ -42,14 +35,11 @@ import { CoursesComponent } from './courses/courses.component';
     HomeComponent,
     LoginComponent,
     SignupComponent,
-    ErrorComponent,
-    NotificationComponent,
-    PdfViewerComponent,
-    DocViewerComponent,
     FooterComponent,
     EventsComponent,
     JitsiMeetComponent,
     CoursesComponent,
+    NewTableLineComponent,
     // ConferenceComponent,
     // CallDashComponent,
   ],
@@ -62,13 +52,12 @@ import { CoursesComponent } from './courses/courses.component';
     MatToolbarModule,
     HttpClientModule,
     AngularMaterialModule,
-    NgxDocViewerModule,
     // AuthModule,
     FormsModule,
-    AssignmentsModule,
-    NgxExtendedPdfViewerModule,
     CommonModule,
+    SharedModule,
   ],
+
   providers: [
     { provide: LocationStrategy, useClass: HashLocationStrategy },
     { provide: Window, useValue: window },
@@ -76,6 +65,6 @@ import { CoursesComponent } from './courses/courses.component';
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
   ],
   bootstrap: [AppComponent],
-  entryComponents: [ErrorComponent],
+  // entryComponents: [ErrorComponent],
 })
 export class AppModule {}

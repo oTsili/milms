@@ -174,10 +174,10 @@ export class AuthService {
   // save to the class var tokenTimer the timer to expire the token
   private setAuthTimer(duration: number) {
     this.tokenTimer = setTimeout(() => {
+      this.logout();
       this.sharedService.throwNotification(
         'Your session has expired. Please login again.'
       );
-      this.logout();
     }, duration * 1000);
   }
 

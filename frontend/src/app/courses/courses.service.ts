@@ -1,11 +1,10 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { FormArray } from '@angular/forms';
 import { Subject } from 'rxjs';
+import { Course } from 'src/app/models/course.model';
+import { environment } from 'src/environments/environment';
 import { map } from 'rxjs/operators';
-import { environment } from '../../environments/environment.prod';
-import { Course } from '../models/course.model';
-import { SharedService } from '../shared/services/shared.service';
+import { HttpClient } from '@angular/common/http';
+import { User } from 'src/app/models/auth-data.model';
 
 const BACKEND_URL = environment.COURSES_BASE_URL + '/api/courses';
 
@@ -13,92 +12,78 @@ const BACKEND_URL = environment.COURSES_BASE_URL + '/api/courses';
 export class CoursesService {
   private editableCourses: boolean[] = [false];
   private editButtonListener = new Subject<boolean[]>();
-  private submitListener = new Subject<boolean[]>();
-  private submittedCourses: boolean[] = [false];
+  private coursesUpdateListener = new Subject<{
+    courses: Course[];
+    coursesCount: number;
+  }>();
 
-  constructor(private http: HttpClient, private sharedService: SharedService) {}
+  constructor(private http: HttpClient) {}
+
+  /////// Subscriptions /////////
+
+  getCoursesListener() {
+    return this.coursesUpdateListener.asObservable();
+  }
+
+  onCoursesUpdate(updatedCourses: Course[], coursesNumber: number) {
+    this.coursesUpdateListener.next({
+      courses: [...updatedCourses],
+      coursesCount: coursesNumber,
+    });
+  }
 
   getEditListener() {
     return this.editButtonListener.asObservable();
   }
 
-  enableEdit(courseIndex: number, coursessLength: number) {
+  onEditEnable(courseIndex: number, coursessLength: number) {
     this.editableCourses[courseIndex] = true;
     this.editButtonListener.next(this.editableCourses);
   }
 
-  disableEdit(courseIndex: number, coursesLength: number) {
+  onEditDisable(courseIndex: number, coursesLength: number) {
     this.editableCourses[courseIndex] = false;
     this.editButtonListener.next(this.editableCourses);
   }
 
-  getSubmitListener() {
-    return this.submitListener.asObservable();
-  }
-
-  onSubmitted(assignmentIndex: number) {
-    this.submittedCourses[assignmentIndex] = true;
-    this.submitListener.next(this.submittedCourses);
-  }
-
-  disableSubmit(assignmentIndex: number) {
-    this.submittedCourses[assignmentIndex] = false;
-    this.submitListener.next(this.submittedCourses);
-  }
+  //////// Functions //////////
 
   getCourses(coursesPerPage: number, currentPage: number, sort: string = '') {
     const queryParams = `?pagesize=${coursesPerPage}&page=${currentPage}&sort=${sort}`;
 
     return this.http
-      .get<{ message: string; courses: any; maxCourses: number }>(
-        BACKEND_URL + queryParams,
+      .get<{ message: string; courses: Course[]; maxCourses: number }>(
+        `${BACKEND_URL}${queryParams}`,
         {
           withCredentials: true,
         }
       )
       .pipe(
         map((courseData) => {
+          console.log(courseData);
+
           return {
-            courses: courseData.courses.map(
-              (course: {
-                id?: string;
-                courseTitle: string;
-                description: string;
-                semester: string;
-                year: string;
-                createdAt: string;
-                instructorId: {
-                  firstName: string;
-                  lastName: string;
-                  id: string;
-                  email: string;
-                  role: string;
-                };
-              }) => {
-                return {
-                  id: course.id,
-                  courseTitle: course.courseTitle,
-                  description: course.description,
-                  semester: course.semester,
-                  year: course.year,
-                  createdAt: course.createdAt,
-                  instructor: `${course.instructorId.firstName} ${course.instructorId.lastName}`,
-                };
-              }
-            ),
+            courses: courseData.courses.map((course, index) => {
+              const instructor = `${(course.instructorId as User).firstName} ${
+                (course.instructorId as User).lastName
+              }`;
+
+              return {
+                position: (currentPage - 1) * coursesPerPage + (index + 1),
+                id: course.id,
+                title: course.title,
+                description: course.description,
+                instructor,
+
+                createdAt: course.createdAt,
+                year: course.year,
+                semester: course.semester,
+              };
+            }),
             maxCourses: courseData.maxCourses,
           };
         })
       );
-  }
-
-  // removes all the values controls of the formArray
-  clearFormArray(formArray: FormArray) {
-    if (formArray) {
-      while (formArray.length !== 0) {
-        formArray.removeAt(0);
-      }
-    }
   }
 
   addCourse(course: Course) {
@@ -109,23 +94,5 @@ export class CoursesService {
           withCredentials: true,
         })
     );
-  }
-
-  updateCourse(course: Course) {
-    const { id } = course;
-
-    return this.http.put<{ message: string; updatedAssignment: Course }>(
-      `${BACKEND_URL}/${id}`,
-      course,
-      {
-        withCredentials: true,
-      }
-    );
-  }
-
-  deleteCourse(courseId: string) {
-    return this.http.delete(`${BACKEND_URL}/${courseId}`, {
-      withCredentials: true,
-    });
   }
 }

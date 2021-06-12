@@ -60,8 +60,9 @@ export const createMaterials = catchAsync(
     }
 
     const fetchedMaterialFiles = await Material.find({
-      assignmentId,
-      creatorId,
+      courseId,
+      // assignmentId,
+      // creatorId,
     });
 
     // 6)  publish the event

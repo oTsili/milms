@@ -135,7 +135,7 @@ export class MaterialsService {
             console.log(materialsFileData);
 
             return {
-              materialFiles: materialsFileData.fetchedMaterialFiles.map(
+              fetchedMaterialFiles: materialsFileData.fetchedMaterialFiles.map(
                 (materialFile) => {
                   return {
                     id: materialFile.id,
