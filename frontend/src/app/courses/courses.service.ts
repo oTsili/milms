@@ -95,4 +95,10 @@ export class CoursesService {
         })
     );
   }
+
+  onDelete(courseId: string) {
+    return this.http.delete(`${BACKEND_URL}/${courseId}`, {
+      withCredentials: true,
+    });
+  }
 }

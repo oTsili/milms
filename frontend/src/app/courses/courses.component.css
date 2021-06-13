@@ -39,3 +39,7 @@ table {
   align-items: top;
   /* align-self: center; */
 }
+
+.button {
+  cursor: pointer;
+}

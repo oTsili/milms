@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import path from 'path';
 var logger = require('winston');
 const Riak = require('basho-riak-client');
-import { catchAsync, extractFile } from '@otmilms/common';
+import { BadRequestError, catchAsync, extractFile } from '@otmilms/common';
 import mongoose from 'mongoose';
 
 // import { courseCreatedPublisher } from './events/publishers/courses-publisher';
@@ -102,6 +102,10 @@ export const deleteCourse = catchAsync(
     const userId = (<any>req).currentUser.id;
 
     const course = await Course.findById(courseId).populate('instructorId');
+
+    if (!course) {
+      throw new BadRequestError('The course was not found!');
+    }
     const user = course!.instructorId as UserDoc;
 
     let result;

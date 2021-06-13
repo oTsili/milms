@@ -12,6 +12,7 @@ import { SharedService } from '../shared/services/shared.service';
 import { NewTableLineComponent } from 'src/app/shared/matDialog/newTableLine/newTableLine.component';
 import { HeaderService } from '../header/header.service';
 import { PageEvent } from '@angular/material/paginator';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-courses',
@@ -25,11 +26,14 @@ export class CoursesComponent implements OnInit, OnDestroy {
     'position',
     'title',
     'description',
+    'year',
+    'semester',
     'instructor',
     'navigate',
   ];
-  emptyAssignment: Course = {
+  emptyCourse: Course = {
     id: null,
+    position: null,
     title: null,
     description: null,
     semester: null,
@@ -38,15 +42,6 @@ export class CoursesComponent implements OnInit, OnDestroy {
     instructor: null,
   };
 
-  currentAssignment: Course = {
-    id: null,
-    title: null,
-    description: null,
-    semester: null,
-    year: null,
-    createdAt: null,
-    instructor: null,
-  };
   user: {
     userPhotoPath: string;
     userName: string;
@@ -69,6 +64,7 @@ export class CoursesComponent implements OnInit, OnDestroy {
     private coursesService: CoursesService,
     private sharedService: SharedService,
     private headerService: HeaderService,
+    private router: Router,
     private formBuilder: FormBuilder,
     public dialog: MatDialog
   ) {
@@ -97,9 +93,7 @@ export class CoursesComponent implements OnInit, OnDestroy {
       });
 
     // define and initialize the form group and formArray
-    this.coursesForm = this.formBuilder.group({
-      coursesFormArray: this.formBuilder.array([]),
-    });
+    this.initializeControls();
 
     // fetch the courses
     this.coursesService
@@ -163,33 +157,34 @@ export class CoursesComponent implements OnInit, OnDestroy {
     });
 
     // on clicking save to the dialog
-    dialogRef.afterClosed().subscribe((result) => {
-      console.log('The dialog was closed');
-      console.log(result);
-      this.addItem(result);
-      let unsavedControlIndex = this.courseControls.length - 1;
-      this.saveCourse(unsavedControlIndex, result);
-      this.dataSource = new MatTableDataSource(this.courseControls.value);
-    });
-  }
+    dialogRef.afterClosed().subscribe((dialogInput) => {
+      let formIsInvalid: boolean = true;
 
-  // adds a control in the controlArray
-  addItem(item: Course = this.emptyAssignment): void {
-    this.addButtonClicked = true;
-    this.courseControls.push(this.createItem(item));
-    this.courseControls.updateValueAndValidity();
+      if (dialogInput) {
+        const { title, description, semester, year } = dialogInput;
+        const resultArray = [title, description, semester, year];
+        console.log('resultArray', resultArray);
+        formIsInvalid = resultArray.some(
+          (item) => item === undefined || item === null
+        );
+      }
+
+      if (formIsInvalid || !dialogInput) {
+        this.sharedService.throwError('Invalid input!');
+        return;
+      }
+
+      dialogInput.createdAt = new Date().toString();
+      dialogInput.instructor = this.user.userName;
+      this.saveCourse(this.courseControls.length, dialogInput);
+    });
   }
 
   // saves the new course to the db
-  saveCourse(index: number, item: Course): void {
-    let newControl = this.courseControls.get(`${index}`);
-    newControl.patchValue({
-      createdAt: new Date().toString(),
-    });
+  saveCourse(index: number, courseInput: Course): void | boolean {
+    this.addItem(courseInput);
 
-    newControl.patchValue({
-      instructor: this.user.userName,
-    });
+    let newControl = this.courseControls.get(`${index}`);
 
     // check specific controls, to be regarded valid
     const formIsValid = (): boolean => {
@@ -207,30 +202,54 @@ export class CoursesComponent implements OnInit, OnDestroy {
 
     if (!formIsValid()) {
       console.log('Invalid form');
-      this.sharedService.throwError('Invalid input!');
       return;
     }
 
     this.isLoading = true;
-    this.coursesService.addCourse(item).subscribe((response) => {
+    this.coursesService.addCourse(courseInput).subscribe((response) => {
       newControl.patchValue({
         id: response.currentCourse.id,
-        createdAt: response.currentCourse.createdAt,
       });
+
+      this.coursesService
+        .getCourses(this.coursesPerPage, this.currentPage)
+        .subscribe((fetchedCourses) => {
+          this.courses = fetchedCourses.courses;
+          this.totalCourses = fetchedCourses.maxCourses;
+
+          this.dataSource = new MatTableDataSource(this.courses);
+          this.isLoading = false;
+        });
+      this.isLoading = false;
     });
   }
 
-  // initialize a form control
-  createItem(item: Course): FormGroup {
-    return this.formBuilder.group({
-      id: [item.id, Validators.required],
-      title: [item.title, Validators.required],
-      description: [item.description, Validators.required],
-      semester: [item.semester, Validators.required],
-      year: [item.year, Validators.required],
-      createdAt: [item.createdAt, Validators.required],
-      instructor: [item.instructor, Validators.required],
-    });
+  // deletes a course with regard it's index
+  deleteCourse(controlIndex: number) {
+    this.courseControls = this.coursesForm.get('coursesFormArray') as FormArray;
+
+    this.coursesService
+      .onDelete(this.courseControls.get(`${controlIndex}`).value.id)
+      .subscribe(
+        (response) => {
+          this.coursesService
+            .getCourses(this.coursesPerPage, this.currentPage)
+            .subscribe((fetchedCourses) => {
+              this.courses = fetchedCourses.courses;
+              this.totalCourses = fetchedCourses.maxCourses;
+
+              // remove from the formArray
+              this.courseControls.removeAt(controlIndex);
+
+              // update the table
+              this.dataSource = new MatTableDataSource(this.courses);
+              this.isLoading = false;
+            });
+        },
+        () => {
+          this.isLoading = false;
+        }
+      );
   }
 
   // enables the input functionality in the corresponding control
@@ -253,5 +272,33 @@ export class CoursesComponent implements OnInit, OnDestroy {
         this.dataSource = new MatTableDataSource(response.courses);
         this.isLoading = false;
       });
+  }
+
+  initializeControls() {
+    // define and initialize the form group and formArray
+    this.coursesForm = this.formBuilder.group({
+      coursesFormArray: this.formBuilder.array([]),
+    });
+  }
+
+  // adds a control in the controlArray
+  addItem(item: Course = this.emptyCourse): void {
+    this.addButtonClicked = true;
+    this.courseControls.push(this.createItem(item));
+    this.courseControls.updateValueAndValidity();
+  }
+
+  // initialize a form control
+  createItem(item: Course): FormGroup {
+    return this.formBuilder.group({
+      id: [item.id, Validators.required],
+      position: [item.position, Validators.required],
+      title: [item.title, Validators.required],
+      description: [item.description, Validators.required],
+      semester: [item.semester, Validators.required],
+      year: [item.year, Validators.required],
+      createdAt: [item.createdAt, Validators.required],
+      instructor: [item.instructor, Validators.required],
+    });
   }
 }
