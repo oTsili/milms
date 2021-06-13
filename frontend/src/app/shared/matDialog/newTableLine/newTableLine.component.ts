@@ -10,7 +10,9 @@ export class NewTableLineComponent {
   constructor(
     public dialogRef: MatDialogRef<NewTableLineComponent>,
     @Inject(MAT_DIALOG_DATA) public data: DialogData
-  ) {}
+  ) {
+    console.log(data);
+  }
 
   onNoClick(): void {
     this.dialogRef.close();

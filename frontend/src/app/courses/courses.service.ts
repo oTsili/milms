@@ -101,4 +101,17 @@ export class CoursesService {
       withCredentials: true,
     });
   }
+
+  onUpdateCourse(course: Course) {
+    console.log(course);
+    const { id } = course;
+
+    return this.http.put<{ message: string; updatedCourse: Course }>(
+      `${BACKEND_URL}/${id}`,
+      course,
+      {
+        withCredentials: true,
+      }
+    );
+  }
 }

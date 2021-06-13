@@ -25,6 +25,8 @@ import { EventsComponent } from './events/events.component';
 import { SharedModule } from './shared/shared.module';
 import { CoursesComponent } from './courses/courses.component';
 import { NewTableLineComponent } from './shared/matDialog/newTableLine/newTableLine.component';
+import { CourseComponent } from './courses/course/course.component';
+
 // import { CallDashComponent } from './conference/call-dash/call-dash.component';
 // import { ConferenceComponent } from './conference/conference.component';
 
@@ -40,6 +42,7 @@ import { NewTableLineComponent } from './shared/matDialog/newTableLine/newTableL
     JitsiMeetComponent,
     CoursesComponent,
     NewTableLineComponent,
+    CourseComponent,
     // ConferenceComponent,
     // CallDashComponent,
   ],

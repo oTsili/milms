@@ -12,6 +12,7 @@ import { JitsiMeetComponent } from './conference/jitsi-meet/jitsi-meet.componene
 import { EventsComponent } from './events/events.component';
 import { PdfViewerComponent } from './shared/pdf-viewer/pdf-viewer.component';
 import { CoursesComponent } from './courses/courses.component';
+import { CourseComponent } from './courses/course/course.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -28,32 +29,32 @@ const routes: Routes = [
         },
       ],
     },
-    // children: [
-    //   {
-    //     path: ':courseId/assignments',
-    //     redirectTo: 'courses/:courseId/assignments',
-    //     pathMatch: 'full',
-    //   },
-    // ],
+    children: [
+      {
+        path: ':courseId/assignments',
+        redirectTo: 'courses/:courseId',
+        pathMatch: 'full',
+      },
+    ],
   },
-  // {
-  //   path: 'courses/:courseId/assignments',
-  //   component: AssignmentListComponent,
-  //   canActivate: [AuthGuard],
-  //   data: {
-  //     title: 'assignments',
-  //     breadcrumb: [
-  //       {
-  //         label: 'Courses',
-  //         url: 'courses',
-  //       },
-  //       {
-  //         label: 'Assignments',
-  //         url: 'courses/:courseId/assignments',
-  //       },
-  //     ],
-  //   },
-  // },
+  {
+    path: 'courses/:courseId',
+    component: CourseComponent,
+    canActivate: [AuthGuard],
+    data: {
+      title: 'assignments',
+      breadcrumb: [
+        {
+          label: 'Courses',
+          url: 'courses',
+        },
+        {
+          label: '{{ dynamicText }}',
+          url: 'courses/:courseId',
+        },
+      ],
+    },
+  },
 
   { path: 'signup', component: SignupComponent },
   { path: 'login', component: LoginComponent },

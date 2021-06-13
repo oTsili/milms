@@ -6,4 +6,7 @@ export const environment = {
   AUTH_STATIC_BASE_URL: '',
   ASSIGNMENT_BASE_URL: '',
   COURSES_BASE_URL: '',
+  TOTAL_COURSES: 0,
+  COURSES_PER_PAGE: 5,
+  CURRENT_PAGE: 1,
 };

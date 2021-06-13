@@ -134,7 +134,7 @@ export const updateCourse = catchAsync(
     // create a course instance
     const updatedCourse = new Course({
       _id: req.params.id,
-      courseTitle: req.body.courseTitle,
+      title: req.body.title,
       description: req.body.description,
       semester: req.body.semester,
       year: req.body.year,

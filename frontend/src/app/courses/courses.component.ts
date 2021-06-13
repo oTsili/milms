@@ -2,9 +2,15 @@ import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { MatSort } from '@angular/material/sort';
 import { Subscription } from 'rxjs';
 import { Sort } from '@angular/material/sort';
-import { FormGroup, FormBuilder, FormArray, Validators } from '@angular/forms';
+import {
+  FormGroup,
+  FormBuilder,
+  FormArray,
+  Validators,
+  AbstractControl,
+} from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 
 import { CoursesService } from './courses.service';
 import { Course } from '../models/course.model';
@@ -13,6 +19,7 @@ import { NewTableLineComponent } from 'src/app/shared/matDialog/newTableLine/new
 import { HeaderService } from '../header/header.service';
 import { PageEvent } from '@angular/material/paginator';
 import { Router } from '@angular/router';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-courses',
@@ -54,11 +61,12 @@ export class CoursesComponent implements OnInit, OnDestroy {
   courseControls: FormArray;
   userRole: string;
   coursesCount: number;
+  mode: string;
   coursesForm: FormGroup;
   isLoading = false;
-  totalCourses = 0;
-  coursesPerPage = 5;
-  currentPage = 1;
+  totalCourses = environment.TOTAL_COURSES;
+  coursesPerPage = environment.COURSES_PER_PAGE;
+  currentPage = environment.CURRENT_PAGE;
 
   constructor(
     private coursesService: CoursesService,
@@ -145,16 +153,35 @@ export class CoursesComponent implements OnInit, OnDestroy {
       });
   }
 
-  openDialog(): void {
-    const dialogRef = this.dialog.open(NewTableLineComponent, {
-      width: '350px',
-      data: {
-        title: null,
-        description: null,
-        semester: null,
-        year: null,
-      },
-    });
+  openDialog(controlIndex: number): void {
+    let currentControl = this.courseControls.get(`${controlIndex}`);
+
+    let dialogRef: MatDialogRef<NewTableLineComponent, any>;
+    if (controlIndex <= this.totalCourses - 1) {
+      // Edit control
+      this.mode = 'edit';
+      dialogRef = this.dialog.open(NewTableLineComponent, {
+        width: '350px',
+        data: {
+          title: currentControl.value.title,
+          description: currentControl.value.description,
+          semester: currentControl.value.semester,
+          year: currentControl.value.year,
+        },
+      });
+    } else {
+      //  Add new control
+      this.mode = 'create';
+      dialogRef = this.dialog.open(NewTableLineComponent, {
+        width: '350px',
+        data: {
+          title: null,
+          description: null,
+          semester: null,
+          year: null,
+        },
+      });
+    }
 
     // on clicking save to the dialog
     dialogRef.afterClosed().subscribe((dialogInput) => {
@@ -176,35 +203,74 @@ export class CoursesComponent implements OnInit, OnDestroy {
 
       dialogInput.createdAt = new Date().toString();
       dialogInput.instructor = this.user.userName;
-      this.saveCourse(this.courseControls.length, dialogInput);
+      this.saveCourse(this.courseControls.length, dialogInput, controlIndex);
     });
   }
 
   // saves the new course to the db
-  saveCourse(index: number, courseInput: Course): void | boolean {
+  saveCourse(
+    controlsLength: number,
+    courseInput: Course,
+    controlIndex: number
+  ): void | boolean {
     this.addItem(courseInput);
 
-    let newControl = this.courseControls.get(`${index}`);
+    let newControl = this.courseControls.get(`${controlsLength}`);
 
-    // check specific controls, to be regarded valid
-    const formIsValid = (): boolean => {
-      if (
-        newControl.get('title').valid &&
-        newControl.get('description').valid &&
-        newControl.get('semester').valid &&
-        newControl.get('year').valid
-      ) {
-        return true;
-      }
-
-      return false;
-    };
-
-    if (!formIsValid()) {
+    if (!this.formIsValid(newControl)) {
       console.log('Invalid form');
       return;
     }
 
+    if ((this.mode = 'edit')) {
+      this.updateCourse(courseInput, controlIndex);
+    } else if ((this.mode = 'create')) {
+      this.addNewCourse(courseInput, newControl);
+    }
+  }
+
+  // check specific controls, to be regarded valid
+  formIsValid = (newControl: AbstractControl): boolean => {
+    if (
+      newControl.get('title').valid &&
+      newControl.get('description').valid &&
+      newControl.get('semester').valid &&
+      newControl.get('year').valid
+    ) {
+      return true;
+    }
+
+    return false;
+  };
+
+  // updates a specific control
+  updateCourse(currentCourse: Course, courseIndex: number) {
+    currentCourse.id = this.courseControls.get(`${courseIndex}`).value.id;
+    console.log(currentCourse, courseIndex);
+    this.coursesService.onUpdateCourse(currentCourse).subscribe(
+      (response) => {
+        this.coursesService
+          .getCourses(this.coursesPerPage, this.currentPage)
+          .subscribe((fetchedCourses) => {
+            this.courses = fetchedCourses.courses;
+            this.totalCourses = fetchedCourses.maxCourses;
+
+            // remove from the formArray
+            this.courseControls.removeAt(courseIndex);
+
+            // update the table
+            this.dataSource = new MatTableDataSource(this.courses);
+            this.isLoading = false;
+          });
+      },
+      () => {
+        this.isLoading = false;
+      }
+    );
+  }
+
+  // add new course to the db
+  addNewCourse(courseInput: Course, newControl: AbstractControl) {
     this.isLoading = true;
     this.coursesService.addCourse(courseInput).subscribe((response) => {
       newControl.patchValue({
