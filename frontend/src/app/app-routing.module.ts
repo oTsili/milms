@@ -49,7 +49,7 @@ const routes: Routes = [
           url: 'courses',
         },
         {
-          label: '{{ dynamicText }}',
+          label: '{{dynamicText}}',
           url: 'courses/:courseId',
         },
       ],

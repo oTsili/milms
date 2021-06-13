@@ -82,6 +82,9 @@ export class CoursesComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    // enable the page breadcrumb
+    this.sharedService.enableBreadcrumb(true);
+
     // update the null values of the current user to be used in new assignments
     this.user = this.headerService.getUserData();
     // define custom subscriptions
@@ -153,23 +156,13 @@ export class CoursesComponent implements OnInit, OnDestroy {
       });
   }
 
-  openDialog(controlIndex: number): void {
+  openDialog(controlIndex: number, mode: string): void {
+    this.mode = mode;
     let currentControl = this.courseControls.get(`${controlIndex}`);
 
     let dialogRef: MatDialogRef<NewTableLineComponent, any>;
-    if (controlIndex <= this.totalCourses - 1) {
-      // Edit control
-      this.mode = 'edit';
-      dialogRef = this.dialog.open(NewTableLineComponent, {
-        width: '350px',
-        data: {
-          title: currentControl.value.title,
-          description: currentControl.value.description,
-          semester: currentControl.value.semester,
-          year: currentControl.value.year,
-        },
-      });
-    } else {
+
+    if (this.mode === 'create') {
       //  Add new control
       this.mode = 'create';
       dialogRef = this.dialog.open(NewTableLineComponent, {
@@ -179,6 +172,18 @@ export class CoursesComponent implements OnInit, OnDestroy {
           description: null,
           semester: null,
           year: null,
+        },
+      });
+    } else if (this.mode === 'edit') {
+      // Edit control
+      this.mode = 'edit';
+      dialogRef = this.dialog.open(NewTableLineComponent, {
+        width: '350px',
+        data: {
+          title: currentControl.value.title,
+          description: currentControl.value.description,
+          semester: currentControl.value.semester,
+          year: currentControl.value.year,
         },
       });
     }
@@ -222,9 +227,9 @@ export class CoursesComponent implements OnInit, OnDestroy {
       return;
     }
 
-    if ((this.mode = 'edit')) {
+    if (this.mode === 'edit') {
       this.updateCourse(courseInput, controlIndex);
-    } else if ((this.mode = 'create')) {
+    } else if (this.mode === 'create') {
       this.addNewCourse(courseInput, newControl);
     }
   }

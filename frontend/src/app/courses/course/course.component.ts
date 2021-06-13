@@ -3,10 +3,11 @@ import { MatBreadcrumbService } from 'mat-breadcrumb';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { CoursesService } from '../courses.service';
 import { environment } from 'src/environments/environment';
+import { SharedService } from 'src/app/shared/services/shared.service';
 @Component({
   selector: 'app-courses',
-  templateUrl: './courses.component.html',
-  styleUrls: ['./courses.component.css', './courses.component.scss'],
+  templateUrl: './course.component.html',
+  styleUrls: ['./course.component.css', './course.component.scss'],
 })
 export class CourseComponent implements OnInit, OnDestroy {
   courseId: string;
@@ -17,10 +18,14 @@ export class CourseComponent implements OnInit, OnDestroy {
   constructor(
     private matBreadcrumbService: MatBreadcrumbService,
     public route: ActivatedRoute,
+    private sharedService: SharedService,
     private coursesService: CoursesService
   ) {}
 
   ngOnInit() {
+    // enable the page breadcrumb
+    this.sharedService.enableBreadcrumb(true);
+
     this.route.paramMap.subscribe((paraMap: ParamMap) => {
       if (paraMap.has('courseId')) {
         this.courseId = paraMap.get('courseId');
