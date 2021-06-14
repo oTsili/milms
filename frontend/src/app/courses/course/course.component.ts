@@ -4,6 +4,7 @@ import { ActivatedRoute, ParamMap } from '@angular/router';
 import { CoursesService } from '../courses.service';
 import { environment } from 'src/environments/environment';
 import { SharedService } from 'src/app/shared/services/shared.service';
+import { Course } from 'src/app/models/course.model';
 @Component({
   selector: 'app-courses',
   templateUrl: './course.component.html',
@@ -11,6 +12,7 @@ import { SharedService } from 'src/app/shared/services/shared.service';
 })
 export class CourseComponent implements OnInit, OnDestroy {
   courseId: string;
+  course: Course;
   totalCourses = environment.TOTAL_COURSES;
   coursesPerPage = environment.COURSES_PER_PAGE;
   currentPage = environment.CURRENT_PAGE;
@@ -34,12 +36,27 @@ export class CourseComponent implements OnInit, OnDestroy {
       }
     });
 
-    // get course NO COURSES and update the dynamic text with the course title
-    const breadcrumb = {
-      customText: 'This is Custom Text',
-      dynamicText: 'Level 2 ',
-    };
-    this.matBreadcrumbService.updateBreadcrumbLabels(breadcrumb);
+    this.updateMatBreadcrumb();
   }
+
   ngOnDestroy() {}
+
+  getCourse(id: string) {
+    return this.coursesService.onGetCourse(id);
+  }
+
+  updateMatBreadcrumb() {
+    this.getCourse(this.courseId).subscribe((response) => {
+      console.log(response);
+      this.course = response.course;
+
+      console.log(this.course);
+      const breadcrumb = {
+        customText: 'This is Custom Text',
+        dynamicText: this.course.title,
+      };
+      this.matBreadcrumbService.updateBreadcrumbLabels(breadcrumb);
+    });
+    // get course NO COURSES and update the dynamic text with the course title
+  }
 }

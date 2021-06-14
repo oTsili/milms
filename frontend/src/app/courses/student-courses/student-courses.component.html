@@ -1,0 +1,201 @@
+<div class="page-container" [class.example-is-mobile]="mobileQuery.matches">
+  <span class="course-sidenav">
+    <button mat-icon-button (click)="snav.toggle()">
+      <mat-icon>menu</mat-icon>
+    </button>
+    <form
+      (submit)="onCoursesUpdate(updateCoursesForm)"
+      #updateCoursesForm="ngForm"
+    >
+      <mat-sidenav
+        #snav
+        [mode]="mobileQuery.matches ? 'over' : 'side'"
+        [fixedInViewport]="mobileQuery.matches"
+        fixedTopGap="56"
+      >
+        <!-- checkbox -->
+        <section class="checkbox-section">
+          <span class="checkbox-list-section">
+            <mat-checkbox
+              class="checkbox-margin"
+              [checked]="allYearComplete"
+              [color]="yearTask.color"
+              [indeterminate]="someYearComplete()"
+              (change)="setYearAll($event.checked)"
+            >
+              {{ yearTask.name }}
+            </mat-checkbox>
+          </span>
+          <span class="checkbox-list-section">
+            <ul>
+              <li
+                *ngFor="
+                  let yearSubtask of yearTask.subtasks;
+                  let yearControlIndex = index
+                "
+              >
+                <mat-checkbox
+                  name="{{ yearSubtask.name }}"
+                  [checked]="yearSubtask.value"
+                  [(ngModel)]="yearSubtask.completed"
+                  [color]="yearSubtask.color"
+                  (ngModelChange)="updateYearAllComplete()"
+                >
+                  {{ yearSubtask.name }}
+                </mat-checkbox>
+              </li>
+            </ul>
+          </span>
+          <span class="checkbox-list-section">
+            <mat-checkbox
+              class="checkbox-margin"
+              [checked]="allSemesterComplete"
+              [color]="semesterTask.color"
+              [indeterminate]="someSemesterComplete()"
+              (change)="setSemesterAll($event.checked)"
+            >
+              {{ semesterTask.name }}
+            </mat-checkbox>
+          </span>
+
+          <span class="checkbox-list-section">
+            <ul>
+              <li
+                *ngFor="
+                  let semesterSubtask of semesterTask.subtasks;
+                  let semesterControlIndex = index
+                "
+              >
+                <mat-checkbox
+                  name="{{ semesterSubtask.name }}"
+                  [checked]="semesterSubtask.value"
+                  [(ngModel)]="semesterSubtask.completed"
+                  [color]="semesterSubtask.color"
+                  (ngModelChange)="updateSemesterAllComplete()"
+                >
+                  {{ semesterSubtask.name }}
+                </mat-checkbox>
+              </li>
+            </ul>
+          </span>
+          <button
+            mat-raised-button
+            type="submit"
+            color="accent"
+            matTooltip="update the list of courses"
+          >
+            Update
+          </button>
+        </section>
+        <!-- end checkbox -->
+      </mat-sidenav>
+    </form>
+  </span>
+  <span class="course-content">
+    <mat-paginator
+      [length]="totalCourses"
+      [pageSize]="coursesPerPage"
+      [pageSizeOptions]="pageSizeOptions"
+      (page)="onChangePage($event)"
+      *ngIf="courses.length > 0"
+    ></mat-paginator>
+
+    <mat-accordion>
+      <mat-spinner *ngIf="isLoading"></mat-spinner>
+      <ng-container
+        *ngFor="let course of courses; let formControlIndex = index"
+      >
+        <mat-expansion-panel
+          [expanded]="matPanelStep[formControlIndex]"
+          *ngIf="course.title && !isLoading"
+        >
+          <mat-expansion-panel-header class="flex-space-between-row">
+            <!-- start -->
+
+            <span class="course-components line-header">
+              <mat-panel-title>
+                <span class="course-components">
+                  <mat-label class="matLabel course-components"
+                    >Title</mat-label
+                  >
+                  <div>{{ course.title }}</div>
+                </span>
+              </mat-panel-title>
+            </span>
+            <!-- end -->
+
+            <!-- start -->
+
+            <span class="course-components line-header">
+              <span class="course-components">
+                <mat-label class="matLabel course-components">Year</mat-label>
+                <div>{{ course.year }}</div>
+              </span>
+            </span>
+            <!-- end -->
+
+            <!-- start -->
+
+            <span class="course-components line-header">
+              <span class="course-components">
+                <mat-label class="matLabel course-components"
+                  >Semester</mat-label
+                >
+                <div>{{ course.semester }}</div>
+              </span>
+            </span>
+            <!-- end -->
+
+            <span class="course-components line-header">
+              <span class="course-components">
+                <mat-label class="matLabel course-components"
+                  >Instructor</mat-label
+                >
+                <div>{{ course.instructor }}</div>
+              </span>
+            </span>
+          </mat-expansion-panel-header>
+          <div class="flex-column">
+            <mat-action-row class="flex-start-row">
+              <div class="course-row">
+                <mat-label class="matLabel course-components"
+                  >Description</mat-label
+                >
+                <div class="description-field">
+                  {{ course.description }}
+                </div>
+              </div>
+            </mat-action-row>
+          </div>
+          <mat-divider></mat-divider>
+          <div class="buttons-line">
+            <button
+              mat-stroked-button
+              style="color: #1a74e6"
+              [routerLink]="['/courses', course.id]"
+              matTooltip="Visit the Course page"
+            >
+              Visit
+            </button>
+            <button
+              mat-stroked-button
+              style="color: #3e4676"
+              matTooltip="Abort the changes"
+            >
+              Register
+            </button>
+          </div>
+        </mat-expansion-panel>
+      </ng-container>
+    </mat-accordion>
+
+    <p
+      class="mat-body-1 info-text"
+      *ngIf="!coursesForm.get('coursesFormArray').get('0') && !isLoading"
+    >
+      <mat-card class="message">
+        <span>No courses added yet!</span>
+      </mat-card>
+    </p>
+  </span>
+</div>

@@ -23,9 +23,8 @@ import { FooterComponent } from './footer/footer.component';
 import { JitsiMeetComponent } from './conference/jitsi-meet/jitsi-meet.componenet';
 import { EventsComponent } from './events/events.component';
 import { SharedModule } from './shared/shared.module';
-import { CoursesComponent } from './courses/courses.component';
 import { NewTableLineComponent } from './shared/matDialog/newTableLine/newTableLine.component';
-import { CourseComponent } from './courses/course/course.component';
+import { CoursesModule } from './courses/courses.module';
 
 // import { CallDashComponent } from './conference/call-dash/call-dash.component';
 // import { ConferenceComponent } from './conference/conference.component';
@@ -40,9 +39,7 @@ import { CourseComponent } from './courses/course/course.component';
     FooterComponent,
     EventsComponent,
     JitsiMeetComponent,
-    CoursesComponent,
     NewTableLineComponent,
-    CourseComponent,
     // ConferenceComponent,
     // CallDashComponent,
   ],
@@ -59,6 +56,7 @@ import { CourseComponent } from './courses/course/course.component';
     FormsModule,
     CommonModule,
     SharedModule,
+    CoursesModule,
   ],
 
   providers: [

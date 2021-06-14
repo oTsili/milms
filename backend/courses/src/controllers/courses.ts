@@ -2,7 +2,12 @@ import { Request, Response, NextFunction } from 'express';
 import path from 'path';
 var logger = require('winston');
 const Riak = require('basho-riak-client');
-import { BadRequestError, catchAsync, extractFile } from '@otmilms/common';
+import {
+  BadRequestError,
+  catchAsync,
+  extractFile,
+  NotFoundError,
+} from '@otmilms/common';
 import mongoose from 'mongoose';
 
 // import { courseCreatedPublisher } from './events/publishers/courses-publisher';
@@ -51,6 +56,20 @@ export const getCourses = catchAsync(
     });
 
     // next();
+  }
+);
+
+export const getCourse = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const course = await Course.findById(req.params.id);
+    // .populate(
+    //   'creatorId'
+    // );
+    if (course) {
+      res.status(200).json({ message: 'Course fetch successfully', course });
+    } else {
+      throw new NotFoundError();
+    }
   }
 );
 

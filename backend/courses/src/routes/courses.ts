@@ -22,6 +22,8 @@ const MIME_TYPE_MAP: { [key: string]: any } = {
 
 router.get('', currentUser, requireAuth, CourseController.getCourses);
 
+router.get('/:id', currentUser, requireAuth, CourseController.getCourse);
+
 router.get(
   '/:id/assignments',
   currentUser,
