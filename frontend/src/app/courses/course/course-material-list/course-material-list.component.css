@@ -44,3 +44,7 @@ table {
 .button {
   cursor: pointer;
 }
+
+::ng-deep .mat-tab-body {
+  margin-bottom: 5%;
+}

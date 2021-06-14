@@ -13,7 +13,7 @@ import { AssignmentsService } from 'src/app/courses.old/assignments/assignment.s
 import { assignmentMimeType } from 'src/app/shared/validators/assignment-mime-type.validator';
 import { Material } from 'src/app/models/material.model';
 import { Assignment } from 'src/app/models/assignment.model';
-import { MaterialsService } from 'src/app/courses/course/material-list/materials.service';
+import { CourseMaterialsService } from 'src/app/courses/course/course-material-list/course-materials.service';
 import { SharedService } from 'src/app/shared/services/shared.service';
 import { StudentDeliveryFile } from 'src/app/models/student-delivery.model';
 // import { StudentDeliveriesService } from 'src/app/'
@@ -27,7 +27,6 @@ import { Course } from 'src/app/models/course.model';
   styleUrls: ['./dragAndDrop.component.scss', './dragAndDrop.component.css'],
 })
 export class DragAndDropComponent implements OnInit {
-  @Input() assingnmentIndex: number;
   @Input() component: string;
   @Input() parentComponent: string;
   materials: Material[];
@@ -43,13 +42,21 @@ export class DragAndDropComponent implements OnInit {
   currentStudentDeliveryControl: FormArray;
   materialsForm: FormGroup;
   materialsControl: FormArray;
-  emptyMaterial = {
+  emptyMaterial: Material = {
     name: null,
     filePath: null,
     fileType: null,
     id: null,
     lastUpdate: null,
     courseId: null,
+    assignmentId: null,
+  };
+  emptyStudentDelivery: StudentDeliveryFile = {
+    name: null,
+    filePath: null,
+    fileType: null,
+    id: null,
+    lastUpdate: null,
     assignmentId: null,
   };
   totalMaterials = 0;
@@ -61,7 +68,7 @@ export class DragAndDropComponent implements OnInit {
   constructor(
     private coursesService: CoursesService,
     private assignmentService: AssignmentsService,
-    private materialsService: MaterialsService,
+    private courseMaterialsService: CourseMaterialsService,
     // private studentDeliveriesService: StudentDeliveriesService,
     private formBuilder: FormBuilder,
     public route: ActivatedRoute,
@@ -79,46 +86,39 @@ export class DragAndDropComponent implements OnInit {
       }
     });
 
+    // initialize the form for student deliveries and materials respectively
     this.studentDeliveriesForm = this.formBuilder.group({
-      studentDeliveriesFormArray: this.formBuilder.array([]),
+      studentDeliveriesFormArray: this.formBuilder.array([
+        // this.createStudentDelivery(this.emptyMaterial),
+      ]),
     });
 
+    this.materialsForm = this.formBuilder.group({
+      materialsFormArray: this.formBuilder.array([
+        // this.createMaterial(this.emptyMaterial),
+      ]),
+    });
+
+    // keep their formArrays in variables
     this.currentStudentDeliveryControl = this.studentDeliveriesForm.get(
       'studentDeliveriesFormArray'
     ) as FormArray;
-
-    this.materialsForm = this.formBuilder.group({
-      materialsFormArray: this.formBuilder.array([]),
-    });
-
     this.materialsControl = this.materialsForm.get(
       'materialsFormArray'
     ) as FormArray;
-
-    console.log(this.assingnmentIndex);
   }
 
   /**
    * on file drop handler
    */
   onFileDropped($event) {
-    this.assignmentService
-      .getAssignments(this.assignmentsPerPage, this.currentPage, this.courseId)
-      .subscribe((response) => {
-        if (this.assingnmentIndex > response.maxAssignments - 1) {
-          this.sharedService.throwError('Please save the assignment first!');
-
-          return;
-        }
-
-        if (this.component === 'material') {
-          this.prepareMaterialFilesList($event);
-          // materials update the assignment control
-        } else if (this.component === 'student-deliveries') {
-          this.prepareStudentDeliveriesFileList($event);
-          // deliveries update the deliveries control
-        }
-      });
+    if (this.component === 'material') {
+      this.prepareMaterialFilesList($event);
+      // materials update the assignment control
+    } else if (this.component === 'student-deliveries') {
+      this.prepareStudentDeliveriesFileList($event);
+      // deliveries update the deliveries control
+    }
   }
 
   onSubmitCourseMaterials(event: Event) {
@@ -131,16 +131,26 @@ export class DragAndDropComponent implements OnInit {
     this.isLoading = true;
     // fetch the current course
     this.coursesService.getCourse(this.courseId).subscribe((response) => {
+      console.log(response);
       this.course = response.course;
-      this.materialsService
+      this.courseMaterialsService
         .addCourseMaterials(this.course, this.materialsControl)
-        .subscribe((responseData) => {
-          this.materialsService.onMaterialsUpdate(
-            responseData.fetchedMaterialFiles
+        .subscribe((response) => {
+          console.log(response);
+          this.courseMaterialsService.onCourseMaterialsUpdate(
+            response.fetchedMaterialFiles
           );
           this.deleteAllFiles();
           this.isLoading = false;
         });
+      (err) => {
+        console.log(err);
+        this.isLoading = false;
+      };
+      () => {
+        console.log('complete');
+        this.isLoading = false;
+      };
     });
   }
 
@@ -197,21 +207,11 @@ export class DragAndDropComponent implements OnInit {
    * handle file from browsing
    */
   fileBrowseHandler(files) {
-    this.assignmentService
-      .getAssignments(this.assignmentsPerPage, this.currentPage, this.courseId)
-      .subscribe((response) => {
-        if (this.assingnmentIndex > response.maxAssignments - 1) {
-          this.sharedService.throwError('Please save the assignment first!');
-
-          return;
-        }
-
-        if (this.component === 'material') {
-          this.prepareMaterialFilesList(files);
-        } else if (this.component === 'student-deliveries') {
-          this.prepareStudentDeliveriesFileList(files);
-        }
-      });
+    if (this.component === 'material') {
+      this.prepareMaterialFilesList(files);
+    } else if (this.component === 'student-deliveries') {
+      this.prepareStudentDeliveriesFileList(files);
+    }
   }
 
   /**
@@ -319,7 +319,7 @@ export class DragAndDropComponent implements OnInit {
       // update and validate the image field value
       this.materialsControl.updateValueAndValidity();
     }
-
+    console.log(this.materialsControl);
     this.uploadFilesSimulator(0);
   }
 

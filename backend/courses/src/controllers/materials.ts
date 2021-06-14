@@ -17,17 +17,82 @@ import { access, constants, mkdir } from 'fs';
 import { riakWrapper } from '../riak-wrapper';
 import { MaterialDoc } from '../models/material';
 
-export const createMaterials = catchAsync(
+// export const createMaterials = catchAsync(
+//   async (req: Request, res: Response, next: NextFunction) => {
+//     const courseId = req.params.courseId;
+//     const assignmentId = req.params.assignmentId;
+//     const creatorId = req.currentUser!.id;
+
+//     // 1) fetch the student's details
+//     const instructor = await User.findById(creatorId);
+
+//     // 2) fetch the assignment
+//     const currentAssignment = await Assignment.findById(assignmentId);
+
+//     // TODO: use fs.mkdir to create a directory of "courseName/assignmentName" instead of "courseName-assignmentName"
+
+//     // 4) create an array to keep account of the saved materialFiles
+//     let materialFiles: MaterialDoc[] = [];
+
+//     // 5) iterate through the files and build a db model for each
+//     const { names, lastUpdates, fileTypes } = req.body;
+
+//     for (let i = 0; i < req.files.length; i++) {
+//       const name = names[i];
+//       const lastUpdate = lastUpdates[i];
+//       const filePath = `api/courses/public/student-deliveries/${req.files[i].filename}`;
+//       const fileType = fileTypes[i];
+
+//       const createdStudentDeliveryFile = Material.build({
+//         name,
+//         filePath,
+//         fileType,
+//         lastUpdate,
+//         courseId,
+//         assignmentId,
+//         creatorId,
+//       });
+
+//       const updatedStudentDeliveryFile =
+//         await createdStudentDeliveryFile.save();
+
+//       materialFiles.push(updatedStudentDeliveryFile);
+//     }
+
+//     const fetchedMaterialFiles = await Material.find({
+//       courseId,
+//       // assignmentId,
+//       // creatorId,
+//     });
+
+//     // 6)  publish the event
+//     // // make the query again for getting the populated fields
+//     // let updatedAssignment = await assignmentQuery;
+
+//     // if (createdAssignment.id && createdAssignment.description) {
+//     //   await new AssignmentCreatedPublisher(natsWrapper.client).publish({
+//     //     id: createdAssignment.id!,
+//     //     title: createdAssignment.title,
+//     //     description: createdAssignment.description!,
+//     //     lastUpdate: createdAssignment.lastUpdate.toString(),
+//     //     rank: createdAssignment.rank!,
+//     //     time: new Date(),
+//     //   });
+//     // }
+
+//     // 7) seng the response
+//     res.status(201).json({
+//       message: 'studentDeliveriesFiles added successfuly',
+//       materialFiles,
+//       fetchedMaterialFiles,
+//     });
+//   }
+// );
+
+export const createCourseMaterials = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const courseId = req.params.courseId;
-    const assignmentId = req.params.assignmentId;
     const creatorId = req.currentUser!.id;
-
-    // 1) fetch the student's details
-    const instructor = await User.findById(creatorId);
-
-    // 2) fetch the assignment
-    const currentAssignment = await Assignment.findById(assignmentId);
 
     // TODO: use fs.mkdir to create a directory of "courseName/assignmentName" instead of "courseName-assignmentName"
 
@@ -49,7 +114,6 @@ export const createMaterials = catchAsync(
         fileType,
         lastUpdate,
         courseId,
-        assignmentId,
         creatorId,
       });
 
@@ -61,8 +125,6 @@ export const createMaterials = catchAsync(
 
     const fetchedMaterialFiles = await Material.find({
       courseId,
-      // assignmentId,
-      // creatorId,
     });
 
     // 6)  publish the event
@@ -89,16 +151,49 @@ export const createMaterials = catchAsync(
   }
 );
 
-export const getMaterials = catchAsync(
+// export const getMaterials = catchAsync(
+//   async (req: Request, res: Response, next: NextFunction) => {
+//     const courseId = req.params.courseId;
+//     const assignmentId = req.params.assignmentId;
+
+//     // get the materials of a specific assignment and a specific course
+//     let materialsQuery = Material.find({
+//       assignmentId: assignmentId,
+//       courseId: courseId,
+//     });
+
+//     let fetchedMaterials = await materialsQuery;
+
+//     const count = await materialsQuery.countDocuments();
+
+//     res.status(200).json({
+//       message: 'Materials fetched successfully!',
+//       materials: fetchedMaterials,
+//       maxMaterials: count,
+//     });
+//   }
+// );
+export const getCourseMaterials = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const courseId = req.params.courseId;
-    const assignmentId = req.params.assignmentId;
 
     // get the materials of a specific assignment and a specific course
     let materialsQuery = Material.find({
-      assignmentId: assignmentId,
       courseId: courseId,
     });
+
+    let sortObj;
+    if (`${req.query.sort}` !== '') {
+      sortObj = JSON.parse(`${req.query.sort}`);
+
+      if (sortObj.direction === 'asc') {
+        materialsQuery = materialsQuery.sort([[sortObj.active, 1]]);
+      } else if (sortObj.direction === 'desc') {
+        materialsQuery = materialsQuery.sort([[sortObj.active, -1]]);
+      }
+    } else {
+      materialsQuery = materialsQuery.sort([['name', 1]]);
+    }
 
     let fetchedMaterials = await materialsQuery;
 
@@ -106,7 +201,7 @@ export const getMaterials = catchAsync(
 
     res.status(200).json({
       message: 'Materials fetched successfully!',
-      materials: fetchedMaterials,
+      fetchedMaterials,
       maxMaterials: count,
     });
   }

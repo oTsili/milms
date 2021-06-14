@@ -102,13 +102,13 @@
       <!-- Row shown when there is no matching data. -->
       <ng-container *ngIf="dataSource._data._value.length === 0">
         <tr class="mat-row" *matNoDataRow>
-          <td class="mat-cell message" colspan="4">No courses added yet!</td>
+          <td class="mat-cell message" colspan="7">No courses added yet!</td>
         </tr>
       </ng-container>
       <!-- Row shown when there is no matching data. -->
       <ng-container *ngIf="dataSource._data._value.length > 0">
-        <tr class="mat-row" *matNoDataRow>
-          <td class="mat-cell message" colspan="4">
+        <tr class="mat-row message" *matNoDataRow>
+          <td class="mat-cell" colspan="7">
             No data matching the filter {{ input.value }}
           </td>
         </tr>

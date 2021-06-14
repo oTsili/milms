@@ -3,7 +3,7 @@
     label="Materials"
     color="primary"
     matTooltip="show the assignment's materials"
-    ><app-material-list></app-material-list>
+    ><app-course-material-list></app-course-material-list>
   </mat-tab>
   <mat-tab
     *ngIf="userRole === 'instructor' || userRole === 'admin'"
@@ -12,8 +12,6 @@
     matTooltip="add assignment's material"
   >
     <app-dragAndDrop
-      [formGroup]="assignmentsForm"
-      [assingnmentIndex]="formControlIndex"
       [component]="'material'"
       [parentComponent]="'course'"
     ></app-dragAndDrop
@@ -32,8 +30,6 @@
     matTooltip="show my assignment delivery"
   >
     <app-dragAndDrop
-      [formGroup]="assignmentsForm"
-      [assingnmentIndex]="formControlIndex"
       [component]="'student-deliveries'"
       [parentComponent]="'course'"
     ></app-dragAndDrop>

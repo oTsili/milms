@@ -15,7 +15,7 @@ import { SharedService } from 'src/app/shared/services/shared.service';
 const BACKEND_URL = environment.ASSIGNMENT_BASE_URL + '/api/courses';
 
 @Injectable({ providedIn: 'root' })
-export class MaterialsService {
+export class CourseMaterialsService {
   private materials: Material[] = [];
 
   private materialsListener = new Subject<Material[]>();
@@ -26,18 +26,20 @@ export class MaterialsService {
 
   constructor(private http: HttpClient) {}
 
-  getMaterialListener() {
+  getCourseMaterialListener() {
     return this.materialsListener.asObservable();
   }
 
-  onMaterialsUpdate(materials) {
+  onCourseMaterialsUpdate(materials) {
+    console.log('materials updated');
     this.materialsListener.next(materials);
   }
 
-  getMaterials(courseId: string, assignmentId: string) {
+  getCourseMaterials(courseId: string, sort: string | Sort = '') {
+    const queryParams = `?sort=${sort}`;
     return this.http
-      .get<{ message: string; materials: any; maxMaterials: number }>(
-        `${BACKEND_URL}/${courseId}/assignments/${assignmentId}/materials`,
+      .get<{ message: string; fetchedMaterials: any; maxMaterials: number }>(
+        `${BACKEND_URL}/${courseId}/materials${queryParams}`,
         {
           withCredentials: true,
         }
@@ -46,9 +48,9 @@ export class MaterialsService {
         map((materialData) => {
           console.log(materialData);
 
-          if (materialData.materials) {
+          if (materialData.fetchedMaterials) {
             return {
-              materials: materialData.materials.map((material) => {
+              materials: materialData.fetchedMaterials.map((material) => {
                 return {
                   name: material.name,
                   filePath: material.filePath,
@@ -147,95 +149,8 @@ export class MaterialsService {
         )
     );
   }
-  addAssignmentMaterials(
-    currentAssignment: Assignment,
-    materialsControl: FormArray
-  ) {
-    console.log('currentAssignment', currentAssignment);
-    console.log('materialsControl', materialsControl);
 
-    const { id, courseId, lastUpdate } = currentAssignment;
-
-    const materialsData = new FormData();
-
-    materialsData.append('courseId', courseId as string);
-    materialsData.append('assignmentId', id);
-    materialsData.append('lastUpdate', lastUpdate);
-
-    // overpass the previously saved files in the db begining from the index of their number
-    for (let i = 0; i < materialsControl.length; i++) {
-      let materialFile = materialsControl.value[i];
-
-      console.log('materialFile', materialFile);
-
-      console.log(!materialFile.creatorId);
-
-      if (!materialFile.creatorId) {
-        console.log('iii: ', i);
-        console.log(materialFile);
-
-        materialsData.append(
-          'lastUpdates[]',
-          (materialFile as Material).lastUpdate
-        );
-        materialsData.append('names[]', (materialFile as Material).name);
-        materialsData.append(
-          'fileTypes[]',
-          (materialFile as Material).fileType
-        );
-        materialsData.append(
-          'filePaths[]',
-          (materialFile as Material).filePath,
-          materialFile.name.split('.')[0]
-        );
-      }
-    }
-
-    console.log('materialsData: ', materialsData);
-
-    // const params = new HttpParams();
-
-    const options = {
-      // params,
-      // reportProgress: true,
-      withCredentials: true,
-    };
-
-    return (
-      this.http
-        // generic type definition, to define what is going to be returned from the http request
-        .post<{
-          message: string;
-          fetchedMaterialFiles: Material[];
-        }>(
-          `${BACKEND_URL}/${courseId}/assignments/${id}/materials`,
-          materialsData,
-          options
-        )
-        .pipe(
-          map((materialsFileData) => {
-            console.log(materialsFileData);
-
-            return {
-              fetchedMaterialFiles: materialsFileData.fetchedMaterialFiles.map(
-                (materialFile) => {
-                  return {
-                    id: materialFile.id,
-                    name: materialFile.name,
-                    lastUpdate: materialFile.lastUpdate,
-                    filePath: materialFile.filePath,
-                    fileType: materialFile.fileType,
-                    assignmentId: materialFile.assignmentId,
-                  };
-                }
-              ),
-            };
-          })
-        )
-    );
-  }
-
-  updateMaterial(currentMaterial: Material) {
+  updateCourseMaterial(currentMaterial: Material) {
     const { id, name, filePath, fileType, lastUpdate, assignmentId, courseId } =
       currentMaterial;
 
@@ -272,7 +187,7 @@ export class MaterialsService {
     );
   }
 
-  deleteMaterial(material: Material) {
+  deleteCourseMaterial(material: Material) {
     console.log('material: ', material);
 
     return this.http.delete(
@@ -283,7 +198,7 @@ export class MaterialsService {
     );
   }
 
-  downloadMaterial(material: Material) {
+  downloadCourseMaterial(material: Material) {
     const filePath = (material.filePath as string).split('/').slice(-1).pop();
     return this.http.post(
       `${BACKEND_URL}/${material.courseId}/assignments/${material.assignmentId}/materials/${material.id}/dump`,

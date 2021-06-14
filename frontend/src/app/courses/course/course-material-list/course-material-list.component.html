@@ -1,0 +1,140 @@
+<!------------------------------ new------------------ -->
+
+<mat-form-field class="filter">
+  <mat-label>Filter</mat-label>
+  <input matInput (keyup)="applyFilter($event)" placeholder="Ex. ium" #input />
+</mat-form-field>
+<div class="container mat-elevation-z8">
+  <ng-container *ngIf="dataSource">
+    <mat-paginator
+      [length]="totalCourses"
+      [pageSize]="coursesPerPage"
+      [pageSizeOptions]="pageSizeOptions"
+      (page)="onChangePage($event)"
+      *ngIf="dataSource._data._value.length > 0"
+    ></mat-paginator>
+  </ng-container>
+
+  <table
+    mat-table
+    [dataSource]="dataSource"
+    (matSortChange)="sortData($event)"
+    matSort
+    class="mat-elevation-z8"
+  >
+    <!-- Position Column -->
+    <ng-container matColumnDef="position">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>No.</th>
+      <td mat-cell *matCellDef="let material; let i = index">
+        {{ material.position }}
+      </td>
+    </ng-container>
+
+    <!-- Material File Name Column -->
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>
+        <span class="file-icon" style="width: 25px">
+          <svg
+            version="1.1"
+            id="Capa_1"
+            xmlns="http://www.w3.org/2000/svg"
+            xmlns:xlink="http://www.w3.org/1999/xlink"
+            x="0px"
+            y="0px"
+            viewBox="0 0 58 58"
+            style="enable-background: new 0 0 58 58"
+            xml:space="preserve"
+          >
+            <polygon
+              style="fill: #edeada"
+              points="51.5,14 37.5,0 6.5,0 6.5,58 51.5,58 "
+            />
+            <g>
+              <path
+                style="fill: #cec9ae"
+                d="M16.5,23h25c0.552,0,1-0.447,1-1s-0.448-1-1-1h-25c-0.552,0-1,0.447-1,1S15.948,23,16.5,23z"
+              />
+              <path
+                style="fill: #cec9ae"
+                d="M16.5,15h10c0.552,0,1-0.447,1-1s-0.448-1-1-1h-10c-0.552,0-1,0.447-1,1S15.948,15,16.5,15z"
+              />
+              <path
+                style="fill: #cec9ae"
+                d="M41.5,29h-25c-0.552,0-1,0.447-1,1s0.448,1,1,1h25c0.552,0,1-0.447,1-1S42.052,29,41.5,29z"
+              />
+              <path
+                style="fill: #cec9ae"
+                d="M41.5,37h-25c-0.552,0-1,0.447-1,1s0.448,1,1,1h25c0.552,0,1-0.447,1-1S42.052,37,41.5,37z"
+              />
+              <path
+                style="fill: #cec9ae"
+                d="M41.5,45h-25c-0.552,0-1,0.447-1,1s0.448,1,1,1h25c0.552,0,1-0.447,1-1S42.052,45,41.5,45z"
+              />
+            </g>
+            <polygon style="fill: #cec9ae" points="37.5,0 37.5,14 51.5,14 " />
+          </svg> </span
+        ><span>File</span>
+      </th>
+      <td mat-cell *matCellDef="let material">{{ material.name }}</td>
+    </ng-container>
+
+    <!-- Last Update Column -->
+    <ng-container matColumnDef="lastUpdate">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Last Update</th>
+      <td mat-cell *matCellDef="let material">
+        {{ material.lastUpdate }}
+      </td>
+    </ng-container>
+
+    <!-- Options Column -->
+    <ng-container matColumnDef="options">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Options</th>
+      <td mat-cell *matCellDef="let material; let controlIndex = index">
+        <a
+          class="button"
+          style="color: #f44b4b"
+          matTooltip="Delete the assignment"
+          (click)="onDeleteCourseMaterial(material, controlIndex)"
+          matTooltip="Delete the file"
+        >
+          <mat-icon>delete</mat-icon>
+        </a>
+        <a
+          class="button"
+          target="_blank"
+          [routerLink]="['/pdfViewer', material.filePath]"
+          matTooltip="Open the Web pdf viewer"
+        >
+          <mat-icon>launch</mat-icon>
+        </a>
+        <a
+          class="button"
+          (click)="ondDownloadCourseMaterial(material)"
+          matTooltip="Download the file"
+        >
+          <mat-icon>save_alt</mat-icon>
+        </a>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+
+    <ng-container *ngIf="dataSource">
+      <!-- Row shown when there is no matching data. -->
+      <ng-container *ngIf="dataSource._data._value.length === 0">
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell message" colspan="7">No files added yet!</td>
+        </tr>
+      </ng-container>
+      <!-- Row shown when there is no matching data. -->
+      <ng-container *ngIf="dataSource._data._value.length > 0">
+        <tr class="mat-row message" *matNoDataRow>
+          <td class="mat-cell" colspan="7">
+            No data matching the filter {{ input.value }}
+          </td>
+        </tr>
+      </ng-container>
+    </ng-container>
+  </table>
+</div>

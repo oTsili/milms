@@ -10,7 +10,7 @@ export interface MaterialAttrs {
   fileType: string;
   lastUpdate: string;
   courseId: string;
-  assignmentId: string;
+  assignmentId?: string;
   creatorId: string | UserDoc;
 }
 
@@ -28,7 +28,7 @@ export interface MaterialDoc extends mongoose.Document {
   fileType: string;
   lastUpdate: string;
   courseId: string;
-  assignmentId: string;
+  assignmentId?: string;
   creatorId: string | UserDoc;
 }
 
@@ -52,7 +52,6 @@ export const materialSchema = new mongoose.Schema(
       default: Date.now().toString(),
     },
     assignmentId: {
-      required: true,
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Assignment',
     },

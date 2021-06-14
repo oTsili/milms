@@ -9,7 +9,7 @@ import { StudentCoursesComponent } from 'src/app/courses/student-courses/student
 import { InstructorCoursesComponent } from 'src/app/courses/instructor-courses/instructor-courses.component';
 import { CoursesComponent } from './courses.component';
 import { CourseComponent } from './course/course.component';
-import { MaterialListComponent } from './course/material-list/material-list.component';
+import { CourseMaterialListComponent } from './course/course-material-list/course-material-list.component';
 
 @NgModule({
   declarations: [
@@ -17,7 +17,7 @@ import { MaterialListComponent } from './course/material-list/material-list.comp
     CourseComponent,
     StudentCoursesComponent,
     InstructorCoursesComponent,
-    MaterialListComponent,
+    CourseMaterialListComponent,
   ],
   imports: [
     ReactiveFormsModule,
