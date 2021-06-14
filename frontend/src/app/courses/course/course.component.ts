@@ -1,7 +1,9 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { MatBreadcrumbService } from 'mat-breadcrumb';
 import { ActivatedRoute, ParamMap } from '@angular/router';
-import { CoursesService } from '../courses.service';
+import { Subscription } from 'rxjs';
+
+import { CoursesService } from 'src/app/courses/courses.service';
 import { environment } from 'src/environments/environment';
 import { SharedService } from 'src/app/shared/services/shared.service';
 import { Course } from 'src/app/models/course.model';
@@ -11,8 +13,11 @@ import { Course } from 'src/app/models/course.model';
   styleUrls: ['./course.component.css', './course.component.scss'],
 })
 export class CourseComponent implements OnInit, OnDestroy {
+  userRoleSubscription: Subscription;
   courseId: string;
   course: Course;
+  isLoading: boolean = false;
+  userRole: string;
   totalCourses = environment.TOTAL_COURSES;
   coursesPerPage = environment.COURSES_PER_PAGE;
   currentPage = environment.CURRENT_PAGE;
@@ -37,16 +42,28 @@ export class CourseComponent implements OnInit, OnDestroy {
     });
 
     this.updateMatBreadcrumb();
+
+    this.sharedService.getUserRole().subscribe((response) => {
+      console.log('ngOnInit');
+      this.userRole = response.userRole;
+      console.log(this.userRole);
+    });
+    this.userRoleSubscription = this.sharedService
+      .getUserRoleListener()
+      .subscribe((response) => {
+        console.log(response);
+        this.userRole = response;
+      });
   }
 
   ngOnDestroy() {}
 
-  getCourse(id: string) {
-    return this.coursesService.onGetCourse(id);
+  onGetCourse(id: string) {
+    return this.coursesService.getCourse(id);
   }
 
   updateMatBreadcrumb() {
-    this.getCourse(this.courseId).subscribe((response) => {
+    this.onGetCourse(this.courseId).subscribe((response) => {
       console.log(response);
       this.course = response.course;
 

@@ -1,1 +1,41 @@
-<h1>hello</h1>
+<mat-tab-group mat-align-tabs="center">
+  <mat-tab
+    label="Materials"
+    color="primary"
+    matTooltip="show the assignment's materials"
+    ><app-material-list></app-material-list>
+  </mat-tab>
+  <mat-tab
+    *ngIf="userRole === 'instructor' || userRole === 'admin'"
+    label="Upload Materials"
+    color="primary"
+    matTooltip="add assignment's material"
+  >
+    <app-dragAndDrop
+      [formGroup]="assignmentsForm"
+      [assingnmentIndex]="formControlIndex"
+      [component]="'material'"
+      [parentComponent]="'course'"
+    ></app-dragAndDrop
+  ></mat-tab>
+
+  <mat-tab
+    label="Assignments"
+    color="primary"
+    matTooltip="upload your assignment delivery"
+  >
+  </mat-tab>
+  <mat-tab
+    label="Upload Assignments"
+    color="primary"
+    *ngIf="userRole === 'instructor' || userRole === 'admin'"
+    matTooltip="show my assignment delivery"
+  >
+    <app-dragAndDrop
+      [formGroup]="assignmentsForm"
+      [assingnmentIndex]="formControlIndex"
+      [component]="'student-deliveries'"
+      [parentComponent]="'course'"
+    ></app-dragAndDrop>
+  </mat-tab>
+</mat-tab-group>

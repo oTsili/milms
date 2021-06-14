@@ -87,11 +87,7 @@
         </a>
         <a
           class="button"
-          [routerLink]="[
-            '/courses',
-            coursesForm.controls.coursesFormArray.controls[controlIndex]
-              .controls.id.value
-          ]"
+          [routerLink]="['/courses', course.id]"
           matTooltip="Open the Assignment's page"
         >
           <mat-icon>launch</mat-icon>

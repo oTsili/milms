@@ -257,6 +257,7 @@ export class InstructorCoursesComponent implements OnInit, OnDestroy {
 
             // update the table
             this.dataSource = new MatTableDataSource(this.courses);
+            console.log(this.dataSource);
             this.isLoading = false;
           });
       },

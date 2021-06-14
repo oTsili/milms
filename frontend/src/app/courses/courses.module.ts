@@ -8,12 +8,16 @@ import { DragAndDropModule } from 'src/app/shared/dragAndDrop/dragAndDrop.module
 import { StudentCoursesComponent } from 'src/app/courses/student-courses/student-courses.component';
 import { InstructorCoursesComponent } from 'src/app/courses/instructor-courses/instructor-courses.component';
 import { CoursesComponent } from './courses.component';
+import { CourseComponent } from './course/course.component';
+import { MaterialListComponent } from './course/material-list/material-list.component';
 
 @NgModule({
   declarations: [
     CoursesComponent,
+    CourseComponent,
     StudentCoursesComponent,
     InstructorCoursesComponent,
+    MaterialListComponent,
   ],
   imports: [
     ReactiveFormsModule,

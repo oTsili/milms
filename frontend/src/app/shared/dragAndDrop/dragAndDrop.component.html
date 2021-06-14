@@ -126,10 +126,19 @@
     </div>
     <div id="submit-button" *ngIf="files.length > 0">
       <button
-        *ngIf="component === 'material'"
+        *ngIf="component === 'material' && parentComponent === 'course'"
         mat-stroked-button
         color="primary"
-        (click)="onSubmitMaterials($event)"
+        (click)="onSubmitCourseMaterials($event)"
+      >
+        Submit
+      </button>
+
+      <button
+        *ngIf="component === 'material' && parentComponent === 'assignment`'"
+        mat-stroked-button
+        color="primary"
+        (click)="onSubmitAssignmentMaterials($event)"
       >
         Submit
       </button>

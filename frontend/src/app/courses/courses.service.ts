@@ -115,7 +115,7 @@ export class CoursesService {
     );
   }
 
-  onGetCourse(courseId: string) {
+  getCourse(courseId: string) {
     return this.http.get<{ message: string; course: Course }>(
       `${BACKEND_URL}/${courseId}`,
       {

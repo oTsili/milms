@@ -9,15 +9,17 @@ import {
   ControlContainer,
 } from '@angular/forms';
 
-import { AssignmentsService } from '../../courses.old/assignments/assignment.service';
-import { assignmentMimeType } from '../validators/assignment-mime-type.validator';
-import { Material } from '../../models/material.model';
-import { Assignment } from '../../models/assignment.model';
-import { MaterialsService } from '../../courses.old/assignments/assignment-list/material-list/materials.service';
-import { SharedService } from '../services/shared.service';
+import { AssignmentsService } from 'src/app/courses.old/assignments/assignment.service';
+import { assignmentMimeType } from 'src/app/shared/validators/assignment-mime-type.validator';
+import { Material } from 'src/app/models/material.model';
+import { Assignment } from 'src/app/models/assignment.model';
+import { MaterialsService } from 'src/app/courses/course/material-list/materials.service';
+import { SharedService } from 'src/app/shared/services/shared.service';
 import { StudentDeliveryFile } from 'src/app/models/student-delivery.model';
-import { StudentDeliveriesService } from '../../courses.old/assignments/assignment-list/student-deliveries/student-deliveries.service';
-import { StudentDeliveryAssignment } from '../../models/student-delivery.model';
+// import { StudentDeliveriesService } from 'src/app/'
+import { StudentDeliveryAssignment } from 'src/app/models/student-delivery.model';
+import { CoursesService } from 'src/app/courses/courses.service';
+import { Course } from 'src/app/models/course.model';
 
 @Component({
   selector: 'app-dragAndDrop',
@@ -25,8 +27,9 @@ import { StudentDeliveryAssignment } from '../../models/student-delivery.model';
   styleUrls: ['./dragAndDrop.component.scss', './dragAndDrop.component.css'],
 })
 export class DragAndDropComponent implements OnInit {
-  @Input() assingnmentIndex;
-  @Input() component;
+  @Input() assingnmentIndex: number;
+  @Input() component: string;
+  @Input() parentComponent: string;
   materials: Material[];
   studentDeliveries: StudentDeliveryAssignment[];
   studentDeliveryFiles: StudentDeliveryFile[];
@@ -35,12 +38,11 @@ export class DragAndDropComponent implements OnInit {
   courseId: string;
   assignmentId: string;
   studentId: string;
-  currentAssignmentControl: FormControl;
+  course: Course;
   studentDeliveriesForm: FormGroup;
   currentStudentDeliveryControl: FormArray;
   materialsForm: FormGroup;
   materialsControl: FormArray;
-  assignmentsForm: FormGroup;
   emptyMaterial = {
     name: null,
     filePath: null,
@@ -57,25 +59,16 @@ export class DragAndDropComponent implements OnInit {
   initialStudentDeliveries;
 
   constructor(
+    private coursesService: CoursesService,
     private assignmentService: AssignmentsService,
     private materialsService: MaterialsService,
-    private studentDeliveriesService: StudentDeliveriesService,
+    // private studentDeliveriesService: StudentDeliveriesService,
     private formBuilder: FormBuilder,
     public route: ActivatedRoute,
-    private controlContainer: ControlContainer,
     private sharedService: SharedService
   ) {}
 
   ngOnInit() {
-    this.assignmentsForm = <FormGroup>this.controlContainer.control;
-
-    this.currentAssignmentControl = (
-      this.assignmentsForm.get('assignmentsFormArray') as FormArray
-    ).get(`${this.assingnmentIndex}`) as FormControl;
-
-    this.assignmentId = this.currentAssignmentControl.value.id;
-
-    console.log(this.assignmentId);
     console.log(this.component);
 
     this.route.paramMap.subscribe((paraMap: ParamMap) => {
@@ -102,9 +95,7 @@ export class DragAndDropComponent implements OnInit {
       'materialsFormArray'
     ) as FormArray;
 
-    console.log(this.currentAssignmentControl);
     console.log(this.assingnmentIndex);
-    console.log(this.assignmentsForm);
   }
 
   /**
@@ -123,7 +114,6 @@ export class DragAndDropComponent implements OnInit {
         if (this.component === 'material') {
           this.prepareMaterialFilesList($event);
           // materials update the assignment control
-          console.log(this.currentAssignmentControl);
         } else if (this.component === 'student-deliveries') {
           this.prepareStudentDeliveriesFileList($event);
           // deliveries update the deliveries control
@@ -131,17 +121,7 @@ export class DragAndDropComponent implements OnInit {
       });
   }
 
-  onSubmitMaterials(event: Event) {
-    const currentAssignment: Assignment = {
-      courseId: this.currentAssignmentControl.value.courseId,
-      id: this.currentAssignmentControl.value.id,
-      title: this.currentAssignmentControl.value.title,
-      description: this.currentAssignmentControl.value.description,
-      filePath: this.currentAssignmentControl.value.filePath,
-      fileType: this.currentAssignmentControl.value.fileType,
-      lastUpdate: this.currentAssignmentControl.value.lastUpdate,
-    };
-
+  onSubmitCourseMaterials(event: Event) {
     // throw error if user has clicked submit without selecting any files
     if (this.materialsControl.length < 1) {
       this.sharedService.throwError('Please add some files first!');
@@ -149,79 +129,68 @@ export class DragAndDropComponent implements OnInit {
       return;
     }
     this.isLoading = true;
-    // 1) check if the assignment is saved in the db
-    this.assignmentService
-      .getAssignments(
-        this.assignmentsPerPage,
-        this.currentPage,
-        currentAssignment.courseId as string
-      )
-      .subscribe((response) => {
-        // 1a) if no, throw an error message
-        if (this.assingnmentIndex > response.maxAssignments - 1) {
-          this.sharedService.throwError('Please save the assignment first!');
+    // fetch the current course
+    this.coursesService.getCourse(this.courseId).subscribe((response) => {
+      this.course = response.course;
+      this.materialsService
+        .addCourseMaterials(this.course, this.materialsControl)
+        .subscribe((responseData) => {
+          this.materialsService.onMaterialsUpdate(
+            responseData.fetchedMaterialFiles
+          );
+          this.deleteAllFiles();
+          this.isLoading = false;
+        });
+    });
+  }
 
-          return;
-        }
-
-        this.materialsService
-          .addMaterials(currentAssignment, this.materialsControl)
-          .subscribe((responseData) => {
-            this.materialsService.onMaterialsUpdate(
-              responseData.fetchedMaterialFiles
-            );
-            this.deleteAllFiles();
-            this.isLoading = false;
-          });
-      });
+  onSubmitAssignmentMaterials(event: Event) {
+    // // throw error if user has clicked submit without selecting any files
+    // if (this.materialsControl.length < 1) {
+    //   this.sharedService.throwError('Please add some files first!');
+    //   return;
+    // }
+    // this.isLoading = true;
+    // this.materialsService
+    //   .addAssignmentMaterials(currentAssignment, this.materialsControl)
+    //   .subscribe((responseData) => {
+    //     this.materialsService.onMaterialsUpdate(
+    //       responseData.fetchedMaterialFiles
+    //     );
+    //     this.deleteAllFiles();
+    //     this.isLoading = false;
+    //   });
   }
 
   onSubmitMyDelivery(event: Event) {
-    const currentAssignment: Assignment = {
-      courseId: this.currentAssignmentControl.value.courseId,
-      id: this.currentAssignmentControl.value.id,
-      title: this.currentAssignmentControl.value.title,
-      description: this.currentAssignmentControl.value.description,
-      filePath: this.currentAssignmentControl.value.filePath,
-      fileType: this.currentAssignmentControl.value.fileType,
-      lastUpdate: this.currentAssignmentControl.value.lastUpdate,
-    };
-
-    // throw error if user has clicked submit without selecting any files
-    if (this.currentStudentDeliveryControl.length < 1) {
-      this.sharedService.throwError('Please add some files first!');
-
-      return;
-    }
-    this.isLoading = true;
-
-    // 1) check if the assignment is saved in the db
-    this.assignmentService
-      .getAssignments(
-        this.assignmentsPerPage,
-        this.currentPage,
-        currentAssignment.courseId as string
-      )
-      .subscribe((response) => {
-        // 1a) if no, throw an error message
-        if (this.assingnmentIndex > response.maxAssignments - 1) {
-          this.sharedService.throwError('Please save the assignment first!');
-
-          return;
-        }
-        this.studentDeliveriesService
-          .addStudentDeliveryFiles(
-            currentAssignment,
-            this.currentStudentDeliveryControl
-          )
-          .subscribe((responseData) => {
-            this.studentDeliveriesService.onStudentDeliveriesUpdate(
-              responseData.fetchedStudentDeliveryFiles
-            );
-            this.deleteAllFiles();
-            this.isLoading = false;
-          });
-      });
+    // // throw error if user has clicked submit without selecting any files
+    // if (this.currentStudentDeliveryControl.length < 1) {
+    //   this.sharedService.throwError('Please add some files first!');
+    //   return;
+    // }
+    // this.isLoading = true;
+    // // 1) check if the assignment is saved in the db
+    // this.assignmentService
+    //   .getAssignments(this.assignmentsPerPage, this.currentPage, this.courseId)
+    //   .subscribe((response) => {
+    //     // 1a) if no, throw an error message
+    //     if (this.assingnmentIndex > response.maxAssignments - 1) {
+    //       this.sharedService.throwError('Please save the assignment first!');
+    //       return;
+    //     }
+    //     this.studentDeliveriesService
+    //       .addStudentDeliveryFiles(
+    //         currentAssignment,
+    //         this.currentStudentDeliveryControl
+    //       )
+    //       .subscribe((responseData) => {
+    //         this.studentDeliveriesService.onStudentDeliveriesUpdate(
+    //           responseData.fetchedStudentDeliveryFiles
+    //         );
+    //         this.deleteAllFiles();
+    //         this.isLoading = false;
+    //       });
+    //   });
   }
 
   /**
@@ -242,8 +211,6 @@ export class DragAndDropComponent implements OnInit {
         } else if (this.component === 'student-deliveries') {
           this.prepareStudentDeliveriesFileList(files);
         }
-
-        console.log(this.currentAssignmentControl);
       });
   }
 
