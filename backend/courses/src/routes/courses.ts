@@ -50,6 +50,13 @@ router.get(
   AssignmentController.getAssignments
 );
 
+router.get(
+  '/:courseId/assignments/:assignmentId',
+  currentUser,
+  requireAuth,
+  AssignmentController.getAssignment
+);
+
 router.post(
   '/:courseId/assignments',
   // AssignmentController.mkDir,
@@ -161,6 +168,13 @@ router.post(
   currentUser,
   requireAuth,
   StudentDeliveriesController.downloadStudentDeliveryFile
+);
+
+router.post(
+  '/events',
+  currentUser,
+  requireAuth,
+  CourseController.getAuthEvents
 );
 
 export { router as CourseRouter };

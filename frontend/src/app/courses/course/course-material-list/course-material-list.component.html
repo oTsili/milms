@@ -97,20 +97,22 @@
         >
           <mat-icon>delete</mat-icon>
         </a>
-        <a
-          class="button"
-          target="_blank"
-          [routerLink]="['/pdfViewer', material.filePath]"
-          matTooltip="Open the Web pdf viewer"
-        >
-          <mat-icon>launch</mat-icon>
-        </a>
+
         <a
           class="button"
           (click)="ondDownloadCourseMaterial(material)"
           matTooltip="Download the file"
         >
           <mat-icon>save_alt</mat-icon>
+        </a>
+        <a
+          style="color: #b34d4d"
+          class="button"
+          target="_blank"
+          [routerLink]="['/pdfViewer', material.filePath]"
+          matTooltip="Open the Web pdf viewer"
+        >
+          <mat-icon>picture_as_pdf</mat-icon>
         </a>
       </td>
     </ng-container>

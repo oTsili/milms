@@ -8,12 +8,11 @@ import { BadRequestError, catchAsync } from '@otmilms/common';
 import { Assignment, User, Course } from '../models/models';
 import { AssignmentCreatedPublisher } from './events/publishers/assignments-publisher';
 import { natsWrapper } from '../nats-wrapper';
-
+import { toHumanDateTime } from './courses';
 // import APIFeatures from '../utils/apiFeatures';
 // import fetch from 'node-fetch';
 import { access, constants, mkdir } from 'fs';
 
-import { riakWrapper } from '../riak-wrapper';
 import { UserDoc } from '../models/user';
 
 export const createAssignment = catchAsync(
@@ -77,6 +76,8 @@ export const updateAssignment = catchAsync(
     let materials = req.body.materials;
 
     const userId = req.currentUser!.id;
+
+    console.log(req.file);
 
     if (req.file) {
       // the path of files folder and filename
@@ -160,20 +161,22 @@ export const getAssignments = catchAsync(
   }
 );
 
-// export const getAssignment = catchAsync(
-//   async (req: Request, res: Response, next: NextFunction) => {
-//     const assignment = await Assignment.findById(req.params.id).populate(
-//       'creatorId'
-//     );
-//     if (assignment) {
-//       res.status(200).json(assignment);
-//     } else {
-//       res.status(404).json({
-//         message: 'Assignment not found!',
-//       });
-//     }
-//   }
-// );
+export const getAssignment = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const assignment = await Assignment.findById(
+      req.params.assignmentId
+    ).populate('instructorId');
+    if (assignment) {
+      res
+        .status(200)
+        .json({ message: 'Assignment fetched successfully', assignment });
+    } else {
+      res.status(404).json({
+        message: 'Assignment not found!',
+      });
+    }
+  }
+);
 
 export const deleteAssignment = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -249,79 +252,6 @@ export const getBlobFile = catchAsync(async (req: Request, res: Response) => {
 
   res.status(200).sendFile(url);
 });
-
-export const getAuthEvents = catchAsync(async (req: Request, res: Response) => {
-  const userId = (<any>req).currentUser.id;
-  const user = await User.findById(userId);
-
-  const startDate = new Date(req.body.startDate).getTime();
-  const endDate = new Date(req.body.endDate).getTime();
-
-  var query =
-    'select * from user where time >' + startDate + 'and time < ' + endDate;
-
-  let userEvents: { [k: string]: any }[] = [];
-
-  var cb = function (err, rslt) {
-    if (err) {
-      console.log(err);
-    } else {
-      rslt.rows.forEach((row: string) => {
-        let cols = row.toString().split(',');
-        userEvents.push(
-          Object.fromEntries(
-            new Map([
-              ['time', toHumanDateTime(new Date(+cols[0]))],
-              ['event', cols[1]],
-              ['email', cols[2]],
-              ['firstName', cols[3]],
-              ['lastName', cols[4]],
-            ])
-          )
-        );
-      });
-    }
-
-    // send a response with the found events
-    res.status(200).json({
-      message: 'Events fetched successfully!',
-      events: userEvents,
-    });
-  };
-
-  var cmd = new Riak.Commands.TS.Query.Builder()
-    .withQuery(query)
-    .withCallback(cb)
-    .build();
-
-  if (user) {
-    riakWrapper.queryClient.execute(cmd);
-  } else {
-    throw new Error('user not found');
-  }
-});
-
-const toHumanDateTime = (date: Date) => {
-  let month = (date.getMonth() + 1).toString();
-
-  let newDateArray = date.toDateString().split(' ');
-  // delete the day name
-  newDateArray.splice(0, 1);
-  // change the month name to month numbers
-  newDateArray.splice(0, 1, month);
-  // monve the month to the center
-  monveInArray(newDateArray, 0, 1);
-  let newDate = newDateArray.join(' ').replace(/\ /g, '/');
-  let newTime = date.toTimeString().split(' ')[0];
-
-  return `${newDate} ${newTime}`;
-};
-
-const monveInArray = (arr: string[], from: number, to: number): void => {
-  let item = arr.splice(from, 1);
-
-  arr.splice(to, 0, item[0]);
-};
 
 // export const   paginate = catchAsync(async (req: Request, res: Response) =>  {
 //     const page = this.queryString.page * 1 || 1;

@@ -1,21 +1,22 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Subscription } from 'rxjs';
+import { Assignment } from 'src/app/models/assignment.model';
+import { environment } from 'src/environments/environment';
 import { MatBreadcrumbService } from 'mat-breadcrumb';
 import { ActivatedRoute, ParamMap } from '@angular/router';
-import { Subscription } from 'rxjs';
-
-import { CoursesService } from 'src/app/courses/courses.service';
-import { environment } from 'src/environments/environment';
 import { SharedService } from 'src/app/shared/services/shared.service';
-import { Course } from 'src/app/models/course.model';
+import { AssignmentsService } from 'src/app/courses/course/assignments/assignments.service';
+
 @Component({
-  selector: 'app-courses',
-  templateUrl: './course.component.html',
-  styleUrls: ['./course.component.css', './course.component.scss'],
+  selector: 'app-assignment',
+  templateUrl: './assignment.component.html',
+  styleUrls: ['./assignment.component.css'],
 })
-export class CourseComponent implements OnInit, OnDestroy {
+export class AssignmentComponent implements OnInit, OnDestroy {
   userRoleSubscription: Subscription;
   courseId: string;
-  course: Course;
+  assignmentId: string;
+  assignment: Assignment;
   isLoading: boolean = false;
   userRole: string;
   totalCourses = environment.TOTAL_COURSES;
@@ -26,7 +27,7 @@ export class CourseComponent implements OnInit, OnDestroy {
     private matBreadcrumbService: MatBreadcrumbService,
     public route: ActivatedRoute,
     private sharedService: SharedService,
-    private coursesService: CoursesService
+    private assignmentsService: AssignmentsService
   ) {}
 
   ngOnInit() {
@@ -34,8 +35,9 @@ export class CourseComponent implements OnInit, OnDestroy {
     this.sharedService.enableBreadcrumb(true);
 
     this.route.paramMap.subscribe((paraMap: ParamMap) => {
-      if (paraMap.has('courseId')) {
+      if (paraMap.has('courseId') && paraMap.has('assignmentId')) {
         this.courseId = paraMap.get('courseId');
+        this.assignmentId = paraMap.get('assignmentId');
       } else {
         throw new Error('no course id provided');
       }
@@ -60,22 +62,24 @@ export class CourseComponent implements OnInit, OnDestroy {
     this.userRoleSubscription.unsubscribe();
   }
 
-  onGetCourse(id: string) {
-    return this.coursesService.getCourse(id);
+  updateMatBreadcrumb() {
+    this.onGetAssignment(this.courseId, this.assignmentId).subscribe(
+      (response) => {
+        console.log(response);
+        this.assignment = response.assignment;
+
+        console.log(this.assignment);
+        const breadcrumb = {
+          customText: 'This is Custom Text',
+          dynamicText: this.assignment.title,
+        };
+        this.matBreadcrumbService.updateBreadcrumbLabels(breadcrumb);
+      }
+    );
+    // get course NO COURSES and update the dynamic text with the course title
   }
 
-  updateMatBreadcrumb() {
-    this.onGetCourse(this.courseId).subscribe((response) => {
-      console.log(response);
-      this.course = response.course;
-
-      console.log(this.course);
-      const breadcrumb = {
-        customText: 'This is Custom Text',
-        dynamicText: this.course.title,
-      };
-      this.matBreadcrumbService.updateBreadcrumbLabels(breadcrumb);
-    });
-    // get course NO COURSES and update the dynamic text with the course title
+  onGetAssignment(courseId: string, assignmentId: string) {
+    return this.assignmentsService.getAssignment(courseId, assignmentId);
   }
 }

@@ -13,6 +13,7 @@ import { EventsComponent } from './events/events.component';
 import { PdfViewerComponent } from './shared/pdf-viewer/pdf-viewer.component';
 import { CoursesComponent } from './courses/courses.component';
 import { CourseComponent } from './courses/course/course.component';
+import { AssignmentComponent } from './courses/course/assignments/assignment/assignment.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -31,7 +32,7 @@ const routes: Routes = [
     },
     children: [
       {
-        path: ':courseId/assignments',
+        path: ':courseId',
         redirectTo: 'courses/:courseId',
         pathMatch: 'full',
       },
@@ -42,7 +43,7 @@ const routes: Routes = [
     component: CourseComponent,
     canActivate: [AuthGuard],
     data: {
-      title: 'assignments',
+      title: 'course',
       breadcrumb: [
         {
           label: 'Courses',
@@ -51,6 +52,42 @@ const routes: Routes = [
         {
           label: '{{dynamicText}}',
           url: 'courses/:courseId',
+        },
+      ],
+      children: [
+        {
+          path: 'assignments/:assignmentId',
+          redirectTo: 'courses/:courseId/assignments/:assignmentId',
+          pathMatch: 'full',
+        },
+      ],
+    },
+  },
+  {
+    path: 'courses/:courseId/assignments/:assignmentId',
+    component: AssignmentComponent,
+    canActivate: [AuthGuard],
+    data: {
+      title: 'assignment',
+      breadcrumb: [
+        {
+          label: 'Courses',
+          url: 'courses',
+        },
+        {
+          label: '{{dynamicText}}',
+          url: 'courses/:courseId',
+        },
+        {
+          label: 'Assignment: {{dynamicText}}',
+          url: 'assignments/:assignmentId',
+        },
+      ],
+      children: [
+        {
+          path: 'assignments/:assignmentId',
+          redirectTo: 'assignments/:assignmentId',
+          pathMatch: 'full',
         },
       ],
     },

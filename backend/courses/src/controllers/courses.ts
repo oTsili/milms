@@ -16,6 +16,7 @@ import { CourseDoc } from '../models/course';
 import { AssignmentDoc } from '../models/assignment';
 import { Assignment, Course, User } from '../models/models';
 import { UserDoc } from '../models/user';
+import { riakWrapper } from '../riak-wrapper';
 
 export const getCourses = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -180,3 +181,76 @@ export const updateCourse = catchAsync(
     // await Assignment.populate(updatedAssignment, { path: 'creatorId' });
   }
 );
+
+export const getAuthEvents = catchAsync(async (req: Request, res: Response) => {
+  const userId = (<any>req).currentUser.id;
+  const user = await User.findById(userId);
+
+  const startDate = new Date(req.body.startDate).getTime();
+  const endDate = new Date(req.body.endDate).getTime();
+
+  var query =
+    'select * from user where time >' + startDate + 'and time < ' + endDate;
+
+  let userEvents: { [k: string]: any }[] = [];
+
+  var cb = function (err, rslt) {
+    if (err) {
+      console.log(err);
+    } else {
+      rslt.rows.forEach((row: string) => {
+        let cols = row.toString().split(',');
+        userEvents.push(
+          Object.fromEntries(
+            new Map([
+              ['time', toHumanDateTime(new Date(+cols[0]))],
+              ['event', cols[1]],
+              ['email', cols[2]],
+              ['firstName', cols[3]],
+              ['lastName', cols[4]],
+            ])
+          )
+        );
+      });
+    }
+
+    // send a response with the found events
+    res.status(200).json({
+      message: 'Events fetched successfully!',
+      events: userEvents,
+    });
+  };
+
+  var cmd = new Riak.Commands.TS.Query.Builder()
+    .withQuery(query)
+    .withCallback(cb)
+    .build();
+
+  if (user) {
+    riakWrapper.queryClient.execute(cmd);
+  } else {
+    throw new Error('user not found');
+  }
+});
+
+export const toHumanDateTime = (date: Date) => {
+  let month = (date.getMonth() + 1).toString();
+
+  let newDateArray = date.toDateString().split(' ');
+  // delete the day name
+  newDateArray.splice(0, 1);
+  // change the month name to month numbers
+  newDateArray.splice(0, 1, month);
+  // monve the month to the center
+  monveInArray(newDateArray, 0, 1);
+  let newDate = newDateArray.join(' ').replace(/\ /g, '/');
+  let newTime = date.toTimeString().split(' ')[0];
+
+  return `${newDate} ${newTime}`;
+};
+
+const monveInArray = (arr: string[], from: number, to: number): void => {
+  let item = arr.splice(from, 1);
+
+  arr.splice(to, 0, item[0]);
+};

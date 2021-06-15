@@ -78,6 +78,15 @@ export class AssignmentsService {
       );
   }
 
+  getAssignment(courseId: string, assignmentId: string) {
+    return this.http.get<{ message: string; assignment: Assignment }>(
+      `${BACKEND_URL}/${courseId}/assignments/${assignmentId}`,
+      {
+        withCredentials: true,
+      }
+    );
+  }
+
   onUpdateAssignment(assignment: Assignment) {
     console.log(assignment);
     const { id, courseId } = assignment;

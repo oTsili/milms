@@ -13,7 +13,7 @@ import { CourseMaterialListComponent } from 'src/app/courses/course/course-mater
 import { StudentAssignmentsComponent } from 'src/app/courses/course/assignments/student-assignments/student-assignments.component';
 import { InstructorAssignmentsComponent } from 'src/app/courses/course/assignments/instructor-assignments/instructor-assignments.component';
 import { AssignmentsComponent } from 'src/app/courses/course/assignments/assignments.component';
-import { SharedModule } from '../shared/shared.module';
+import { AssignmentComponent } from './course/assignments/assignment/assignment.component';
 
 @NgModule({
   declarations: [
@@ -25,6 +25,7 @@ import { SharedModule } from '../shared/shared.module';
     StudentAssignmentsComponent,
     InstructorAssignmentsComponent,
     AssignmentsComponent,
+    AssignmentComponent,
   ],
   imports: [
     ReactiveFormsModule,

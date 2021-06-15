@@ -91,7 +91,8 @@
         <a
           style="color: #b34d4d"
           class="button"
-          (click)="openDialog(controlIndex, 'upload')"
+          target="_blank"
+          [routerLink]="['/pdfViewer', assignment.filePath]"
           matTooltip="Open the pdf web viewer page"
         >
           <mat-icon>picture_as_pdf</mat-icon>
@@ -99,7 +100,12 @@
         <a
           style="color: #5b4db3"
           class="button"
-          [routerLink]="['/assignments', assignment.id]"
+          [routerLink]="[
+            '/courses/',
+            assignment.courseId,
+            'assignments',
+            assignment.id
+          ]"
           matTooltip="Open the Assignment's page"
         >
           <mat-icon>launch</mat-icon>

@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
 
 const ASSIGNMENTS_BACKEND_URL =
-  environment.ASSIGNMENT_BASE_URL + '/api/assignments';
+  environment.ASSIGNMENT_BASE_URL + '/api/courses';
 
 @Injectable({ providedIn: 'root' })
 export class EventsService {
