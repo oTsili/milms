@@ -3,7 +3,7 @@ import path from 'path';
 var logger = require('winston');
 const Riak = require('basho-riak-client');
 
-import { catchAsync } from '@otmilms/common';
+import { BadRequestError, catchAsync } from '@otmilms/common';
 
 import { Assignment, User, Course } from '../models/models';
 import { AssignmentCreatedPublisher } from './events/publishers/assignments-publisher';
@@ -18,16 +18,12 @@ import { UserDoc } from '../models/user';
 
 export const createAssignment = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    let courseId = req.params.id;
+    let courseId = req.params.courseId;
 
-    let courseQuery = Course.findById(courseId).populate('assignments');
-
-    let currentCourse = await courseQuery;
-
-    let dir = '';
-    if (currentCourse) {
-      dir = `src/public/assignments`;
-    }
+    // let dir = '';
+    // if (currentCourse) {
+    //   dir = `src/public/assignments`;
+    // }
 
     const instructorId = req.currentUser!.id;
 
@@ -39,7 +35,7 @@ export const createAssignment = catchAsync(
       filePath = `api/courses/public/assignments/${req.file.filename}`;
     }
 
-    const { title, description, fileType, lastUpdate, materials } = req.body;
+    const { title, description, fileType, lastUpdate } = req.body;
 
     const newAssignment = Assignment.build({
       title,
@@ -48,17 +44,10 @@ export const createAssignment = catchAsync(
       fileType,
       instructorId,
       courseId,
-      lastUpdate,
-      materials,
+      lastUpdate: toHumanDateTime(new Date()),
     });
 
     const createdAssignment = await newAssignment.save();
-
-    currentCourse!.assignments!.push(createdAssignment);
-
-    await currentCourse!.save();
-
-    let updatedCourse = await courseQuery;
 
     if (createdAssignment.id && createdAssignment.description) {
       await new AssignmentCreatedPublisher(natsWrapper.client).publish({
@@ -73,7 +62,7 @@ export const createAssignment = catchAsync(
 
     res.status(201).json({
       message: 'Assignment added successfuly',
-      updatedCourse,
+      createdAssignment,
     });
 
     // populate the user's information
@@ -101,8 +90,8 @@ export const updateAssignment = catchAsync(
       _id: req.params.assignmentId,
       title: req.body.title,
       description: req.body.description,
-      createdAt: req.body.createdAt,
-      creatorId: userId,
+      lastUpdate: req.body.lastUpdate,
+      instructorId: userId,
       filePath: newFilePath,
       fileType: fileType,
       materials: materials,
@@ -112,15 +101,20 @@ export const updateAssignment = catchAsync(
       // matching requirements
       {
         _id: req.params.assignmentId,
-        creatorId: userId,
+        instructorId: userId,
       },
       // the new values of assigment object
       updatedAssignment
     );
 
+    const fetchedAssignment = await Assignment.find({
+      _id: req.params.assignmentId,
+      instructorId: userId,
+    });
+
     res.status(200).json({
       message: 'update successful!',
-      updatedAssignment,
+      fetchedAssignment,
     });
   }
 );
@@ -129,34 +123,38 @@ export const getAssignments = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const pageSize = +req.query.pagesize!;
     const currentPage = +req.query.page!;
+    const courseId = req.params.courseId;
 
-    let courseQuery = Course.findById(req.params.id);
+    let assignmentsQuery = Assignment.find({
+      courseId,
+    });
 
     let sortObj;
     if (`${req.query.sort}` !== '') {
       sortObj = JSON.parse(`${req.query.sort}`);
 
       if (sortObj.direction === 'asc') {
-        courseQuery = courseQuery.sort([[sortObj.active, 1]]);
+        assignmentsQuery = assignmentsQuery.sort([[sortObj.active, 1]]);
       } else if (sortObj.direction === 'desc') {
-        courseQuery = courseQuery.sort([[sortObj.active, -1]]);
+        assignmentsQuery = assignmentsQuery.sort([[sortObj.active, -1]]);
       }
     } else {
-      courseQuery = courseQuery.sort([['title', 1]]);
+      assignmentsQuery = assignmentsQuery.sort([['title', 1]]);
     }
 
-    let fetchedCourse = await courseQuery
+    let fetchedAssignments = await assignmentsQuery
       .skip(pageSize * (currentPage - 1))
       .limit(pageSize)
-      .populate('assignments')
       .populate('instructorId')
       .populate('materials');
 
-    const count = fetchedCourse!.assignments!.length;
+    const count = await Assignment.find({
+      courseId,
+    }).countDocuments();
 
     res.status(200).json({
-      message: 'Course fetched successfully!',
-      course: fetchedCourse,
+      message: 'Assignments fetched successfully!',
+      fetchedAssignments,
       maxAssignments: count,
     });
   }

@@ -1,4 +1,5 @@
-import { User } from "./auth-data.model";
+import { AbstractControl } from '@angular/forms';
+import { User } from './auth-data.model';
 
 export interface DialogData {
   id?: string;
@@ -10,4 +11,6 @@ export interface DialogData {
   createdAt: string;
   instructorId?: string | User;
   instructor?: string;
+  lastUpdate?: string;
+  currentControl?: AbstractControl;
 }

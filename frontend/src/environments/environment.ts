@@ -12,6 +12,7 @@ export const environment = {
   // AUTH_BASE_URL: 'http://localhost:3000',
   // ASSIGNMENT_BASE_URL: 'http://localhost:4000',
   // COURSES_BASE_URL: 'http://localhost:4000',
+  PAGE_SIZE_OPTIONS: [5, 10, 25, 100],
   TOTAL_COURSES: 0,
   COURSES_PER_PAGE: 5,
   CURRENT_PAGE: 1,

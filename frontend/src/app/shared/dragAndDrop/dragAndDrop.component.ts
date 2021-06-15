@@ -7,9 +7,10 @@ import {
   FormBuilder,
   FormArray,
   ControlContainer,
+  AbstractControl,
 } from '@angular/forms';
 
-import { AssignmentsService } from 'src/app/courses.old/assignments/assignment.service';
+import { AssignmentsService } from 'src/app/courses/course/assignments/assignments.service';
 import { assignmentMimeType } from 'src/app/shared/validators/assignment-mime-type.validator';
 import { Material } from 'src/app/models/material.model';
 import { Assignment } from 'src/app/models/assignment.model';
@@ -29,10 +30,13 @@ import { Course } from 'src/app/models/course.model';
 export class DragAndDropComponent implements OnInit {
   @Input() component: string;
   @Input() parentComponent: string;
+  @Input() currentControl: AbstractControl;
+
   materials: Material[];
   studentDeliveries: StudentDeliveryAssignment[];
   studentDeliveryFiles: StudentDeliveryFile[];
   files: any[] = [];
+  file: any;
   isLoading: boolean = false;
   courseId: string;
   assignmentId: string;
@@ -42,6 +46,8 @@ export class DragAndDropComponent implements OnInit {
   currentStudentDeliveryControl: FormArray;
   materialsForm: FormGroup;
   materialsControl: FormArray;
+  assignmentsForm: FormGroup;
+  assignmentsControl: FormArray;
   emptyMaterial: Material = {
     name: null,
     filePath: null,
@@ -67,7 +73,7 @@ export class DragAndDropComponent implements OnInit {
 
   constructor(
     private coursesService: CoursesService,
-    private assignmentService: AssignmentsService,
+    private assignmentsService: AssignmentsService,
     private courseMaterialsService: CourseMaterialsService,
     // private studentDeliveriesService: StudentDeliveriesService,
     private formBuilder: FormBuilder,
@@ -81,6 +87,9 @@ export class DragAndDropComponent implements OnInit {
     this.route.paramMap.subscribe((paraMap: ParamMap) => {
       if (paraMap.has('courseId')) {
         this.courseId = paraMap.get('courseId');
+      } else if (this.currentControl) {
+        console.log(this.currentControl);
+        this.courseId = this.currentControl.value.courseId;
       } else {
         throw new Error('no course id provided');
       }
@@ -118,6 +127,22 @@ export class DragAndDropComponent implements OnInit {
     } else if (this.component === 'student-deliveries') {
       this.prepareStudentDeliveriesFileList($event);
       // deliveries update the deliveries control
+    } else if (this.component === 'assignment') {
+      this.prepareAssignmentFileList($event);
+      // deliveries update the deliveries control
+    }
+  }
+
+  /**
+   * handle file from browsing
+   */
+  fileBrowseHandler(files) {
+    if (this.component === 'material') {
+      this.prepareMaterialFilesList(files);
+    } else if (this.component === 'student-deliveries') {
+      this.prepareStudentDeliveriesFileList(files);
+    } else if (this.component === 'assignment') {
+      this.prepareAssignmentFileList(files);
     }
   }
 
@@ -201,17 +226,6 @@ export class DragAndDropComponent implements OnInit {
     //         this.isLoading = false;
     //       });
     //   });
-  }
-
-  /**
-   * handle file from browsing
-   */
-  fileBrowseHandler(files) {
-    if (this.component === 'material') {
-      this.prepareMaterialFilesList(files);
-    } else if (this.component === 'student-deliveries') {
-      this.prepareStudentDeliveriesFileList(files);
-    }
   }
 
   /**
@@ -324,6 +338,32 @@ export class DragAndDropComponent implements OnInit {
   }
 
   /**
+   * Convert Files list to normal array list
+   * @param files (Files List)
+   */
+  prepareAssignmentFileList(files: Array<any>) {
+    if (files.length > 1) {
+      this.sharedService.throwError('Only one file is permitted!');
+      return;
+    }
+
+    const file = files[0];
+
+    console.log(this.currentControl);
+
+    this.currentControl.patchValue({
+      filePath: file,
+      fileType: file.type,
+    });
+
+    // update and validate the image field value
+    this.currentControl.updateValueAndValidity();
+
+    console.log(this.currentControl);
+    this.uploadFilesSimulator(0);
+  }
+
+  /**
    * format bytes
    * @param bytes (File size in bytes)
    * @param decimals (Decimals point)
@@ -362,6 +402,18 @@ export class DragAndDropComponent implements OnInit {
       courseId: material.courseId,
       assignmentId: material.assignmentId,
       creatorId: material.creatorId,
+    });
+  }
+  // initialize a form control
+  createAssignmnet(assignment: Assignment): FormGroup {
+    return this.formBuilder.group({
+      title: assignment.title,
+      lastUpdate: assignment.lastUpdate,
+      filePath: assignment.filePath,
+      fileType: assignment.fileType,
+      id: assignment.id,
+      courseId: assignment.courseId,
+      instructorId: assignment.instructorId,
     });
   }
 }

@@ -5,8 +5,8 @@
 <div class="container mat-elevation-z8">
   <ng-container *ngIf="dataSource">
     <mat-paginator
-      [length]="totalCourses"
-      [pageSize]="coursesPerPage"
+      [length]="totalAssignments"
+      [pageSize]="assingnmentsPerPage"
       [pageSizeOptions]="pageSizeOptions"
       (page)="onChangePage($event)"
       *ngIf="dataSource._data._value.length > 0"
@@ -23,51 +23,45 @@
     <!-- Position Column -->
     <ng-container matColumnDef="position">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>No.</th>
-      <td mat-cell *matCellDef="let course; let i = index">
-        {{ course.position }}
+      <td mat-cell *matCellDef="let assignment; let i = index">
+        {{ assignment.position }}
       </td>
     </ng-container>
 
-    <!-- Course Title Column -->
+    <!-- assignment Title Column -->
     <ng-container matColumnDef="title">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Title</th>
-      <td mat-cell *matCellDef="let course">{{ course.title }}</td>
+      <td mat-cell *matCellDef="let assignment">{{ assignment.title }}</td>
     </ng-container>
 
-    <!-- Last Update Column -->
+    <!-- Description Column -->
     <ng-container matColumnDef="description">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Description</th>
-      <td mat-cell *matCellDef="let course">
-        {{ course.description }}
+      <td mat-cell *matCellDef="let assignment">
+        {{ assignment.description }}
       </td>
     </ng-container>
-    <!-- Last Update Column -->
-    <ng-container matColumnDef="year">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Year</th>
-      <td mat-cell *matCellDef="let course">
-        {{ course.year }}
-      </td>
-    </ng-container>
-    <!-- Last Update Column -->
-    <ng-container matColumnDef="semester">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Semester</th>
-      <td mat-cell *matCellDef="let course">
-        {{ course.semester }}
+
+    <!-- lastUpdate Column -->
+    <ng-container matColumnDef="lastUpdate">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Last Update</th>
+      <td mat-cell *matCellDef="let assignment">
+        {{ assignment.lastUpdate }}
       </td>
     </ng-container>
 
     <!-- Instructor Column -->
     <ng-container matColumnDef="instructor">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Instructor</th>
-      <td mat-cell *matCellDef="let course">
-        {{ course.instructor }}
+      <td mat-cell *matCellDef="let assignment">
+        {{ assignment.instructor }}
       </td>
     </ng-container>
 
-    <!-- Options Column -->
+    <!-- options Column -->
     <ng-container matColumnDef="options">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Options</th>
-      <td mat-cell *matCellDef="let course; let controlIndex = index">
+      <td mat-cell *matCellDef="let assignment; let controlIndex = index">
         <a
           class="button"
           style="color: #3f51b5"
@@ -80,14 +74,32 @@
           class="button"
           style="color: #f44b4b"
           matTooltip="Delete the assignment"
-          (click)="deleteCourse(controlIndex)"
-          matTooltip="Delete the course"
+          (click)="deleteAssignment(controlIndex)"
+          matTooltip="Delete the assignment"
         >
           <mat-icon>delete</mat-icon>
         </a>
+
         <a
+          style="color: #2a78d1"
           class="button"
-          [routerLink]="['/courses', course.id]"
+          (click)="openDialog(controlIndex, 'upload')"
+          matTooltip="Attach the assignment file"
+        >
+          <mat-icon> attach_file</mat-icon>
+        </a>
+        <a
+          style="color: #b34d4d"
+          class="button"
+          (click)="openDialog(controlIndex, 'upload')"
+          matTooltip="Open the pdf web viewer page"
+        >
+          <mat-icon>picture_as_pdf</mat-icon>
+        </a>
+        <a
+          style="color: #5b4db3"
+          class="button"
+          [routerLink]="['/assignments', assignment.id]"
           matTooltip="Open the Assignment's page"
         >
           <mat-icon>launch</mat-icon>
@@ -102,7 +114,9 @@
       <!-- Row shown when there is no matching data. -->
       <ng-container *ngIf="dataSource._data._value.length === 0">
         <tr class="mat-row" *matNoDataRow>
-          <td class="mat-cell message" colspan="7">No courses added yet!</td>
+          <td class="mat-cell message" colspan="7">
+            No assignments added yet!
+          </td>
         </tr>
       </ng-container>
       <!-- Row shown when there is no matching data. -->
@@ -122,6 +136,6 @@
     color="primary"
     (click)="openDialog(undefined, 'create')"
   >
-    Add Course
+    Add assignment
   </button>
 </div>

@@ -176,7 +176,8 @@ export const createCourseMaterials = catchAsync(
 export const getCourseMaterials = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const courseId = req.params.courseId;
-
+    const pageSize = +req.query.pagesize!;
+    const currentPage = +req.query.page!;
     // get the materials of a specific assignment and a specific course
     let materialsQuery = Material.find({
       courseId: courseId,
@@ -195,9 +196,13 @@ export const getCourseMaterials = catchAsync(
       materialsQuery = materialsQuery.sort([['name', 1]]);
     }
 
-    let fetchedMaterials = await materialsQuery;
+    let fetchedMaterials = await materialsQuery
+      .skip(pageSize * (currentPage - 1))
+      .limit(pageSize);
 
-    const count = await materialsQuery.countDocuments();
+    const count = await Material.find({
+      courseId: courseId,
+    }).countDocuments();
 
     res.status(200).json({
       message: 'Materials fetched successfully!',

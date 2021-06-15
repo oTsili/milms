@@ -30,6 +30,7 @@ router.get(
   requireAuth,
   MaterialsController.getCourseMaterials
 );
+
 router.post(
   '/:courseId/materials',
   extractMultipleFiles(
@@ -43,14 +44,14 @@ router.post(
 );
 
 router.get(
-  '/:id/assignments',
+  '/:courseId/assignments',
   currentUser,
   requireAuth,
   AssignmentController.getAssignments
 );
 
 router.post(
-  '/:id/assignments',
+  '/:courseId/assignments',
   // AssignmentController.mkDir,
   // AssignmentController.extractFileController,
   extractFile(MIME_TYPE_MAP, 'src/public/assignments', 'filePath'),
@@ -74,6 +75,7 @@ router.delete(
 
 router.put(
   '/:courseId/assignments/:assignmentId',
+  extractFile(MIME_TYPE_MAP, 'src/public/assignments', 'filePath'),
   currentUser,
   requireAuth,
   AssignmentController.updateAssignment

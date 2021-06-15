@@ -17,17 +17,14 @@ import { Router } from '@angular/router';
 import { CoursesService } from 'src/app/courses/courses.service';
 import { Course } from 'src/app/models/course.model';
 import { SharedService } from 'src/app/shared/services/shared.service';
-import { NewTableLineComponent } from 'src/app/shared/matDialog/newTableLine/newTableLine.component';
+import { CourseTableLineomponent } from 'src/app/shared/matDialog/courseTableLine/courseTableLine.component';
 import { HeaderService } from 'src/app/header/header.service';
 import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-instructor-courses',
   templateUrl: './instructor-courses.component.html',
-  styleUrls: [
-    './instructor-courses.component.css',
-    './instructor-courses.component.scss',
-  ],
+  styleUrls: ['./instructor-courses.component.css'],
 })
 export class InstructorCoursesComponent implements OnInit, OnDestroy {
   @ViewChild(MatSort) sort: MatSort;
@@ -39,7 +36,7 @@ export class InstructorCoursesComponent implements OnInit, OnDestroy {
     'year',
     'semester',
     'instructor',
-    'navigate',
+    'options',
   ];
   emptyCourse: Course = {
     id: null,
@@ -59,14 +56,13 @@ export class InstructorCoursesComponent implements OnInit, OnDestroy {
   addButtonClicked = false;
   matPanelStep: boolean[] = [false];
   private coursesUpdateSubscription: Subscription;
-  private userRoleSubscription: Subscription;
   courses: Course[];
   courseControls: FormArray;
   userRole: string;
-  coursesCount: number;
   mode: string;
   coursesForm: FormGroup;
   isLoading = false;
+  pageSizeOptions = environment.PAGE_SIZE_OPTIONS;
   totalCourses = environment.TOTAL_COURSES;
   coursesPerPage = environment.COURSES_PER_PAGE;
   currentPage = environment.CURRENT_PAGE;
@@ -75,7 +71,6 @@ export class InstructorCoursesComponent implements OnInit, OnDestroy {
     private coursesService: CoursesService,
     private sharedService: SharedService,
     private headerService: HeaderService,
-    private router: Router,
     private formBuilder: FormBuilder,
     public dialog: MatDialog
   ) {}
@@ -92,7 +87,7 @@ export class InstructorCoursesComponent implements OnInit, OnDestroy {
       .subscribe((response) => {
         console.log('courses updated');
         this.courses = response.courses;
-        this.coursesCount = response.coursesCount;
+        this.totalCourses = response.coursesCount;
       });
 
     // define and initialize the form group and formArray
@@ -152,12 +147,11 @@ export class InstructorCoursesComponent implements OnInit, OnDestroy {
     this.mode = mode;
     let currentControl = this.courseControls.get(`${controlIndex}`);
 
-    let dialogRef: MatDialogRef<NewTableLineComponent, any>;
+    let dialogRef: MatDialogRef<CourseTableLineomponent, any>;
 
     if (this.mode === 'create') {
       //  Add new control
-      this.mode = 'create';
-      dialogRef = this.dialog.open(NewTableLineComponent, {
+      dialogRef = this.dialog.open(CourseTableLineomponent, {
         width: '350px',
         data: {
           title: null,
@@ -168,8 +162,7 @@ export class InstructorCoursesComponent implements OnInit, OnDestroy {
       });
     } else if (this.mode === 'edit') {
       // Edit control
-      this.mode = 'edit';
-      dialogRef = this.dialog.open(NewTableLineComponent, {
+      dialogRef = this.dialog.open(CourseTableLineomponent, {
         width: '350px',
         data: {
           title: currentControl.value.title,
@@ -314,15 +307,6 @@ export class InstructorCoursesComponent implements OnInit, OnDestroy {
           this.isLoading = false;
         }
       );
-  }
-
-  // enables the input functionality in the corresponding control
-  permitEdit(event: Event, courseIndex: number) {
-    this.courseControls = this.coursesForm.get('coursesFormArray') as FormArray;
-
-    if (this.courseControls.get(`${courseIndex}`)) {
-      this.coursesService.onEditEnable(courseIndex, this.courses.length);
-    }
   }
 
   // fetches the assignments of the corresponding page of the pagination

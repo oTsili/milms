@@ -52,6 +52,7 @@ export class StudentCoursesComponent implements OnInit, OnDestroy {
   mobileQuery: MediaQueryList;
   allYearComplete: boolean = false;
   allSemesterComplete: boolean = false;
+  private _mobileQueryListener: () => void;
 
   constructor(
     private sharedService: SharedService,
@@ -104,8 +105,6 @@ export class StudentCoursesComponent implements OnInit, OnDestroy {
     this.coursesUpdateSubscription.unsubscribe();
     this.mobileQuery.removeListener(this._mobileQueryListener);
   }
-
-  private _mobileQueryListener: () => void;
 
   years: Year[] = [
     { value: '2018', viewValue: '2018' },

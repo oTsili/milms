@@ -4,11 +4,11 @@ import { DialogData } from 'src/app/models/dialog-data';
 
 @Component({
   selector: 'dialog-overview-example-dialog',
-  templateUrl: 'newTableLine.component.html',
+  templateUrl: './courseTableLine.component.html',
 })
-export class NewTableLineComponent {
+export class CourseTableLineomponent {
   constructor(
-    public dialogRef: MatDialogRef<NewTableLineComponent>,
+    public dialogRef: MatDialogRef<CourseTableLineomponent>,
     @Inject(MAT_DIALOG_DATA) public data: DialogData
   ) {
     console.log(data);

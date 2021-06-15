@@ -1,4 +1,5 @@
 export interface Material {
+  position?: number;
   name: string;
   id?: string;
   filePath: File | string;

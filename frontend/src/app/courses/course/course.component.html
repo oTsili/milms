@@ -21,17 +21,6 @@
     label="Assignments"
     color="primary"
     matTooltip="upload your assignment delivery"
-  >
-  </mat-tab>
-  <mat-tab
-    label="Upload Assignments"
-    color="primary"
-    *ngIf="userRole === 'instructor' || userRole === 'admin'"
-    matTooltip="show my assignment delivery"
-  >
-    <app-dragAndDrop
-      [component]="'student-deliveries'"
-      [parentComponent]="'course'"
-    ></app-dragAndDrop>
+    ><app-assignments></app-assignments>
   </mat-tab>
 </mat-tab-group>

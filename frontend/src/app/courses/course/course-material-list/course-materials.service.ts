@@ -35,8 +35,13 @@ export class CourseMaterialsService {
     this.materialsListener.next(materials);
   }
 
-  getCourseMaterials(courseId: string, sort: string | Sort = '') {
-    const queryParams = `?sort=${sort}`;
+  getCourseMaterials(
+    coursesPerPage: number,
+    currentPage: number,
+    courseId: string,
+    sort: string | Sort = ''
+  ) {
+    const queryParams = `?pagesize=${coursesPerPage}&page=${currentPage}&sort=${sort}`;
     return this.http
       .get<{ message: string; fetchedMaterials: any; maxMaterials: number }>(
         `${BACKEND_URL}/${courseId}/materials${queryParams}`,
@@ -50,17 +55,20 @@ export class CourseMaterialsService {
 
           if (materialData.fetchedMaterials) {
             return {
-              materials: materialData.fetchedMaterials.map((material) => {
-                return {
-                  name: material.name,
-                  filePath: material.filePath,
-                  fileType: material.fileType,
-                  lastUpdate: material.lastUpdate,
-                  assignmentId: material.assignmentId,
-                  courseId: material.courseId,
-                  id: material.id,
-                };
-              }),
+              materials: materialData.fetchedMaterials.map(
+                (material, index) => {
+                  return {
+                    position: (currentPage - 1) * coursesPerPage + (index + 1),
+                    name: material.name,
+                    filePath: material.filePath,
+                    fileType: material.fileType,
+                    lastUpdate: material.lastUpdate,
+                    assignmentId: material.assignmentId,
+                    courseId: material.courseId,
+                    id: material.id,
+                  };
+                }
+              ),
               maxMaterials: materialData.maxMaterials,
             };
           }

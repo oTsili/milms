@@ -1,0 +1,86 @@
+<div class="assignment-content">
+  <mat-paginator
+    [length]="totalAssignments"
+    [pageSize]="assignmentsPerPage"
+    [pageSizeOptions]="pageSizeOptions"
+    (page)="onChangePage($event)"
+    *ngIf="totalAssignments > 0"
+  ></mat-paginator>
+
+  <mat-accordion>
+    <mat-spinner *ngIf="isLoading"></mat-spinner>
+    <ng-container
+      *ngFor="let assignment of assignments; let formControlIndex = index"
+    >
+      <mat-expansion-panel
+        [expanded]="matPanelStep[formControlIndex]"
+        *ngIf="assignment.title && !isLoading"
+      >
+        <mat-expansion-panel-header class="flex-space-between-row">
+          <!-- start -->
+
+          <span class="assignment-components line-header">
+            <mat-panel-title>
+              <span class="assignment-components">
+                <mat-label class="matLabel assignment-components"
+                  >Title</mat-label
+                >
+                <div>{{ assignment.title }}</div>
+              </span>
+            </mat-panel-title>
+          </span>
+          <!-- end -->
+
+          <span class="assignment-components line-header">
+            <span class="assignment-components">
+              <mat-label class="matLabel assignment-components"
+                >Instructor</mat-label
+              >
+              <div>{{ assignment.instructor }}</div>
+            </span>
+          </span>
+        </mat-expansion-panel-header>
+        <div class="flex-column">
+          <mat-action-row class="flex-start-row">
+            <div class="assignment-row">
+              <mat-label class="matLabel assignment-components"
+                >Description</mat-label
+              >
+              <div class="description-field">
+                {{ assignment.description }}
+              </div>
+            </div>
+          </mat-action-row>
+        </div>
+        <mat-divider></mat-divider>
+        <div class="buttons-line">
+          <button
+            mat-stroked-button
+            style="color: #1a74e6"
+            [routerLink]="['/assignments', assignment.id]"
+            matTooltip="Visit the assignment page"
+          >
+            Visit
+          </button>
+          <button
+            mat-stroked-button
+            style="color: #1a74e6"
+            (click)="onDownload()"
+            matTooltip="Visit the assignment page"
+          >
+            Download
+          </button>
+        </div>
+      </mat-expansion-panel>
+    </ng-container>
+  </mat-accordion>
+
+  <p
+    class="mat-body-1 info-text"
+    *ngIf="!assignmentsForm.get('assignmentsFormArray').get('0') && !isLoading"
+  >
+    <mat-card class="message">
+      <span>No assignments added yet!</span>
+    </mat-card>
+  </p>
+</div>

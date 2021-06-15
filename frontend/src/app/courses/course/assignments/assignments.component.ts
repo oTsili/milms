@@ -2,10 +2,10 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { SharedService } from 'src/app/shared/services/shared.service';
 @Component({
-  selector: 'app-courses',
-  templateUrl: './courses.component.html',
+  selector: 'app-assignments',
+  templateUrl: './assignments.component.html',
 })
-export class CoursesComponent implements OnInit, OnDestroy {
+export class AssignmentsComponent implements OnInit, OnDestroy {
   userRole: string;
   private userRoleSubscription: Subscription;
 

@@ -11,9 +11,19 @@ import { AngularMaterialModule } from 'src/app/angular-material.module';
 import { ErrorComponent } from './matDialog/error/error.component';
 import { NotificationComponent } from './matDialog/notification/notification.component';
 import { PdfViewerComponent } from './pdf-viewer/pdf-viewer.component';
+import { CourseTableLineomponent } from './matDialog/courseTableLine/courseTableLine.component';
+import { AssignmentTableLineComponent } from './matDialog/assignmentTableLine/assignmentTableLine.component';
+import { fileTableLineComponent } from './matDialog/fileTableLine/fileTableLine.component';
 
 @NgModule({
-  declarations: [ErrorComponent, NotificationComponent, PdfViewerComponent],
+  declarations: [
+    ErrorComponent,
+    NotificationComponent,
+    PdfViewerComponent,
+    CourseTableLineomponent,
+    AssignmentTableLineComponent,
+    fileTableLineComponent,
+  ],
   imports: [
     ReactiveFormsModule,
     FormsModule,

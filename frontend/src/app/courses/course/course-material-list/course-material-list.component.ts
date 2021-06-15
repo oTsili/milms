@@ -16,6 +16,7 @@ import { SharedService } from 'src/app//shared/services/shared.service';
 // import { AssignmentsService } from '../../assignment.service';
 import { environment } from 'src/environments/environment';
 import { ActivatedRoute, ParamMap } from '@angular/router';
+import { PageEvent } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-course-material-list',
@@ -34,8 +35,8 @@ export class CourseMaterialListComponent implements OnInit, OnDestroy {
   courseId: string;
   assignmentId: string;
   isLoading: boolean = false;
-  totalCourses = environment.TOTAL_COURSES;
-  coursesPerPage = environment.COURSES_PER_PAGE;
+  totalMaterials = environment.TOTAL_COURSES;
+  materialsPerPage = environment.COURSES_PER_PAGE;
   currentPage = environment.CURRENT_PAGE;
 
   constructor(
@@ -69,8 +70,17 @@ export class CourseMaterialListComponent implements OnInit, OnDestroy {
     this.materialUpdateSubscription = this.courseMaterialService
       .getCourseMaterialListener()
       .subscribe((materials) => {
-        this.materials = materials;
-        this.dataSource = new MatTableDataSource(this.materials);
+        this.courseMaterialService
+          .getCourseMaterials(
+            this.materialsPerPage,
+            this.currentPage,
+            this.courseId
+          )
+          .subscribe((response) => {
+            this.materials = response.materials;
+            this.totalMaterials = response.maxMaterials;
+            this.dataSource = new MatTableDataSource(this.materials);
+          });
       });
 
     // // save the courseId and the assignmentId from the parent component assignmentForm
@@ -87,14 +97,19 @@ export class CourseMaterialListComponent implements OnInit, OnDestroy {
 
     // fetch the materials
     this.courseMaterialService
-      .getCourseMaterials(this.courseId)
+      .getCourseMaterials(
+        this.materialsPerPage,
+        this.currentPage,
+        this.courseId
+      )
       .subscribe((response) => {
         console.log(response);
 
         this.materials = response.materials;
+        this.totalMaterials = response.maxMaterials;
         this.dataSource = new MatTableDataSource(this.materials);
+        console.log(this.materials);
       });
-    console.log(this.materials);
   }
 
   ngOnDestroy() {
@@ -116,7 +131,12 @@ export class CourseMaterialListComponent implements OnInit, OnDestroy {
 
     this.isLoading = true;
     this.courseMaterialService
-      .getCourseMaterials(this.courseId, sort)
+      .getCourseMaterials(
+        this.materialsPerPage,
+        this.currentPage,
+        this.courseId,
+        sort
+      )
       .subscribe((response) => {
         this.materials = response.materials;
         // this.clearFormArray(this.assignmentControls);
@@ -158,6 +178,23 @@ export class CourseMaterialListComponent implements OnInit, OnDestroy {
       .downloadCourseMaterial(material)
       .subscribe((response: Blob) => {
         saveAs(response, material.name);
+        this.isLoading = false;
+      });
+  }
+
+  // fetches the assignments of the corresponding page of the pagination
+  onChangePage(pageData: PageEvent) {
+    this.isLoading = true;
+    this.currentPage = pageData.pageIndex + 1;
+    this.materialsPerPage = pageData.pageSize;
+    this.courseMaterialService
+      .getCourseMaterials(
+        this.materialsPerPage,
+        this.currentPage,
+        this.courseId
+      )
+      .subscribe((response) => {
+        this.dataSource = new MatTableDataSource(response.materials);
         this.isLoading = false;
       });
   }
