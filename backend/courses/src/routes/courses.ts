@@ -43,6 +43,21 @@ router.post(
   MaterialsController.createCourseMaterials
 );
 
+router.delete(
+  '/:courseId/materials/:materialId',
+  currentUser,
+  requireAuth,
+  MaterialsController.deleteCourseMaterials
+);
+
+// download file (pdf, doc)
+router.post(
+  '/:courseId/materials/:materialId/dump',
+  currentUser,
+  requireAuth,
+  MaterialsController.downloadCourseMaterials
+);
+
 router.get(
   '/:courseId/assignments',
   currentUser,
@@ -114,21 +129,6 @@ router.post(
 //   requireAuth,
 //   MaterialsController.createMaterials
 // );
-
-router.delete(
-  '/:courseId/assignments/:assignmentId/materials/:materialId',
-  currentUser,
-  requireAuth,
-  MaterialsController.deleteMaterial
-);
-
-// download file (pdf, doc)
-router.post(
-  '/:courseId/assignments/:assignmentId/materials/:materialId/dump',
-  currentUser,
-  requireAuth,
-  MaterialsController.downloadMaterial
-);
 
 router.post(
   '/:courseId/assignments/:assignmentId/student-deliveries',

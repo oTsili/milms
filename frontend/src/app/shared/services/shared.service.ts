@@ -12,14 +12,20 @@ export class SharedService {
 
   private breadcrumbIsEnabled = new Subject<boolean>();
   private userRoleListener = new Subject<string>();
+  private NoButtonListener = new Subject<boolean>();
   private userRole: string = '';
 
   getBreadcrumbDisability(): Observable<boolean> {
     return this.breadcrumbIsEnabled.asObservable();
   }
-
   enableBreadcrumb(enable: boolean) {
     this.breadcrumbIsEnabled.next(enable);
+  }
+  getNoButtonListener(): Observable<boolean> {
+    return this.NoButtonListener.asObservable();
+  }
+  onNoButtonClick() {
+    this.NoButtonListener.next(true);
   }
 
   toHumanDateTime(date: string) {

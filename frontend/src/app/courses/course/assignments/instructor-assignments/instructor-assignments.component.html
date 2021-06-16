@@ -89,6 +89,7 @@
           <mat-icon> attach_file</mat-icon>
         </a>
         <a
+          *ngIf="assignment.filePath"
           style="color: #b34d4d"
           class="button"
           target="_blank"
@@ -96,6 +97,14 @@
           matTooltip="Open the pdf web viewer page"
         >
           <mat-icon>picture_as_pdf</mat-icon>
+        </a>
+        <a
+          *ngIf="assignment.filePath"
+          class="button"
+          (click)="onDownloadAssignment(assignment)"
+          matTooltip="Download the assignment"
+        >
+          <mat-icon>save_alt</mat-icon>
         </a>
         <a
           style="color: #5b4db3"
@@ -135,6 +144,9 @@
       </ng-container>
     </ng-container>
   </table>
+</div>
+<div class="flex-row-center">
+  <mat-spinner *ngIf="isLoading"></mat-spinner>
 </div>
 <div id="add-button" *ngIf="!isLoading">
   <button

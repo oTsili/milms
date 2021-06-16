@@ -12,7 +12,6 @@ export interface CourseAttrs {
   year: string;
   createdAt: Date;
   instructorId: string | UserDoc;
-  assignments?: AssignmentDoc[];
 }
 
 // An interface that describes the properties
@@ -30,7 +29,6 @@ export interface CourseDoc extends mongoose.Document {
   year: string;
   createdAt: Date;
   instructorId: string | UserDoc;
-  assignments?: AssignmentDoc[];
 }
 
 export const courseSchema = new mongoose.Schema(
@@ -63,12 +61,6 @@ export const courseSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
     },
-    assignments: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Assignment',
-      },
-    ],
   },
 
   {

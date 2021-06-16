@@ -166,6 +166,7 @@ export class DragAndDropComponent implements OnInit {
             response.fetchedMaterialFiles
           );
           this.deleteAllFiles();
+          this.materialsControl.removeAt(0);
           this.isLoading = false;
         });
       (err) => {

@@ -19,7 +19,6 @@ export interface StudentDeliveryAssignmentAttrs {
   instructorId?: UserDoc | string;
   studentName?: string;
   comment?: string;
-  children?: StudentDeliveryAssignmentAttrs[];
 }
 
 // An interface that describes the properties
@@ -43,7 +42,6 @@ export interface StudentDeliveryAssignmentDoc extends mongoose.Document {
   instructorId?: UserDoc | string;
   studentName?: string;
   comment?: string;
-  children?: StudentDeliveryAssignmentAttrs[];
 }
 
 export const StudentDeliveryAssignmentSchema = new mongoose.Schema(
@@ -81,12 +79,6 @@ export const StudentDeliveryAssignmentSchema = new mongoose.Schema(
     comment: {
       type: String,
     },
-    studentDeliveriesAssignmentsId: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'StudentDeliveryAssignment',
-      },
-    ],
   },
 
   {

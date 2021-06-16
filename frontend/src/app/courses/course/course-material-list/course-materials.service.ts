@@ -199,7 +199,7 @@ export class CourseMaterialsService {
     console.log('material: ', material);
 
     return this.http.delete(
-      `${BACKEND_URL}/${material.courseId}/assignments/${material.assignmentId}/materials/${material.id}`,
+      `${BACKEND_URL}/${material.courseId}/materials/${material.id}`,
       {
         withCredentials: true,
       }
@@ -209,7 +209,7 @@ export class CourseMaterialsService {
   downloadCourseMaterial(material: Material) {
     const filePath = (material.filePath as string).split('/').slice(-1).pop();
     return this.http.post(
-      `${BACKEND_URL}/${material.courseId}/assignments/${material.assignmentId}/materials/${material.id}/dump`,
+      `${BACKEND_URL}/${material.courseId}/materials/${material.id}/dump`,
       { filePath },
       { responseType: 'blob' as 'json', withCredentials: true }
     );

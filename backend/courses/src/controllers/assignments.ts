@@ -77,8 +77,6 @@ export const updateAssignment = catchAsync(
 
     const userId = req.currentUser!.id;
 
-    console.log(req.file);
-
     if (req.file) {
       // the path of files folder and filename
       newFilePath = `api/courses/public/assignments/${req.file.filename}`;
@@ -91,7 +89,7 @@ export const updateAssignment = catchAsync(
       _id: req.params.assignmentId,
       title: req.body.title,
       description: req.body.description,
-      lastUpdate: req.body.lastUpdate,
+      lastUpdate: toHumanDateTime(new Date()),
       instructorId: userId,
       filePath: newFilePath,
       fileType: fileType,
@@ -108,10 +106,9 @@ export const updateAssignment = catchAsync(
       updatedAssignment
     );
 
-    const fetchedAssignment = await Assignment.find({
-      _id: req.params.assignmentId,
-      instructorId: userId,
-    });
+    const fetchedAssignment = await Assignment.findById(
+      req.params.assignmentId
+    );
 
     res.status(200).json({
       message: 'update successful!',

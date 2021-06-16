@@ -148,7 +148,7 @@ export class CourseMaterialListComponent implements OnInit, OnDestroy {
   }
 
   // deletes a material with regard it's index
-  onDeleteMaterial(material: Material, materialIndex: number) {
+  onDeleteCourseMaterial(material: Material, materialIndex: number) {
     console.log('material: ', material);
 
     // this.currentAssignmentControl = (
@@ -162,7 +162,7 @@ export class CourseMaterialListComponent implements OnInit, OnDestroy {
         console.log(this.materials);
         this.materials.splice(materialIndex, 1);
         console.log(this.materials);
-
+        this.dataSource = new MatTableDataSource(this.materials);
         this.isLoading = false;
       },
       (err) => {
@@ -172,7 +172,7 @@ export class CourseMaterialListComponent implements OnInit, OnDestroy {
     );
   }
 
-  ondDownloadMaterial(material: Material) {
+  ondDownloadCourseMaterial(material: Material) {
     this.isLoading = true;
     this.courseMaterialService
       .downloadCourseMaterial(material)

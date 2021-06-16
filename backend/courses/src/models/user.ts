@@ -10,8 +10,6 @@ export interface UserAttrs {
   lastName: string;
   email: string;
   role: string;
-  courseId?: string;
-  assignmentId?: string;
 }
 
 // An interface that describes the properties
@@ -27,8 +25,7 @@ export interface UserDoc extends mongoose.Document {
   firstName: string;
   lastName: string;
   email: string;
-  courseId: string;
-  assignmentId: string;
+
   role?: string;
 }
 
@@ -53,15 +50,6 @@ export const userSchema = new mongoose.Schema(
       unique: true,
       lowercase: true,
       validate: [validator.isEmail, 'Please provide a valid email'],
-    },
-
-    courseId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Course',
-    },
-    assignmentId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Assignment',
     },
   },
   {

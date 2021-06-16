@@ -56,6 +56,7 @@ export class InstructorAssignmentsComponent implements OnInit, OnDestroy {
   };
   matPanelStep: boolean[] = [false];
   private assignmentsUpdateSubscription: Subscription;
+  private dialogNoButtonClickSubscription: Subscription;
   assignments: Assignment[];
   assignmentControls: FormArray;
   userRole: string;
@@ -63,6 +64,7 @@ export class InstructorAssignmentsComponent implements OnInit, OnDestroy {
   courseId: string;
   assignmentsForm: FormGroup;
   isLoading = false;
+  noButtonIsClicked = false;
   pageSizeOptions = environment.PAGE_SIZE_OPTIONS;
   totalAssignments = environment.TOTAL_COURSES;
   assignmentsPerPage = environment.COURSES_PER_PAGE;
@@ -97,6 +99,12 @@ export class InstructorAssignmentsComponent implements OnInit, OnDestroy {
         this.assignments = response.assignments;
         this.totalAssignments = response.maxAssignments;
       });
+    this.dialogNoButtonClickSubscription = this.sharedService
+      .getNoButtonListener()
+      .subscribe((response) => {
+        console.log('No button clicked');
+        this.noButtonIsClicked = response;
+      });
 
     // define and initialize the form group and formArray
     this.initializeControls();
@@ -126,6 +134,7 @@ export class InstructorAssignmentsComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.assignmentsUpdateSubscription.unsubscribe();
+    this.dialogNoButtonClickSubscription.unsubscribe();
   }
 
   applyFilter(event: Event) {
@@ -219,11 +228,23 @@ export class InstructorAssignmentsComponent implements OnInit, OnDestroy {
             title,
           } = dialogInput.currentControl.value;
 
+          const resultArray = [filePath, fileType];
+
+          formIsInvalid = resultArray.some(
+            (item) => item === undefined || item === null
+          );
           // update the form control
-          currentControl.patchValue({
-            filePath,
-            fileType,
-          });
+
+          if (dialogInput) {
+            dialogInput.instructor = this.user.userName;
+          }
+
+          if (!this.noButtonIsClicked) {
+            currentControl.patchValue({
+              filePath,
+              fileType,
+            });
+          }
 
           const assignment: Assignment = {
             courseId,
@@ -241,13 +262,11 @@ export class InstructorAssignmentsComponent implements OnInit, OnDestroy {
         }
       }
 
-      if (formIsInvalid || !dialogInput) {
+      if ((formIsInvalid || !dialogInput) && !this.noButtonIsClicked) {
         this.sharedService.throwError('Invalid input!');
         return;
       }
 
-      dialogInput.lastUpdate = new Date().toString();
-      dialogInput.instructor = this.user.userName;
       this.saveAssignment(
         this.assignmentControls.length,
         dialogInput,
@@ -280,7 +299,10 @@ export class InstructorAssignmentsComponent implements OnInit, OnDestroy {
 
   // check specific controls, to be regarded valid
   formIsValid = (newControl: AbstractControl): boolean => {
-    if (newControl.get('title').valid && newControl.get('description').valid) {
+    if (
+      (newControl.get('title').valid && newControl.get('description').valid) ||
+      newControl.get('filePath')
+    ) {
       return true;
     }
 
@@ -292,11 +314,27 @@ export class InstructorAssignmentsComponent implements OnInit, OnDestroy {
     currentAssignment.id = this.assignmentControls.get(
       `${assignmentIndex}`
     ).value.id;
+
+    let currentControl = this.assignmentControls.get(`${assignmentIndex}`);
+
     console.log(currentAssignment, assignmentIndex);
+
+    this.isLoading = true;
     // update request
     this.assignmentsService.onUpdateAssignment(currentAssignment).subscribe(
       (response) => {
         console.log(response);
+
+        if (response.fetchedAssignment.title) {
+          // update the form control
+          currentControl.patchValue({
+            title: response.fetchedAssignment.title,
+            description: response.fetchedAssignment.description,
+          });
+        }
+
+        console.log(currentControl);
+
         // update the table
         this.assignmentsService
           .getAssignments(
@@ -307,9 +345,6 @@ export class InstructorAssignmentsComponent implements OnInit, OnDestroy {
           .subscribe((response) => {
             this.assignments = response.assignments;
             this.totalAssignments = response.maxAssignments;
-
-            // remove from the formArray
-            this.assignmentControls.removeAt(assignmentIndex);
 
             // update the table
             this.dataSource = new MatTableDataSource(this.assignments);
@@ -385,6 +420,17 @@ export class InstructorAssignmentsComponent implements OnInit, OnDestroy {
         this.isLoading = false;
       }
     );
+  }
+
+  onDownloadAssignment(assignment: Assignment) {
+    console.log(assignment);
+    // this.isLoading = true;
+    // this.assignmentsService
+    //   .downloadAssignment(assignment)
+    //   .subscribe((response: Blob) => {
+    //     saveAs(response, assignment.title);
+    //     this.isLoading = false;
+    //   });
   }
 
   // fetches the assignments of the corresponding page of the pagination

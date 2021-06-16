@@ -12,10 +12,7 @@
   ></mat-tab>
 
   <mat-tab label="Deliveries"> </mat-tab>
-  <mat-tab
-    *ngIf="userRole === 'instructor' || userRole === 'admin'"
-    label="Upload Delivery"
-  >
+  <mat-tab *ngIf="userRole === 'student'" label="Upload Delivery">
     <app-dragAndDrop
       [component]="'material'"
       [parentComponent]="'assignment'"

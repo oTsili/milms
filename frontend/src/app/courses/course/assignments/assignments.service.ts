@@ -89,11 +89,34 @@ export class AssignmentsService {
 
   onUpdateAssignment(assignment: Assignment) {
     console.log(assignment);
-    const { id, courseId } = assignment;
+    const {
+      id,
+      title,
+      courseId,
+      description,
+      filePath,
+      fileType,
+      instructorId,
+      lastUpdate,
+      // position,
+    } = assignment;
 
-    return this.http.put<{ message: string; updatedAssignment: Assignment }>(
+    const assignmentData = new FormData();
+
+    // in the quotation marks "file", we refer to the name we assigned in multer single function
+    // the 3rd argument is the filename we pass to the backend
+    if (typeof filePath === 'object') {
+      assignmentData.append('filePath', filePath, title);
+      assignmentData.append('fileType', filePath.type);
+    } else {
+      assignmentData.append('filePath', filePath);
+      assignmentData.append('title', title);
+      assignmentData.append('description', description);
+    }
+
+    return this.http.put<{ message: string; fetchedAssignment: Assignment }>(
       `${BACKEND_URL}/${courseId}/assignments/${id}`,
-      assignment,
+      assignmentData,
       {
         withCredentials: true,
       }

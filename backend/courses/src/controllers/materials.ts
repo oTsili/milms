@@ -105,7 +105,7 @@ export const createCourseMaterials = catchAsync(
     for (let i = 0; i < req.files.length; i++) {
       const name = names[i];
       const lastUpdate = lastUpdates[i];
-      const filePath = `api/courses/public/student-deliveries/${req.files[i].filename}`;
+      const filePath = `api/courses/public/course-materials/${req.files[i].filename}`;
       const fileType = fileTypes[i];
 
       const createdStudentDeliveryFile = Material.build({
@@ -212,7 +212,7 @@ export const getCourseMaterials = catchAsync(
   }
 );
 
-export const deleteMaterial = catchAsync(
+export const deleteCourseMaterials = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const materialId = req.params.materialId;
     const userId = req.currentUser!.id;
@@ -229,19 +229,19 @@ export const deleteMaterial = catchAsync(
     }
 
     if (result.n! > 0) {
-      res.status(200).json({ message: 'Deletion successfull' });
+      res.status(200).json({ message: 'Delete successfull' });
     } else {
       res.status(401).json({ message: 'Not authorized' });
     }
   }
 );
 
-export const downloadMaterial = (req: Request, res: Response) => {
+export const downloadCourseMaterials = (req: Request, res: Response) => {
   // const file = path.resolve(req.body.filePath);
   const file = path.join(
     __dirname,
     '..',
-    `/public/materials/${req.body.filePath}`
+    `/public/course-materials/${req.body.filePath}`
   );
 
   res.download(file);

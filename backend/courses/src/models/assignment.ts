@@ -14,8 +14,6 @@ export interface AssignmentAttrs {
   instructorId: string | UserDoc;
   courseId?: string;
   lastUpdate: string;
-  rank?: number;
-  materials?: MaterialDoc[];
 }
 
 // An interface that describes the properties
@@ -34,10 +32,8 @@ export interface AssignmentDoc extends mongoose.Document {
   // fileType: string;
   lastUpdate: string;
   createdAt: string;
-  rank?: number;
   courseId: string;
   instructorId?: string | UserDoc;
-  materials?: MaterialDoc[];
 }
 
 export const assignmentSchema = new mongoose.Schema(
@@ -65,13 +61,6 @@ export const assignmentSchema = new mongoose.Schema(
     createdAt: {
       type: String,
     },
-    rank: { type: Number },
-    materials: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Material',
-      },
-    ],
     instructorId: {
       // required: true,
       type: mongoose.Schema.Types.ObjectId,
