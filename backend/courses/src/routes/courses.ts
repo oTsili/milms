@@ -24,6 +24,7 @@ router.get('', currentUser, requireAuth, CourseController.getCourses);
 
 router.get('/:id', currentUser, requireAuth, CourseController.getCourse);
 
+/////////////////  Course Materials /////////////////
 router.get(
   '/:courseId/materials',
   currentUser,
@@ -58,6 +59,43 @@ router.post(
   MaterialsController.downloadCourseMaterials
 );
 
+/////////////////  Assignment Materials /////////////////
+
+router.get(
+  '/:courseId/assignments/:assignmentId/materials',
+  currentUser,
+  requireAuth,
+  MaterialsController.getAssignmentMaterials
+);
+
+router.post(
+  '/:courseId/assignments/:assignmentId/materials',
+  extractMultipleFiles(
+    MIME_TYPE_MAP,
+    'src/public/assignment-materials',
+    'filePaths[]'
+  ),
+  currentUser,
+  requireAuth,
+  MaterialsController.createAssignmentMaterials
+);
+
+router.delete(
+  '/:courseId/assignments/:assignmentId/materials/:materialId',
+  currentUser,
+  requireAuth,
+  MaterialsController.deleteAssignmentMaterials
+);
+
+// download file (pdf, doc)
+router.post(
+  '/:courseId/assignments/:assignmentId/materials/:materialId/dump',
+  currentUser,
+  requireAuth,
+  MaterialsController.downloadAssignmentMaterials
+);
+
+///////////////// Assignmnets /////////////////
 router.get(
   '/:courseId/assignments',
   currentUser,

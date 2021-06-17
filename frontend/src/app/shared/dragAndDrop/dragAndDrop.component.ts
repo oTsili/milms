@@ -21,6 +21,7 @@ import { StudentDeliveryFile } from 'src/app/models/student-delivery.model';
 import { StudentDeliveryAssignment } from 'src/app/models/student-delivery.model';
 import { CoursesService } from 'src/app/courses/courses.service';
 import { Course } from 'src/app/models/course.model';
+import { AssignmentMaterialsService } from 'src/app/courses/course/assignments/assignment/assignment-material-list/assignment-materials.service';
 
 @Component({
   selector: 'app-dragAndDrop',
@@ -78,20 +79,30 @@ export class DragAndDropComponent implements OnInit {
     // private studentDeliveriesService: StudentDeliveriesService,
     private formBuilder: FormBuilder,
     public route: ActivatedRoute,
-    private sharedService: SharedService
+    private sharedService: SharedService,
+    private assignmentMaterialsService: AssignmentMaterialsService
   ) {}
 
   ngOnInit() {
-    console.log(this.component);
+    console.log('component', this.component);
+    console.log('parentComponent', this.parentComponent);
 
     this.route.paramMap.subscribe((paraMap: ParamMap) => {
+      console.log('paraMap', paraMap);
       if (paraMap.has('courseId')) {
         this.courseId = paraMap.get('courseId');
       } else if (this.currentControl) {
         console.log(this.currentControl);
         this.courseId = this.currentControl.value.courseId;
       } else {
-        throw new Error('no course id provided');
+        // throw new Error('no course id provided');
+        console.log('no course id provided');
+      }
+
+      if (paraMap.has('assignmentId')) {
+        this.assignmentId = paraMap.get('assignmentId');
+      } else {
+        console.log('no assignment id provided');
       }
     });
 
@@ -181,21 +192,26 @@ export class DragAndDropComponent implements OnInit {
   }
 
   onSubmitAssignmentMaterials(event: Event) {
-    // // throw error if user has clicked submit without selecting any files
-    // if (this.materialsControl.length < 1) {
-    //   this.sharedService.throwError('Please add some files first!');
-    //   return;
-    // }
-    // this.isLoading = true;
-    // this.materialsService
-    //   .addAssignmentMaterials(currentAssignment, this.materialsControl)
-    //   .subscribe((responseData) => {
-    //     this.materialsService.onMaterialsUpdate(
-    //       responseData.fetchedMaterialFiles
-    //     );
-    //     this.deleteAllFiles();
-    //     this.isLoading = false;
-    //   });
+    // throw error if user has clicked submit without selecting any files
+    if (this.materialsControl.length < 1) {
+      this.sharedService.throwError('Please add some files first!');
+      return;
+    }
+
+    this.isLoading = true;
+    this.assignmentMaterialsService
+      .addAssignmentMaterials(
+        this.courseId,
+        this.assignmentId,
+        this.materialsControl
+      )
+      .subscribe((responseData) => {
+        this.assignmentMaterialsService.onAssignmentMaterialsUpdate(
+          responseData.fetchedMaterialFiles
+        );
+        this.deleteAllFiles();
+        this.isLoading = false;
+      });
   }
 
   onSubmitMyDelivery(event: Event) {
@@ -308,17 +324,19 @@ export class DragAndDropComponent implements OnInit {
    * @param files (Files List)
    */
   prepareMaterialFilesList(files: Array<any>) {
-    if (files.length > 3 || this.materialsControl.length >= 3) {
-      this.sharedService.throwError(
-        'Max number of files 3! Please consider deleting some.'
-      );
-      return;
-    }
+    // if (files.length > 3 || this.materialsControl.length >= 3) {
+    //   this.sharedService.throwError(
+    //     'Max number of files 3! Please consider deleting some.'
+    //   );
+    //   return;
+    // }
 
     for (const item of files) {
       // item.progress = 0;
       this.files.push(item);
     }
+
+    console.log(this.files);
 
     console.log(this.materialsControl);
 

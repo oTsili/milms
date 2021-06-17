@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, Input } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { Assignment } from 'src/app/models/assignment.model';
 import { environment } from 'src/environments/environment';
@@ -31,6 +31,15 @@ export class AssignmentComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
+    this.route.paramMap.subscribe((paraMap: ParamMap) => {
+      if (paraMap.has('courseId')) {
+        this.courseId = paraMap.get('courseId');
+        this.assignmentId = paraMap.get('courseId');
+      } else {
+        // throw new Error('no course id provided');
+        console.log('no course id provided');
+      }
+    });
     // enable the page breadcrumb
     this.sharedService.enableBreadcrumb(true);
 
@@ -39,11 +48,17 @@ export class AssignmentComponent implements OnInit, OnDestroy {
         this.courseId = paraMap.get('courseId');
         this.assignmentId = paraMap.get('assignmentId');
       } else {
-        throw new Error('no course id provided');
+        throw new Error('Either courseId or assignmentId are provided');
       }
     });
 
-    this.updateMatBreadcrumb();
+    this.assignmentsService
+      .getAssignment(this.courseId, this.assignmentId)
+      .subscribe((response) => {
+        console.log(response);
+        this.assignment = response.assignment;
+        this.updateMatBreadcrumb(this.assignment);
+      });
 
     this.sharedService.getUserRole().subscribe((response) => {
       console.log('ngOnInit');
@@ -62,20 +77,16 @@ export class AssignmentComponent implements OnInit, OnDestroy {
     this.userRoleSubscription.unsubscribe();
   }
 
-  updateMatBreadcrumb() {
-    this.onGetAssignment(this.courseId, this.assignmentId).subscribe(
-      (response) => {
-        console.log(response);
-        this.assignment = response.assignment;
+  updateMatBreadcrumb(assignment: Assignment) {
+    console.log(assignment);
 
-        console.log(this.assignment);
-        const breadcrumb = {
-          customText: 'This is Custom Text',
-          dynamicText: this.assignment.title,
-        };
-        this.matBreadcrumbService.updateBreadcrumbLabels(breadcrumb);
-      }
-    );
+    const breadcrumb = {
+      customText: 'This is Custom Text',
+      dynamicText: this.assignment.title,
+    };
+
+    this.matBreadcrumbService.updateBreadcrumbLabels(breadcrumb);
+
     // get course NO COURSES and update the dynamic text with the course title
   }
 

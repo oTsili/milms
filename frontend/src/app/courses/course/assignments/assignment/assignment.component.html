@@ -1,6 +1,14 @@
 <mat-tab-group mat-align-tabs="center">
-  <mat-tab label="Description"> </mat-tab>
-  <mat-tab label="Materials"> </mat-tab>
+  <mat-tab label="Description">
+    <mat-card>
+      <mat-card-content *ngIf="assignment">{{
+        assignment.description
+      }}</mat-card-content></mat-card
+    ></mat-tab
+  >
+  <mat-tab label="Materials"
+    ><app-assignment-material-list></app-assignment-material-list>
+  </mat-tab>
   <mat-tab
     *ngIf="userRole === 'instructor' || userRole === 'admin'"
     label="Upload Materials"
@@ -14,7 +22,7 @@
   <mat-tab label="Deliveries"> </mat-tab>
   <mat-tab *ngIf="userRole === 'student'" label="Upload Delivery">
     <app-dragAndDrop
-      [component]="'material'"
+      [component]="'delivery'"
       [parentComponent]="'assignment'"
     ></app-dragAndDrop
   ></mat-tab>

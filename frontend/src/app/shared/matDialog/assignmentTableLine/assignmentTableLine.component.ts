@@ -6,6 +6,7 @@ import { SharedService } from 'src/app/shared/services/shared.service';
 @Component({
   selector: 'dialog-overview-example-dialog',
   templateUrl: './assignmentTableLine.component.html',
+  styleUrls: ['./assignmentTableLine.component.css'],
 })
 export class AssignmentTableLineComponent {
   constructor(
@@ -19,6 +20,5 @@ export class AssignmentTableLineComponent {
   onNoClick(): void {
     this.sharedService.onNoButtonClick();
     this.dialogRef.close();
-
   }
 }

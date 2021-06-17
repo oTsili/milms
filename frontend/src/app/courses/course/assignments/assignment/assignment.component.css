@@ -1,0 +1,14 @@
+mat-form-field,
+textarea {
+  width: 100%;
+}
+
+input[type='file'] {
+  visibility: hidden;
+}
+
+mat-card {
+  /* max-width: 400px; */
+  margin: 2% 2%;
+  /* text-align: center; */
+}

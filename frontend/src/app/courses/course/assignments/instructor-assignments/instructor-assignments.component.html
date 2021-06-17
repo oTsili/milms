@@ -34,14 +34,6 @@
       <td mat-cell *matCellDef="let assignment">{{ assignment.title }}</td>
     </ng-container>
 
-    <!-- Description Column -->
-    <ng-container matColumnDef="description">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Description</th>
-      <td mat-cell *matCellDef="let assignment">
-        {{ assignment.description }}
-      </td>
-    </ng-container>
-
     <!-- lastUpdate Column -->
     <ng-container matColumnDef="lastUpdate">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Last Update</th>
@@ -62,63 +54,66 @@
     <ng-container matColumnDef="options">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Options</th>
       <td mat-cell *matCellDef="let assignment; let controlIndex = index">
-        <a
-          class="button"
-          style="color: #3f51b5"
-          (click)="openDialog(controlIndex, 'edit')"
-          matTooltip="Edit the assignment"
-        >
-          <mat-icon>create</mat-icon>
-        </a>
-        <a
-          class="button"
-          style="color: #f44b4b"
-          matTooltip="Delete the assignment"
-          (click)="deleteAssignment(controlIndex)"
-          matTooltip="Delete the assignment"
-        >
-          <mat-icon>delete</mat-icon>
-        </a>
+        <mat-spinner *ngIf="isLoading"></mat-spinner>
+        <ng-container *ngIf="!isLoading">
+          <a
+            class="button"
+            style="color: #3f51b5"
+            (click)="openDialog(controlIndex, 'edit')"
+            matTooltip="Edit the assignment"
+          >
+            <mat-icon>create</mat-icon>
+          </a>
+          <a
+            class="button"
+            style="color: #f44b4b"
+            matTooltip="Delete the assignment"
+            (click)="deleteAssignment(controlIndex)"
+            matTooltip="Delete the assignment"
+          >
+            <mat-icon>delete</mat-icon>
+          </a>
 
-        <a
-          style="color: #2a78d1"
-          class="button"
-          (click)="openDialog(controlIndex, 'upload')"
-          matTooltip="Attach the assignment file"
-        >
-          <mat-icon> attach_file</mat-icon>
-        </a>
-        <a
-          *ngIf="assignment.filePath"
-          style="color: #b34d4d"
-          class="button"
-          target="_blank"
-          [routerLink]="['/pdfViewer', assignment.filePath]"
-          matTooltip="Open the pdf web viewer page"
-        >
-          <mat-icon>picture_as_pdf</mat-icon>
-        </a>
-        <a
-          *ngIf="assignment.filePath"
-          class="button"
-          (click)="onDownloadAssignment(assignment)"
-          matTooltip="Download the assignment"
-        >
-          <mat-icon>save_alt</mat-icon>
-        </a>
-        <a
-          style="color: #5b4db3"
-          class="button"
-          [routerLink]="[
-            '/courses/',
-            assignment.courseId,
-            'assignments',
-            assignment.id
-          ]"
-          matTooltip="Open the Assignment's page"
-        >
-          <mat-icon>launch</mat-icon>
-        </a>
+          <a
+            style="color: #2a78d1"
+            class="button"
+            (click)="openDialog(controlIndex, 'upload')"
+            matTooltip="Attach the assignment file"
+          >
+            <mat-icon> attach_file</mat-icon>
+          </a>
+          <a
+            *ngIf="assignment.filePath"
+            style="color: #b34d4d"
+            class="button"
+            target="_blank"
+            [routerLink]="['/pdfViewer', assignment.filePath]"
+            matTooltip="Open the pdf web viewer page"
+          >
+            <mat-icon>picture_as_pdf</mat-icon>
+          </a>
+          <a
+            *ngIf="assignment.filePath"
+            class="button"
+            (click)="onDownloadAssignment(assignment)"
+            matTooltip="Download the assignment"
+          >
+            <mat-icon>save_alt</mat-icon>
+          </a>
+          <a
+            style="color: #5b4db3"
+            class="button"
+            [routerLink]="[
+              '/courses/',
+              assignment.courseId,
+              'assignments',
+              assignment.id
+            ]"
+            matTooltip="Open the Assignment's page"
+          >
+            <mat-icon>launch</mat-icon>
+          </a>
+        </ng-container>
       </td>
     </ng-container>
 
@@ -145,9 +140,7 @@
     </ng-container>
   </table>
 </div>
-<div class="flex-row-center">
-  <mat-spinner *ngIf="isLoading"></mat-spinner>
-</div>
+<div class="flex-row-center"></div>
 <div id="add-button" *ngIf="!isLoading">
   <button
     mat-raised-button

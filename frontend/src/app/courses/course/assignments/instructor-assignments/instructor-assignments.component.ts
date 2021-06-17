@@ -33,7 +33,6 @@ export class InstructorAssignmentsComponent implements OnInit, OnDestroy {
   displayedColumns: string[] = [
     'position',
     'title',
-    'description',
     'lastUpdate',
     'instructor',
     'options',
@@ -175,7 +174,7 @@ export class InstructorAssignmentsComponent implements OnInit, OnDestroy {
     if (this.mode === 'create') {
       //  Add new control
       dialogRef = this.dialog.open(AssignmentTableLineComponent, {
-        width: '350px',
+        width: '650px',
         data: {
           title: null,
           description: null,
@@ -184,7 +183,7 @@ export class InstructorAssignmentsComponent implements OnInit, OnDestroy {
     } else if (this.mode === 'edit') {
       // Edit control
       dialogRef = this.dialog.open(AssignmentTableLineComponent, {
-        width: '350px',
+        width: '650px',
         data: {
           title: currentControl.value.title,
           description: currentControl.value.description,
@@ -193,7 +192,7 @@ export class InstructorAssignmentsComponent implements OnInit, OnDestroy {
     } else if (this.mode === 'upload') {
       // Edit control
       dialogRef = this.dialog.open(fileTableLineComponent, {
-        width: '350px',
+        width: '650px',
         data: {
           file: null,
           currentControl,

@@ -14,10 +14,6 @@ input[type='file'] {
   visibility: hidden;
 }
 
-#signupBtn {
-  margin-top: 5%;
-}
-
 mat-card {
   max-width: 400px;
   margin: 2em auto;
@@ -35,4 +31,8 @@ mat-card {
 
 .full-width-input {
   width: 100%;
+}
+
+#signupBtn {
+  margin-top: 5%;
 }

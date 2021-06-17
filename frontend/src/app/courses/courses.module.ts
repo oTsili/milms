@@ -14,6 +14,7 @@ import { StudentAssignmentsComponent } from 'src/app/courses/course/assignments/
 import { InstructorAssignmentsComponent } from 'src/app/courses/course/assignments/instructor-assignments/instructor-assignments.component';
 import { AssignmentsComponent } from 'src/app/courses/course/assignments/assignments.component';
 import { AssignmentComponent } from './course/assignments/assignment/assignment.component';
+import { AssignmentMaterialsComponent } from './course/assignments/assignment/assignment-material-list/assignment-material-list.component';
 
 @NgModule({
   declarations: [
@@ -26,6 +27,7 @@ import { AssignmentComponent } from './course/assignments/assignment/assignment.
     InstructorAssignmentsComponent,
     AssignmentsComponent,
     AssignmentComponent,
+    AssignmentMaterialsComponent,
   ],
   imports: [
     ReactiveFormsModule,
