@@ -19,10 +19,12 @@
     ></app-dragAndDrop
   ></mat-tab>
 
-  <mat-tab label="Deliveries"> </mat-tab>
+  <mat-tab label="Deliveries">
+    <app-student-delivery-list></app-student-delivery-list
+  ></mat-tab>
   <mat-tab *ngIf="userRole === 'student'" label="Upload Delivery">
     <app-dragAndDrop
-      [component]="'delivery'"
+      [component]="'student-delivery'"
       [parentComponent]="'assignment'"
     ></app-dragAndDrop
   ></mat-tab>

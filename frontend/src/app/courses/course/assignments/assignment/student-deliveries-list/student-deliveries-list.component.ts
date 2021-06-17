@@ -1,32 +1,32 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Sort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute, ParamMap } from '@angular/router';
+import { StudentDeliveriesService } from './student-delivery.service';
 import { Subscription } from 'rxjs';
-import { Material } from 'src/app/models/material.model';
 import { environment } from 'src/environments/environment';
-import { AssignmentMaterialsService } from './assignment-materials.service';
+import { StudentDeliveryFile } from 'src/app/models/student-delivery.model';
+import { MatTableDataSource } from '@angular/material/table';
+import { Sort } from '@angular/material/sort';
 @Component({
-  selector: 'app-assignment-material-list',
-  templateUrl: './assignment-material-list.component.html',
-  styleUrls: ['./assignment-material-list.component.css'],
+  selector: 'app-student-delivery-list',
+  templateUrl: './student-deliveries-list.component.html',
+  styleUrls: ['./student-deliveries-list.component.css'],
 })
-export class AssignmentMaterialsComponent implements OnInit, OnDestroy {
+export class StudentDeliveryListComponent implements OnInit, OnDestroy {
   displayedColumns: string[] = ['position', 'name', 'lastUpdate', 'options'];
 
   courseId: string;
   assignmentId: string;
   isLoading: boolean = false;
-  materials: Material[];
   dataSource;
-  materialUpdateSubscription: Subscription;
-  totalMaterials = environment.TOTAL_COURSES;
-  materialsPerPage = environment.COURSES_PER_PAGE;
+  studentDeliveries: StudentDeliveryFile[];
+  studentDeliveryUpdateSubscription: Subscription;
+  totalStudentDeliveries = environment.TOTAL_COURSES;
+  studentDeliveriesPerPage = environment.COURSES_PER_PAGE;
   currentPage = environment.CURRENT_PAGE;
   constructor(
     // private controlContainer: ControlContainer,
     public route: ActivatedRoute,
-    private assignmentMaterialsService: AssignmentMaterialsService
+    private studentDeliveriesService: StudentDeliveriesService
   ) {}
   ngOnInit() {
     this.route.paramMap.subscribe((paraMap: ParamMap) => {
@@ -39,28 +39,27 @@ export class AssignmentMaterialsComponent implements OnInit, OnDestroy {
       }
     });
 
-
-    this.materialUpdateSubscription = this.assignmentMaterialsService
-      .getAssignmentMaterialListener()
-      .subscribe((materials) => {
-        this.assignmentMaterialsService
-          .getAssignmentMaterials(
-            this.materialsPerPage,
+    this.studentDeliveryUpdateSubscription = this.studentDeliveriesService
+      .getStudentDeliverieslListener()
+      .subscribe((response) => {
+        this.studentDeliveriesService
+          .getStudentDeliveries(
+            this.studentDeliveriesPerPage,
             this.currentPage,
             this.courseId,
             this.assignmentId
           )
           .subscribe((response) => {
-            this.materials = response.materials;
-            this.totalMaterials = response.maxMaterials;
-            this.dataSource = new MatTableDataSource(this.materials);
+            this.studentDeliveries = response.studentDeliveries;
+            this.totalStudentDeliveries = response.maxStudentDeliveries;
+            this.dataSource = new MatTableDataSource(this.studentDeliveries);
           });
       });
 
     // fetch the materials
-    this.assignmentMaterialsService
-      .getAssignmentMaterials(
-        this.materialsPerPage,
+    this.studentDeliveriesService
+      .getStudentDeliveries(
+        this.studentDeliveriesPerPage,
         this.currentPage,
         this.courseId,
         this.assignmentId
@@ -68,15 +67,15 @@ export class AssignmentMaterialsComponent implements OnInit, OnDestroy {
       .subscribe((response) => {
         console.log(response);
 
-        this.materials = response.materials;
-        this.totalMaterials = response.maxMaterials;
-        this.dataSource = new MatTableDataSource(this.materials);
-        console.log(this.materials);
+        this.studentDeliveries = response.studentDeliveries;
+        this.totalStudentDeliveries = response.maxStudentDeliveries;
+        this.dataSource = new MatTableDataSource(this.studentDeliveries);
+        console.log(this.studentDeliveries);
       });
   }
   ngOnDestroy() {
     // this.assignmentIdUpdateSub.unsubscribe();
-    this.materialUpdateSubscription.unsubscribe();
+    this.studentDeliveryUpdateSubscription.unsubscribe();
   }
 
   applyFilter(event: Event) {
@@ -87,21 +86,21 @@ export class AssignmentMaterialsComponent implements OnInit, OnDestroy {
   // fetches the assignments sorted with regard the 'sort.active' value
   sortData(sort: Sort) {
     if (!sort.active || sort.direction === '') {
-      this.materials = this.materials.slice();
+      this.studentDeliveries = this.studentDeliveries.slice();
       return;
     }
 
     this.isLoading = true;
-    this.assignmentMaterialsService
-      .getAssignmentMaterials(
-        this.materialsPerPage,
+    this.studentDeliveriesService
+      .getStudentDeliveries(
+        this.studentDeliveriesPerPage,
         this.currentPage,
         this.courseId,
         this.assignmentId,
         sort
       )
       .subscribe((response) => {
-        this.materials = response.materials;
+        this.studentDeliveries = response.studentDeliveries;
         // this.clearFormArray(this.assignmentControls);
         // for (let i = 0; i < this.assignments.length; i++) {
         //   this.addItem(this.assignments[i]);
@@ -111,23 +110,26 @@ export class AssignmentMaterialsComponent implements OnInit, OnDestroy {
   }
 
   // deletes a material with regard it's index
-  onDeleteAssignmentMaterial(material: Material, materialIndex: number) {
-    console.log('material: ', material);
+  onDeleteStudentDelivery(
+    studentDelivery: StudentDeliveryFile,
+    studentDeliveryIndex: number
+  ) {
+    console.log('studentDelivery: ', studentDelivery);
 
     // this.currentAssignmentControl = (
     //   this.assignmentsForm.get('assignmentsFormArray') as FormArray
     // ).get(`${this.assingnmentIndex}`) as FormControl;
 
     this.isLoading = true;
-    this.assignmentMaterialsService
-      .deleteAssignmentMaterial(material)
+    this.studentDeliveriesService
+      .deleteStudentDelivery(studentDelivery)
       .subscribe(
         (response) => {
           console.log('response: ', response);
-          console.log(this.materials);
-          this.materials.splice(materialIndex, 1);
-          console.log(this.materials);
-          this.dataSource = new MatTableDataSource(this.materials);
+          console.log(this.studentDeliveries);
+          this.studentDeliveries.splice(studentDeliveryIndex, 1);
+          console.log(this.studentDeliveries);
+          this.dataSource = new MatTableDataSource(this.studentDeliveries);
           this.isLoading = false;
         },
         (err) => {
@@ -137,12 +139,12 @@ export class AssignmentMaterialsComponent implements OnInit, OnDestroy {
       );
   }
 
-  ondDownloadAssignmentMaterial(material: Material) {
+  ondDownloadAssignmentMaterial(studentDelivery: StudentDeliveryFile) {
     this.isLoading = true;
-    this.assignmentMaterialsService
-      .downloadAssignmentMaterial(material)
+    this.studentDeliveriesService
+      .downloadStudentDelivery(studentDelivery)
       .subscribe((response: Blob) => {
-        saveAs(response, material.name);
+        saveAs(response, studentDelivery.name);
         this.isLoading = false;
       });
   }

@@ -24,6 +24,7 @@ export interface StudentDeliveryFile {
   lastUpdate?: string;
   filePath?: string | File;
   fileType?: string;
+  courseId?: string;
   assignmentId?: string | Assignment;
   studentDeliveryAssignmentId?: string | StudentDeliveryAssignment;
   studentId?: string | User;

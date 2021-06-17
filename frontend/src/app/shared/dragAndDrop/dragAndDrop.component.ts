@@ -22,6 +22,7 @@ import { StudentDeliveryAssignment } from 'src/app/models/student-delivery.model
 import { CoursesService } from 'src/app/courses/courses.service';
 import { Course } from 'src/app/models/course.model';
 import { AssignmentMaterialsService } from 'src/app/courses/course/assignments/assignment/assignment-material-list/assignment-materials.service';
+import { StudentDeliveriesService } from 'src/app/courses/course/assignments/assignment/student-deliveries-list/student-delivery.service';
 
 @Component({
   selector: 'app-dragAndDrop',
@@ -64,6 +65,7 @@ export class DragAndDropComponent implements OnInit {
     fileType: null,
     id: null,
     lastUpdate: null,
+    courseId: null,
     assignmentId: null,
   };
   totalMaterials = 0;
@@ -76,7 +78,7 @@ export class DragAndDropComponent implements OnInit {
     private coursesService: CoursesService,
     private assignmentsService: AssignmentsService,
     private courseMaterialsService: CourseMaterialsService,
-    // private studentDeliveriesService: StudentDeliveriesService,
+    private studentDeliveriesService: StudentDeliveriesService,
     private formBuilder: FormBuilder,
     public route: ActivatedRoute,
     private sharedService: SharedService,
@@ -135,7 +137,7 @@ export class DragAndDropComponent implements OnInit {
     if (this.component === 'material') {
       this.prepareMaterialFilesList($event);
       // materials update the assignment control
-    } else if (this.component === 'student-deliveries') {
+    } else if (this.component === 'student-delivery') {
       this.prepareStudentDeliveriesFileList($event);
       // deliveries update the deliveries control
     } else if (this.component === 'assignment') {
@@ -150,7 +152,7 @@ export class DragAndDropComponent implements OnInit {
   fileBrowseHandler(files) {
     if (this.component === 'material') {
       this.prepareMaterialFilesList(files);
-    } else if (this.component === 'student-deliveries') {
+    } else if (this.component === 'student-delivery') {
       this.prepareStudentDeliveriesFileList(files);
     } else if (this.component === 'assignment') {
       this.prepareAssignmentFileList(files);
@@ -215,43 +217,32 @@ export class DragAndDropComponent implements OnInit {
   }
 
   onSubmitMyDelivery(event: Event) {
-    // // throw error if user has clicked submit without selecting any files
-    // if (this.currentStudentDeliveryControl.length < 1) {
-    //   this.sharedService.throwError('Please add some files first!');
-    //   return;
-    // }
-    // this.isLoading = true;
-    // // 1) check if the assignment is saved in the db
-    // this.assignmentService
-    //   .getAssignments(this.assignmentsPerPage, this.currentPage, this.courseId)
-    //   .subscribe((response) => {
-    //     // 1a) if no, throw an error message
-    //     if (this.assingnmentIndex > response.maxAssignments - 1) {
-    //       this.sharedService.throwError('Please save the assignment first!');
-    //       return;
-    //     }
-    //     this.studentDeliveriesService
-    //       .addStudentDeliveryFiles(
-    //         currentAssignment,
-    //         this.currentStudentDeliveryControl
-    //       )
-    //       .subscribe((responseData) => {
-    //         this.studentDeliveriesService.onStudentDeliveriesUpdate(
-    //           responseData.fetchedStudentDeliveryFiles
-    //         );
-    //         this.deleteAllFiles();
-    //         this.isLoading = false;
-    //       });
-    //   });
+    // throw error if user has clicked submit without selecting any files
+    if (this.currentStudentDeliveryControl.length < 1) {
+      this.sharedService.throwError('Please add some files first!');
+      return;
+    }
+
+    this.isLoading = true;
+    this.studentDeliveriesService
+      .addStudentDeliveries(
+        this.courseId,
+        this.assignmentId,
+        this.currentStudentDeliveryControl
+      )
+      .subscribe((responseData) => {
+        this.studentDeliveriesService.onStudentDeliveriesUpdate(
+          responseData.fetchedStudentDeliveryFiles
+        );
+        this.deleteAllFiles();
+        this.isLoading = false;
+      });
   }
 
   /**
    * Delete file from files list
    * @param index (File index)
    */
-  deleteMaterialFile(index: number) {
-    this.files.splice(index, 1);
-  }
 
   deleteStudentDeliveryFile(index: number) {
     this.files.splice(index, 1);
@@ -406,6 +397,7 @@ export class DragAndDropComponent implements OnInit {
       filePath: studentDelivery.filePath,
       fileType: studentDelivery.fileType,
       id: studentDelivery.id,
+      courseId: studentDelivery.courseId,
       assignmentId: studentDelivery.assignmentId,
     });
   }

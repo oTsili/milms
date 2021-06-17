@@ -180,8 +180,8 @@ export class AssignmentMaterialsService {
       materialData.append('filePath', filePath as File, name.split('.')[0]);
       materialData.append('fileType', (filePath as File).type);
       materialData.append('lastUpdate', lastUpdate);
-      materialData.append('lastUpdate', assignmentId);
-      materialData.append('lastUpdate', courseId);
+      materialData.append('assignmentId', assignmentId);
+      materialData.append('courseId', courseId);
     } else {
       materialData = {
         id,

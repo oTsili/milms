@@ -5,8 +5,8 @@
 <div class="container mat-elevation-z8">
   <ng-container *ngIf="dataSource">
     <mat-paginator
-      [length]="totalMaterials"
-      [pageSize]="materialsPerPage"
+      [length]="totalStudentDeliveries"
+      [pageSize]="studentDeliveriesPerPage"
       [pageSizeOptions]="pageSizeOptions"
       (page)="onChangePage($event)"
       *ngIf="dataSource._data._value.length > 0"
@@ -23,12 +23,12 @@
     <!-- Position Column -->
     <ng-container matColumnDef="position">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>No.</th>
-      <td mat-cell *matCellDef="let material; let i = index">
-        {{ material.position }}
+      <td mat-cell *matCellDef="let studentDelivery; let i = index">
+        {{ studentDelivery.position }}
       </td>
     </ng-container>
 
-    <!-- Material File Name Column -->
+    <!-- studentDelivery File Name Column -->
     <ng-container matColumnDef="name">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>
         <span class="file-icon" style="width: 25px">
@@ -73,27 +73,32 @@
           </svg> </span
         ><span>File</span>
       </th>
-      <td mat-cell *matCellDef="let material">{{ material.name }}</td>
+      <td mat-cell *matCellDef="let studentDelivery">
+        {{ studentDelivery.name }}
+      </td>
     </ng-container>
 
     <!-- Last Update Column -->
     <ng-container matColumnDef="lastUpdate">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Last Update</th>
-      <td mat-cell *matCellDef="let material">
-        {{ material.lastUpdate }}
+      <td mat-cell *matCellDef="let studentDelivery">
+        {{ studentDelivery.lastUpdate }}
       </td>
     </ng-container>
 
     <!-- Options Column -->
     <ng-container matColumnDef="options">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Options</th>
-      <td mat-cell *matCellDef="let material; let controlIndex = index">
+      <td
+        mat-cell
+        *matCellDef="let materstudentDeliveryial; let controlIndex = index"
+      >
         <a
           *ngIf="userRole === 'instructor' || userRole === 'admin'"
           class="button"
           style="color: #f44b4b"
           matTooltip="Delete the assignment"
-          (click)="onDeleteAssignmentMaterial(material, controlIndex)"
+          (click)="onDeleteStudentDelivery(studentDelivery, controlIndex)"
           matTooltip="Delete the file"
         >
           <mat-icon>delete</mat-icon>
@@ -101,7 +106,7 @@
 
         <a
           class="button"
-          (click)="ondDownloadAssignmentMaterial(material)"
+          (click)="ondDownloadAssignmentStudentDelivery(studentDelivery)"
           matTooltip="Download the file"
         >
           <mat-icon>save_alt</mat-icon>
@@ -110,7 +115,7 @@
           style="color: #b34d4d"
           class="button"
           target="_blank"
-          [routerLink]="['/pdfViewer', material.filePath]"
+          [routerLink]="['/pdfViewer', studentDelivery.filePath]"
           matTooltip="Open the Web pdf viewer"
         >
           <mat-icon>picture_as_pdf</mat-icon>
