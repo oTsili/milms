@@ -175,13 +175,11 @@ export class StudentAssignmentsComponent implements OnInit, OnDestroy {
 
   // downloads the specific file/assignment
   onDownload(assignment: Assignment, formControlIndex: number): void {
-    const fileName = (assignment.filePath as string).split('/').slice(-1).pop();
-
     this.isLoading = true;
     this.assignmentsService
-      .downloadAssignment(fileName, this.courseId, assignment)
+      .downloadAssignment(this.courseId, assignment)
       .subscribe((response: Blob) => {
-        saveAs(response, fileName);
+        saveAs(response, assignment.title);
         this.isLoading = false;
       });
   }

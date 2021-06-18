@@ -57,7 +57,12 @@
           <button
             mat-stroked-button
             style="color: #1a74e6"
-            [routerLink]="['/assignments', assignment.id]"
+            [routerLink]="[
+              '/courses/',
+              assignment.courseId,
+              'assignments',
+              assignment.id
+            ]"
             matTooltip="Visit the assignment page"
           >
             Visit

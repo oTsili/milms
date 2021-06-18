@@ -44,14 +44,11 @@ export class CourseComponent implements OnInit, OnDestroy {
     this.updateMatBreadcrumb();
 
     this.sharedService.getUserRole().subscribe((response) => {
-      console.log('ngOnInit');
       this.userRole = response.userRole;
-      console.log(this.userRole);
     });
     this.userRoleSubscription = this.sharedService
       .getUserRoleListener()
       .subscribe((response) => {
-        console.log(response);
         this.userRole = response;
       });
   }
@@ -66,10 +63,8 @@ export class CourseComponent implements OnInit, OnDestroy {
 
   updateMatBreadcrumb() {
     this.onGetCourse(this.courseId).subscribe((response) => {
-      console.log(response);
       this.course = response.course;
 
-      console.log(this.course);
       const breadcrumb = {
         customText: 'This is Custom Text',
         dynamicText: this.course.title,

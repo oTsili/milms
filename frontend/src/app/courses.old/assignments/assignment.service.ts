@@ -119,8 +119,6 @@ export class AssignmentsService {
       )
       .pipe(
         map((courseData) => {
-          console.log(courseData);
-
           return {
             assignments: courseData.course.assignments.map((assignment) => {
               return {
@@ -143,8 +141,6 @@ export class AssignmentsService {
   }
 
   addAssignment(currentAssignment: Assignment) {
-    console.log('currentAssignment', currentAssignment);
-
     const { title, description, lastUpdate, filePath } = currentAssignment;
 
     const assignmentData: FormData = new FormData();
@@ -214,8 +210,6 @@ export class AssignmentsService {
   }
 
   deleteAssignment(assignment: Assignment, assignmentId: string) {
-    console.log(assignment);
-
     return this.http.delete(
       `${BACKEND_URL}/${assignment.courseId}/assignments/${assignmentId}`,
       {
@@ -225,7 +219,6 @@ export class AssignmentsService {
   }
 
   downloadAssignment(filePath: string, assignment?: Assignment) {
-    console.log(assignment);
     return this.http.post(
       `${BACKEND_URL}/${assignment.courseId}/assignments/${assignment.id}/dump`,
       { filePath: filePath },

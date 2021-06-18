@@ -44,8 +44,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.userDataSubs = this.headerService
       .getUserDataSubs()
       .subscribe((response) => {
-        console.log(environment.ASSIGNMENT_BASE_URL);
-        console.log(response);
         this.userPhotoSrc = response.photo;
         this.usrName = response.name;
       });
@@ -68,7 +66,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   onUserRoleUpdate(role: string) {
     this.headerService.updateUserRole(role).subscribe((response) => {
-      console.log(response);
       this.sharedService.onUserRoleUpdate(role);
     });
   }

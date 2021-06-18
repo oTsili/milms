@@ -51,7 +51,6 @@ export class CourseMaterialsService {
       )
       .pipe(
         map((materialData) => {
-          console.log(materialData);
 
           if (materialData.fetchedMaterials) {
             return {
@@ -79,7 +78,6 @@ export class CourseMaterialsService {
   }
 
   addCourseMaterials(currentCourse: Course, materialsControl: FormArray) {
-    console.log('materialsControl', materialsControl);
 
     const { id } = currentCourse;
 
@@ -93,13 +91,9 @@ export class CourseMaterialsService {
     for (let i = 0; i < materialsControl.length; i++) {
       let materialFile = materialsControl.value[i];
 
-      console.log('materialFile', materialFile);
 
-      console.log(!materialFile.creatorId);
 
       if (!materialFile.creatorId) {
-        console.log('iii: ', i);
-        console.log(materialFile);
 
         materialsData.append(
           'lastUpdates[]',
@@ -118,7 +112,6 @@ export class CourseMaterialsService {
       }
     }
 
-    console.log('materialsData: ', materialsData);
 
     // const params = new HttpParams();
 
@@ -137,7 +130,6 @@ export class CourseMaterialsService {
         }>(`${BACKEND_URL}/${id}/materials`, materialsData, options)
         .pipe(
           map((materialsFileData) => {
-            console.log(materialsFileData);
 
             return {
               fetchedMaterialFiles: materialsFileData.fetchedMaterialFiles.map(
@@ -196,7 +188,6 @@ export class CourseMaterialsService {
   }
 
   deleteCourseMaterial(material: Material) {
-    console.log('material: ', material);
 
     return this.http.delete(
       `${BACKEND_URL}/${material.courseId}/materials/${material.id}`,

@@ -348,7 +348,6 @@ export class AssignmentListComponent implements OnInit, OnDestroy {
 
               // update and validate the image field value
               currentControl.updateValueAndValidity();
-              console.log(currentControl);
               this.assignmentService.onAssignmentIdUpdate(currentAssignmentId);
 
               this.router.navigate([`courses/${this.courseId}/assignments`]);
@@ -368,8 +367,6 @@ export class AssignmentListComponent implements OnInit, OnDestroy {
           this.assignmentService
             .updateAssignment(currentAssignment)
             .subscribe((responseData) => {
-              console.log(responseData);
-
               currentAssignmentControl.patchValue({
                 fileType: responseData.updatedAssignment.fileType,
                 filePath: responseData.updatedAssignment.filePath,
@@ -474,7 +471,6 @@ export class AssignmentListComponent implements OnInit, OnDestroy {
     this.assignmentService
       .getAssignments(this.assignmentsPerPage, this.currentPage, this.courseId)
       .subscribe((responseData) => {
-        console.log(responseData);
         fileName = responseData.assignments[formControlIndex].filePath
           .split('/')
           .slice(-1)
@@ -549,7 +545,6 @@ export class AssignmentListComponent implements OnInit, OnDestroy {
     this.assignmentService
       .getAssignments(this.assignmentsPerPage, this.currentPage, this.courseId)
       .subscribe((fetchedAssignments) => {
-        console.log(fetchedAssignments);
         this.assignments = fetchedAssignments.assignments;
         this.totalAssignments = fetchedAssignments.maxAssignments;
         this.isLoading = true;

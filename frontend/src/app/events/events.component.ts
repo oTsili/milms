@@ -58,7 +58,6 @@ export class EventsComponent implements OnInit {
     this.eventService
       .getEvents(form.value.startDate, form.value.endDate)
       .subscribe((data) => {
-        console.log(data);
         this.authEvents = data.events;
       });
   }

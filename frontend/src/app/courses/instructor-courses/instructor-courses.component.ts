@@ -97,7 +97,6 @@ export class InstructorCoursesComponent implements OnInit, OnDestroy {
     this.coursesService
       .getCourses(this.coursesPerPage, this.currentPage)
       .subscribe((response) => {
-        console.log(response);
         this.courses = response.courses;
         this.totalCourses = response.maxCourses;
 
@@ -107,7 +106,6 @@ export class InstructorCoursesComponent implements OnInit, OnDestroy {
           }
         }
         this.dataSource = new MatTableDataSource(this.courses);
-        console.log(this.dataSource);
         this.isLoading = false;
       });
 
@@ -180,7 +178,6 @@ export class InstructorCoursesComponent implements OnInit, OnDestroy {
       if (dialogInput) {
         const { title, description, semester, year } = dialogInput;
         const resultArray = [title, description, semester, year];
-        console.log('resultArray', resultArray);
         formIsInvalid = resultArray.some(
           (item) => item === undefined || item === null
         );
@@ -236,7 +233,6 @@ export class InstructorCoursesComponent implements OnInit, OnDestroy {
   // updates a specific control
   updateCourse(currentCourse: Course, courseIndex: number) {
     currentCourse.id = this.courseControls.get(`${courseIndex}`).value.id;
-    console.log(currentCourse, courseIndex);
     this.coursesService.onUpdateCourse(currentCourse).subscribe(
       (response) => {
         this.coursesService
@@ -250,7 +246,6 @@ export class InstructorCoursesComponent implements OnInit, OnDestroy {
 
             // update the table
             this.dataSource = new MatTableDataSource(this.courses);
-            console.log(this.dataSource);
             this.isLoading = false;
           });
       },

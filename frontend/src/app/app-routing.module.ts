@@ -75,11 +75,11 @@ const routes: Routes = [
           url: 'courses',
         },
         {
-          label: '{{dynamicText}}',
+          label: '{{courseText}}',
           url: 'courses/:courseId',
         },
         {
-          label: 'Assignment: {{dynamicText}}',
+          label: 'Assignment: {{assignmentText}}',
           url: 'assignments/:assignmentId',
         },
       ],

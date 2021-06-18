@@ -3,7 +3,7 @@ import path from 'path';
 var logger = require('winston');
 const Riak = require('basho-riak-client');
 import { access, constants, mkdir } from 'fs';
-import { catchAsync } from '@otmilms/common';
+import { BadRequestError, catchAsync } from '@otmilms/common';
 
 import {
   Assignment,
@@ -102,8 +102,6 @@ export const createStudentDelivery = catchAsync(
       studentId,
     });
 
-    console.log(fetchedStudentDeliveryFiles);
-
     // 6)  publish the event
     // // make the query again for getting the populated fields
     // let updatedAssignment = await assignmentQuery;
@@ -128,61 +126,46 @@ export const createStudentDelivery = catchAsync(
   }
 );
 
-export const getAllStudentDeliveries = catchAsync(
+export const getStudentDeliveries = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const courseId = req.params.courseId;
     const assignmentId = req.params.assignmentId;
+    const userId = req.currentUser!.id;
 
-    const studentDeliveryFilesQuery = StudentDeliveryFile.find({
-      assignmentId,
-      courseId,
-    });
+    // get user role
+    const user = await User.findById(userId);
+
+    let studentDeliveryFilesQuery;
+
+    if (user) {
+      if (user.role === 'admin' || user.role === 'instructor') {
+        studentDeliveryFilesQuery = StudentDeliveryFile.find({
+          assignmentId,
+          courseId,
+        });
+      } else if (user.role === 'student') {
+        studentDeliveryFilesQuery = StudentDeliveryFile.find({
+          assignmentId,
+          courseId,
+          studentId: userId,
+        });
+      }
+    }
 
     let fetchedStudentDeliveryFiles = await studentDeliveryFilesQuery
       .populate('studentDeliveryAssignmentId')
-      .populate('assignmentId');
+      .populate('assignmentId')
+      .populate('studentId');
 
     let countStudentDeliveryFile = await StudentDeliveryFile.countDocuments({
       assignmentId,
       courseId,
     });
 
-    console.log('fetchedStudentDeliveryFiles', fetchedStudentDeliveryFiles);
-
     res.status(200).json({
       message: "Assignment's total studentDeliveryFiles fetched successfully!",
       fetchedStudentDeliveryFiles,
       countStudentDeliveryFile,
-    });
-  }
-);
-
-export const getMyStudentDelivery = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const courseId = req.params.courseId;
-    const assignmentId = req.params.assignmentId;
-    const studentId = req.currentUser!.id;
-
-    const studentDeliveryFileQuery = StudentDeliveryFile.find({
-      assignmentId,
-      studentId,
-    });
-
-    const fetchedMyStudentDeliveryFiles = await studentDeliveryFileQuery
-      .populate('studentId')
-      .populate('assignmentId')
-      .populate('studentDeliveryAssignmentId');
-    // .populate('studentId');
-
-    const count = await StudentDeliveryFile.countDocuments({
-      assignmentId,
-      studentId,
-    });
-
-    res.status(200).json({
-      message: 'My student delivery fetched successfully!',
-      fetchedMyStudentDeliveryFiles,
-      maxDeliveryFiles: count,
     });
   }
 );
@@ -209,11 +192,13 @@ export const deleteStudentDelivery = catchAsync(
       result = await StudentDeliveryFile.deleteOne({
         _id: fileId,
       });
+    } else {
+      throw new BadRequestError('Not permitted to delete!');
     }
 
     // 3) send the response
     if (result.n! > 0) {
-      res.status(200).json({ message: 'Deletion successfull' });
+      res.status(200).json({ message: 'Delete successfull' });
     } else {
       res.status(401).json({ message: 'Not authorized' });
     }

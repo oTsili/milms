@@ -149,25 +149,6 @@ router.post(
   AssignmentController.downloadAssignment
 );
 
-// router.get(
-//   '/:courseId/assignments/:assignmentId/materials',
-//   currentUser,
-//   requireAuth,
-//   MaterialsController.getMaterials
-// );
-
-// router.post(
-//   '/:courseId/assignments/:assignmentId/materials',
-//   extractMultipleFiles(
-//     MIME_TYPE_MAP,
-//     'src/public/assignment-materials',
-//     'filePaths[]'
-//   ),
-//   currentUser,
-//   requireAuth,
-//   MaterialsController.createMaterials
-// );
-
 /////////////// Student Deliveries ///////////////
 
 router.post(
@@ -183,28 +164,21 @@ router.post(
 );
 
 router.get(
-  '/:courseId/assignments/:assignmentId/all-student-deliveries',
+  '/:courseId/assignments/:assignmentId/student-deliveries',
   currentUser,
   requireAuth,
-  StudentDeliveriesController.getAllStudentDeliveries
-);
-
-router.get(
-  '/:courseId/assignments/:assignmentId/my-student-delivery',
-  currentUser,
-  requireAuth,
-  StudentDeliveriesController.getMyStudentDelivery
+  StudentDeliveriesController.getStudentDeliveries
 );
 
 router.delete(
-  '/:courseId/assignments/:assignmentId/student-delivery-files/:fileId',
+  '/:courseId/assignments/:assignmentId/student-deliveries/:fileId',
   currentUser,
   requireAuth,
   StudentDeliveriesController.deleteStudentDelivery
 );
 
 router.post(
-  '/:courseId/assignments/:assignmentId/student-delivery-files/:fileId/dump',
+  '/:courseId/assignments/:assignmentId/student-deliveries/:fileId/dump',
   currentUser,
   requireAuth,
   StudentDeliveriesController.downloadStudentDeliveryFile

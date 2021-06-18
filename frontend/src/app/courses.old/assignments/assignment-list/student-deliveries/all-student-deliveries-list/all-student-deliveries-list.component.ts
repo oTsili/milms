@@ -80,10 +80,7 @@ export class AllStudentDeliveriesListComponent implements OnInit, OnDestroy {
       .subscribe((studentDeliveryFiles) => {
         console.log('deliveries updated!!!!!!!!!!!!!!!!!!!');
 
-        console.log(studentDeliveryFiles);
         this.studentDeliveryFiles = studentDeliveryFiles;
-
-        console.log(this.studentDeliveryFiles);
       });
 
     // save the courseId and the assignmentId from the parent component assignmentForm
@@ -110,12 +107,10 @@ export class AllStudentDeliveriesListComponent implements OnInit, OnDestroy {
           this.studentDeliveryFiles = response.studentDeliveryFiles;
           this.dataSource = new MatTableDataSource(this.studentDeliveryFiles);
 
-          console.log(this.dataSource);
           this.studentDeliveriesService.onStudentDeliveriesUpdate(
             this.studentDeliveryFiles
           );
         }
-        console.log(this.studentDeliveryFiles);
       });
   }
 

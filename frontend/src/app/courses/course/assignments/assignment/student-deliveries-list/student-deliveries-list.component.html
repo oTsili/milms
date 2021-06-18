@@ -78,6 +78,17 @@
       </td>
     </ng-container>
 
+    <!-- Student Name Column -->
+    <ng-container
+      matColumnDef="studentName"
+      *ngIf="userRole === 'admin' || userRole === 'instructor'"
+    >
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Student</th>
+      <td mat-cell *matCellDef="let studentDelivery">
+        {{ studentDelivery.studentName }}
+      </td>
+    </ng-container>
+
     <!-- Last Update Column -->
     <ng-container matColumnDef="lastUpdate">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Last Update</th>
@@ -89,12 +100,9 @@
     <!-- Options Column -->
     <ng-container matColumnDef="options">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Options</th>
-      <td
-        mat-cell
-        *matCellDef="let materstudentDeliveryial; let controlIndex = index"
-      >
+      <td mat-cell *matCellDef="let studentDelivery; let controlIndex = index">
         <a
-          *ngIf="userRole === 'instructor' || userRole === 'admin'"
+          *ngIf="userRole === 'student'"
           class="button"
           style="color: #f44b4b"
           matTooltip="Delete the assignment"
@@ -106,7 +114,7 @@
 
         <a
           class="button"
-          (click)="ondDownloadAssignmentStudentDelivery(studentDelivery)"
+          (click)="ondDownloadStudentDelivery(studentDelivery)"
           matTooltip="Download the file"
         >
           <mat-icon>save_alt</mat-icon>

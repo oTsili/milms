@@ -14,6 +14,7 @@ export class SharedService {
   private userRoleListener = new Subject<string>();
   private NoButtonListener = new Subject<boolean>();
   private userRole: string = '';
+  private user_role: string = '';
 
   getBreadcrumbDisability(): Observable<boolean> {
     return this.breadcrumbIsEnabled.asObservable();
@@ -74,6 +75,7 @@ export class SharedService {
     ];
     this.dialog.open(ErrorComponent, { data: currentError });
   }
+
   throwNotification(error: string) {
     let currentError = [
       {
@@ -81,5 +83,13 @@ export class SharedService {
       },
     ];
     this.dialog.open(NotificationComponent, { data: currentError });
+  }
+
+  setUerRolelocally(role: string) {
+    this.user_role = role;
+  }
+
+  getLocallyUserRole() {
+    return this.user_role;
   }
 }

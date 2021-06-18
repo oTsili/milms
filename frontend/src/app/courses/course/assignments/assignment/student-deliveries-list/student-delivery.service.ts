@@ -47,23 +47,23 @@ export class StudentDeliveriesService {
     return this.http
       .get<{
         message: string;
-        fetchedStudentDeliveries: any;
-        maxStudentDeliveries: number;
+        fetchedStudentDeliveryFiles: any;
+        countStudentDeliveryFile: number;
       }>(
-        `${BACKEND_URL}/${courseId}/assignments/${assignmentId}/studentDeliveries${queryParams}`,
+        `${BACKEND_URL}/${courseId}/assignments/${assignmentId}/student-deliveries${queryParams}`,
         {
           withCredentials: true,
         }
       )
       .pipe(
         map((studentDeliveriesData) => {
-          console.log(studentDeliveriesData);
 
-          if (studentDeliveriesData.fetchedStudentDeliveries) {
+          if (studentDeliveriesData.fetchedStudentDeliveryFiles) {
             return {
               studentDeliveries:
-                studentDeliveriesData.fetchedStudentDeliveries.map(
+                studentDeliveriesData.fetchedStudentDeliveryFiles.map(
                   (studentDelivery, index) => {
+                    const studentName = `${studentDelivery.studentId.firstName} ${studentDelivery.studentId.lastName}`;
                     return {
                       position:
                         (currentPage - 1) * coursesPerPage + (index + 1),
@@ -74,10 +74,13 @@ export class StudentDeliveriesService {
                       assignmentId: studentDelivery.assignmentId,
                       courseId: studentDelivery.courseId,
                       id: studentDelivery.id,
+                      studentId: studentDelivery.studentId,
+                      studentName,
                     };
                   }
                 ),
-              maxStudentDeliveries: studentDeliveriesData.maxStudentDeliveries,
+              maxStudentDeliveries:
+                studentDeliveriesData.countStudentDeliveryFile,
             };
           }
           // if there are no any studentDelivery yet in the assigment
@@ -91,7 +94,6 @@ export class StudentDeliveriesService {
     assignmentId: string,
     studentDeliveriesControl: FormArray
   ) {
-    console.log('studentDeliveriesControl', studentDeliveriesControl);
 
     const studentDeliveriesData = new FormData();
 
@@ -102,13 +104,9 @@ export class StudentDeliveriesService {
     for (let i = 0; i < studentDeliveriesControl.length; i++) {
       let studentDeliveryFile = studentDeliveriesControl.value[i];
 
-      console.log('studentDeliveryFile', studentDeliveryFile);
 
-      console.log(!studentDeliveryFile.creatorId);
 
       if (!studentDeliveryFile.creatorId) {
-        console.log('iii: ', i);
-        console.log(studentDeliveryFile);
 
         studentDeliveriesData.append(
           'lastUpdates[]',
@@ -130,7 +128,6 @@ export class StudentDeliveriesService {
       }
     }
 
-    console.log('studentDeliveriesData: ', studentDeliveriesData);
 
     // const params = new HttpParams();
 
@@ -153,7 +150,6 @@ export class StudentDeliveriesService {
         )
         .pipe(
           map((studentDeliveriesFileData) => {
-            console.log(studentDeliveriesFileData);
 
             return {
               fetchedStudentDeliveryFiles:
@@ -221,7 +217,6 @@ export class StudentDeliveriesService {
   }
 
   deleteStudentDelivery(studentDelivery: StudentDeliveryFile) {
-    console.log('studentDelivery: ', studentDelivery);
 
     return this.http.delete(
       `${BACKEND_URL}/${studentDelivery.courseId}/assignments/${studentDelivery.assignmentId}/student-deliveries/${studentDelivery.id}`,

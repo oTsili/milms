@@ -358,8 +358,6 @@ export class CoursesComponent implements OnInit, OnDestroy {
           this.coursesService
             .addCourse(currentCourse)
             .subscribe((responseData) => {
-              console.log(responseData);
-
               let currentControl = (
                 this.coursesForm.get('coursesFormArray') as FormArray
               ).get(`${formControlIndex}`);

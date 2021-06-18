@@ -44,8 +44,6 @@ export class MaterialsService {
       )
       .pipe(
         map((materialData) => {
-          console.log(materialData);
-
           if (materialData.materials) {
             return {
               materials: materialData.materials.map((material) => {
@@ -69,9 +67,6 @@ export class MaterialsService {
   }
 
   addMaterials(currentAssignment: Assignment, materialsControl: FormArray) {
-    console.log('currentAssignment', currentAssignment);
-    console.log('materialsControl', materialsControl);
-
     const { id, courseId, lastUpdate } = currentAssignment;
 
     const materialsData = new FormData();
@@ -84,14 +79,7 @@ export class MaterialsService {
     for (let i = 0; i < materialsControl.length; i++) {
       let materialFile = materialsControl.value[i];
 
-      console.log('materialFile', materialFile);
-
-      console.log(!materialFile.creatorId);
-
       if (!materialFile.creatorId) {
-        console.log('iii: ', i);
-        console.log(materialFile);
-
         materialsData.append(
           'lastUpdates[]',
           (materialFile as Material).lastUpdate
@@ -108,8 +96,6 @@ export class MaterialsService {
         );
       }
     }
-
-    console.log('materialsData: ', materialsData);
 
     // const params = new HttpParams();
 
@@ -132,8 +118,6 @@ export class MaterialsService {
         )
         .pipe(
           map((materialsFileData) => {
-            console.log(materialsFileData);
-
             return {
               fetchedMaterialFiles: materialsFileData.fetchedMaterialFiles.map(
                 (materialFile) => {
@@ -191,8 +175,6 @@ export class MaterialsService {
   }
 
   deleteMaterial(material: Material) {
-    console.log('material: ', material);
-
     return this.http.delete(
       `${BACKEND_URL}/${material.courseId}/assignments/${material.assignmentId}/materials/${material.id}`,
       {

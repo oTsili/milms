@@ -13,9 +13,7 @@ export class AssignmentTableLineComponent {
     public sharedService: SharedService,
     public dialogRef: MatDialogRef<AssignmentTableLineComponent>,
     @Inject(MAT_DIALOG_DATA) public data: DialogData
-  ) {
-    console.log(data);
-  }
+  ) {}
 
   onNoClick(): void {
     this.sharedService.onNoButtonClick();

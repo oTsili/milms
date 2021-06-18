@@ -13,14 +13,11 @@ export class AssignmentsComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.sharedService.getUserRole().subscribe((response) => {
-      console.log('ngOnInit');
       this.userRole = response.userRole;
-      console.log(this.userRole);
     });
     this.userRoleSubscription = this.sharedService
       .getUserRoleListener()
       .subscribe((response) => {
-        console.log(response);
         this.userRole = response;
       });
   }

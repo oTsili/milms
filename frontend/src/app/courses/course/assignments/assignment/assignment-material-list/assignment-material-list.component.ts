@@ -4,6 +4,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { Material } from 'src/app/models/material.model';
+import { SharedService } from 'src/app/shared/services/shared.service';
 import { environment } from 'src/environments/environment';
 import { AssignmentMaterialsService } from './assignment-materials.service';
 @Component({
@@ -12,21 +13,23 @@ import { AssignmentMaterialsService } from './assignment-materials.service';
   styleUrls: ['./assignment-material-list.component.css'],
 })
 export class AssignmentMaterialsComponent implements OnInit, OnDestroy {
+  userRoleSubscription: Subscription;
+  materialUpdateSubscription: Subscription;
   displayedColumns: string[] = ['position', 'name', 'lastUpdate', 'options'];
-
+  userRole: string;
   courseId: string;
   assignmentId: string;
   isLoading: boolean = false;
   materials: Material[];
   dataSource;
-  materialUpdateSubscription: Subscription;
   totalMaterials = environment.TOTAL_COURSES;
   materialsPerPage = environment.COURSES_PER_PAGE;
   currentPage = environment.CURRENT_PAGE;
   constructor(
     // private controlContainer: ControlContainer,
     public route: ActivatedRoute,
-    private assignmentMaterialsService: AssignmentMaterialsService
+    private assignmentMaterialsService: AssignmentMaterialsService,
+    private sharedService: SharedService
   ) {}
   ngOnInit() {
     this.route.paramMap.subscribe((paraMap: ParamMap) => {
@@ -39,6 +42,14 @@ export class AssignmentMaterialsComponent implements OnInit, OnDestroy {
       }
     });
 
+    this.sharedService.getUserRole().subscribe((response) => {
+      this.userRole = response.userRole;
+    });
+    this.userRoleSubscription = this.sharedService
+      .getUserRoleListener()
+      .subscribe((response) => {
+        this.userRole = response;
+      });
 
     this.materialUpdateSubscription = this.assignmentMaterialsService
       .getAssignmentMaterialListener()
@@ -66,17 +77,15 @@ export class AssignmentMaterialsComponent implements OnInit, OnDestroy {
         this.assignmentId
       )
       .subscribe((response) => {
-        console.log(response);
-
         this.materials = response.materials;
         this.totalMaterials = response.maxMaterials;
         this.dataSource = new MatTableDataSource(this.materials);
-        console.log(this.materials);
       });
   }
   ngOnDestroy() {
     // this.assignmentIdUpdateSub.unsubscribe();
     this.materialUpdateSubscription.unsubscribe();
+    this.userRoleSubscription.unsubscribe();
   }
 
   applyFilter(event: Event) {
@@ -102,18 +111,15 @@ export class AssignmentMaterialsComponent implements OnInit, OnDestroy {
       )
       .subscribe((response) => {
         this.materials = response.materials;
-        // this.clearFormArray(this.assignmentControls);
-        // for (let i = 0; i < this.assignments.length; i++) {
-        //   this.addItem(this.assignments[i]);
-        // }
+        this.totalMaterials = response.maxMaterials;
+        this.dataSource = new MatTableDataSource(this.materials);
+
         this.isLoading = false;
       });
   }
 
   // deletes a material with regard it's index
   onDeleteAssignmentMaterial(material: Material, materialIndex: number) {
-    console.log('material: ', material);
-
     // this.currentAssignmentControl = (
     //   this.assignmentsForm.get('assignmentsFormArray') as FormArray
     // ).get(`${this.assingnmentIndex}`) as FormControl;
@@ -123,12 +129,19 @@ export class AssignmentMaterialsComponent implements OnInit, OnDestroy {
       .deleteAssignmentMaterial(material)
       .subscribe(
         (response) => {
-          console.log('response: ', response);
-          console.log(this.materials);
-          this.materials.splice(materialIndex, 1);
-          console.log(this.materials);
-          this.dataSource = new MatTableDataSource(this.materials);
-          this.isLoading = false;
+          // fetch the materials
+          this.assignmentMaterialsService
+            .getAssignmentMaterials(
+              this.materialsPerPage,
+              this.currentPage,
+              this.courseId,
+              this.assignmentId
+            )
+            .subscribe((response) => {
+              this.materials = response.materials;
+              this.totalMaterials = response.maxMaterials;
+              this.dataSource = new MatTableDataSource(this.materials);
+            });
         },
         (err) => {
           console.log(err);

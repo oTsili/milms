@@ -15,7 +15,6 @@ export class fileTableLineComponent {
     public dialogRef: MatDialogRef<fileTableLineComponent>,
     @Inject(MAT_DIALOG_DATA) public data: DialogData
   ) {
-    console.log(data);
     this.currentControl = data.currentControl;
   }
 

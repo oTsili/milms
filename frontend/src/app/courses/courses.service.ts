@@ -60,8 +60,6 @@ export class CoursesService {
       )
       .pipe(
         map((courseData) => {
-          console.log(courseData);
-
           return {
             courses: courseData.courses.map((course, index) => {
               const instructor = `${(course.instructorId as User).firstName} ${
@@ -103,7 +101,6 @@ export class CoursesService {
   }
 
   onUpdateCourse(course: Course) {
-    console.log(course);
     const { id } = course;
 
     return this.http.put<{ message: string; updatedCourse: Course }>(

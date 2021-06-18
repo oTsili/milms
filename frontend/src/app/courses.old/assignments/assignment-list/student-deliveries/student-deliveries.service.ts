@@ -52,8 +52,6 @@ export class StudentDeliveriesService {
       )
       .pipe(
         map((studentDiliveriesData) => {
-          console.log(studentDiliveriesData);
-
           if (studentDiliveriesData.fetchedStudentDeliveryFiles) {
             return {
               studentDeliveryFiles:
@@ -82,7 +80,6 @@ export class StudentDeliveriesService {
   }
 
   getMyStudentDeliveryFiles(courseId: string, assignmentId: string) {
-    console.log(courseId, assignmentId);
     return this.http
       .get<{
         message: string;
@@ -96,8 +93,6 @@ export class StudentDeliveriesService {
       )
       .pipe(
         map((myStudentDeliveryFilesData) => {
-          console.log(myStudentDeliveryFilesData);
-
           return {
             studentDeliveryFiles:
               myStudentDeliveryFilesData.fetchedMyStudentDeliveryFiles.map(
@@ -126,7 +121,6 @@ export class StudentDeliveriesService {
     assignmentId: string,
     sort: string = ''
   ) {
-    console.log(courseId, assignmentId);
     return this.http
       .get<{
         message: string;
@@ -140,8 +134,6 @@ export class StudentDeliveriesService {
       )
       .pipe(
         map((myStudentDeliveryFilesData) => {
-          console.log(myStudentDeliveryFilesData);
-
           return {
             studentDeliveryFiles:
               myStudentDeliveryFilesData.fetchedMyStudentDeliveryFiles.map(
@@ -244,7 +236,6 @@ export class StudentDeliveriesService {
         )
         .pipe(
           map((studentDeliveryFileData) => {
-            console.log(studentDeliveryFileData);
             return {
               fetchedStudentDeliveryFiles:
                 studentDeliveryFileData.fetchedStudentDeliveryFiles.map(
@@ -268,8 +259,6 @@ export class StudentDeliveriesService {
   deleteStudentDeliveryAssignment(
     studentDeliveryAssignment: StudentDeliveryAssignment
   ) {
-    console.log('studentDelivery: ', studentDeliveryAssignment);
-
     return this.http.delete(
       `${BACKEND_URL}/${studentDeliveryAssignment.courseId}/assignments
       /${studentDeliveryAssignment.assignmentId}/all-student-deliveries
@@ -285,8 +274,6 @@ export class StudentDeliveriesService {
     assignmentId: string,
     studentDeliveryFile: StudentDeliveryFile
   ) {
-    console.log('studentDelivery: ', studentDeliveryFile);
-
     return this.http.delete(
       `${BACKEND_URL}/${courseId}/assignments
       /${assignmentId}/student-delivery-files
@@ -302,7 +289,6 @@ export class StudentDeliveriesService {
     assignmentId: string,
     studentDeliveryFile: any
   ) {
-    console.log(studentDeliveryFile);
     let filePath;
 
     if (studentDeliveryFile.filePath) {

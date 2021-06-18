@@ -30,7 +30,7 @@ export class MaterialListComponent implements OnInit, OnDestroy {
   constructor(
     private controlContainer: ControlContainer,
     private materialService: MaterialsService,
-    private assignmentsService: AssignmentsService,
+    private assignmentsService: AssignmentsService
   ) {}
 
   ngOnInit() {
@@ -69,11 +69,8 @@ export class MaterialListComponent implements OnInit, OnDestroy {
     this.materialService
       .getMaterials(this.courseId, this.assignmentId)
       .subscribe((response) => {
-        console.log(response);
-
         this.materials = response.materials;
       });
-    console.log(this.materials);
   }
 
   ngOnDestroy() {
@@ -83,8 +80,6 @@ export class MaterialListComponent implements OnInit, OnDestroy {
 
   // deletes a material with regard it's index
   onDeleteMaterial(material: Material, materialIndex: number) {
-    console.log('material: ', material);
-
     this.currentAssignmentControl = (
       this.assignmentsForm.get('assignmentsFormArray') as FormArray
     ).get(`${this.assingnmentIndex}`) as FormControl;
@@ -92,10 +87,7 @@ export class MaterialListComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     this.materialService.deleteMaterial(material).subscribe(
       (response) => {
-        console.log('response: ', response);
-        console.log(this.materials);
         this.materials.splice(materialIndex, 1);
-        console.log(this.materials);
 
         this.isLoading = false;
       },

@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { StudentDeliveriesService } from './student-delivery.service';
 import { Subscription } from 'rxjs';
@@ -6,27 +6,30 @@ import { environment } from 'src/environments/environment';
 import { StudentDeliveryFile } from 'src/app/models/student-delivery.model';
 import { MatTableDataSource } from '@angular/material/table';
 import { Sort } from '@angular/material/sort';
+import { SharedService } from 'src/app/shared/services/shared.service';
 @Component({
   selector: 'app-student-delivery-list',
   templateUrl: './student-deliveries-list.component.html',
   styleUrls: ['./student-deliveries-list.component.css'],
 })
 export class StudentDeliveryListComponent implements OnInit, OnDestroy {
-  displayedColumns: string[] = ['position', 'name', 'lastUpdate', 'options'];
-
+  displayedColumns: string[];
+  userRoleSubscription: Subscription;
+  studentDeliveryUpdateSubscription: Subscription;
   courseId: string;
   assignmentId: string;
   isLoading: boolean = false;
+  userRole: string;
   dataSource;
   studentDeliveries: StudentDeliveryFile[];
-  studentDeliveryUpdateSubscription: Subscription;
   totalStudentDeliveries = environment.TOTAL_COURSES;
   studentDeliveriesPerPage = environment.COURSES_PER_PAGE;
   currentPage = environment.CURRENT_PAGE;
   constructor(
     // private controlContainer: ControlContainer,
     public route: ActivatedRoute,
-    private studentDeliveriesService: StudentDeliveriesService
+    private studentDeliveriesService: StudentDeliveriesService,
+    private sharedService: SharedService
   ) {}
   ngOnInit() {
     this.route.paramMap.subscribe((paraMap: ParamMap) => {
@@ -38,6 +41,23 @@ export class StudentDeliveryListComponent implements OnInit, OnDestroy {
         console.log('no assignment id or course id provided');
       }
     });
+
+    this.sharedService.getUserRole().subscribe((response) => {
+      this.sharedService.setUerRolelocally(response.userRole);
+
+      this.userRole = this.sharedService.getLocallyUserRole();
+
+      this.displayedColumns =
+        this.userRole === 'admin' || this.userRole === 'administrator'
+          ? ['position', 'name', 'studentName', 'lastUpdate', 'options']
+          : ['position', 'name', 'lastUpdate', 'options'];
+    });
+
+    this.userRoleSubscription = this.sharedService
+      .getUserRoleListener()
+      .subscribe((response) => {
+        this.userRole = response;
+      });
 
     this.studentDeliveryUpdateSubscription = this.studentDeliveriesService
       .getStudentDeliverieslListener()
@@ -65,12 +85,9 @@ export class StudentDeliveryListComponent implements OnInit, OnDestroy {
         this.assignmentId
       )
       .subscribe((response) => {
-        console.log(response);
-
         this.studentDeliveries = response.studentDeliveries;
         this.totalStudentDeliveries = response.maxStudentDeliveries;
         this.dataSource = new MatTableDataSource(this.studentDeliveries);
-        console.log(this.studentDeliveries);
       });
   }
   ngOnDestroy() {
@@ -105,6 +122,8 @@ export class StudentDeliveryListComponent implements OnInit, OnDestroy {
         // for (let i = 0; i < this.assignments.length; i++) {
         //   this.addItem(this.assignments[i]);
         // }
+        this.dataSource = new MatTableDataSource(this.studentDeliveries);
+
         this.isLoading = false;
       });
   }
@@ -114,8 +133,6 @@ export class StudentDeliveryListComponent implements OnInit, OnDestroy {
     studentDelivery: StudentDeliveryFile,
     studentDeliveryIndex: number
   ) {
-    console.log('studentDelivery: ', studentDelivery);
-
     // this.currentAssignmentControl = (
     //   this.assignmentsForm.get('assignmentsFormArray') as FormArray
     // ).get(`${this.assingnmentIndex}`) as FormControl;
@@ -125,12 +142,19 @@ export class StudentDeliveryListComponent implements OnInit, OnDestroy {
       .deleteStudentDelivery(studentDelivery)
       .subscribe(
         (response) => {
-          console.log('response: ', response);
-          console.log(this.studentDeliveries);
-          this.studentDeliveries.splice(studentDeliveryIndex, 1);
-          console.log(this.studentDeliveries);
-          this.dataSource = new MatTableDataSource(this.studentDeliveries);
-          this.isLoading = false;
+          // fetch the materials
+          this.studentDeliveriesService
+            .getStudentDeliveries(
+              this.studentDeliveriesPerPage,
+              this.currentPage,
+              this.courseId,
+              this.assignmentId
+            )
+            .subscribe((response) => {
+              this.studentDeliveries = response.studentDeliveries;
+              this.totalStudentDeliveries = response.maxStudentDeliveries;
+              this.dataSource = new MatTableDataSource(this.studentDeliveries);
+            });
         },
         (err) => {
           console.log(err);
@@ -139,7 +163,7 @@ export class StudentDeliveryListComponent implements OnInit, OnDestroy {
       );
   }
 
-  ondDownloadAssignmentMaterial(studentDelivery: StudentDeliveryFile) {
+  ondDownloadStudentDelivery(studentDelivery: StudentDeliveryFile) {
     this.isLoading = true;
     this.studentDeliveriesService
       .downloadStudentDelivery(studentDelivery)

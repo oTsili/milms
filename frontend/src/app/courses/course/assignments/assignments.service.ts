@@ -53,8 +53,6 @@ export class AssignmentsService {
       })
       .pipe(
         map((res) => {
-          console.log(res);
-
           return {
             assignments: res.fetchedAssignments.map((assignment, index) => {
               const instructor = `${(assignment.instructorId as User).firstName}
@@ -88,7 +86,6 @@ export class AssignmentsService {
   }
 
   onUpdateAssignment(assignment: Assignment) {
-    console.log(assignment);
     const {
       id,
       title,
@@ -146,12 +143,9 @@ export class AssignmentsService {
     );
   }
 
-  downloadAssignment(
-    filePath: string,
-    courseId: string,
-    assignment?: Assignment
-  ) {
-    console.log(assignment);
+  downloadAssignment(courseId: string, assignment?: Assignment) {
+    const filePath = (assignment.filePath as string).split('/').slice(-1).pop();
+
     return this.http.post(
       `${BACKEND_URL}/${courseId}/assignments/${assignment.id}/dump`,
       { filePath: filePath },

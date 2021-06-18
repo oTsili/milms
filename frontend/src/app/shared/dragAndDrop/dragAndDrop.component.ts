@@ -86,15 +86,10 @@ export class DragAndDropComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    console.log('component', this.component);
-    console.log('parentComponent', this.parentComponent);
-
     this.route.paramMap.subscribe((paraMap: ParamMap) => {
-      console.log('paraMap', paraMap);
       if (paraMap.has('courseId')) {
         this.courseId = paraMap.get('courseId');
       } else if (this.currentControl) {
-        console.log(this.currentControl);
         this.courseId = this.currentControl.value.courseId;
       } else {
         // throw new Error('no course id provided');
@@ -169,17 +164,14 @@ export class DragAndDropComponent implements OnInit {
     this.isLoading = true;
     // fetch the current course
     this.coursesService.getCourse(this.courseId).subscribe((response) => {
-      console.log(response);
       this.course = response.course;
       this.courseMaterialsService
         .addCourseMaterials(this.course, this.materialsControl)
         .subscribe((response) => {
-          console.log(response);
           this.courseMaterialsService.onCourseMaterialsUpdate(
             response.fetchedMaterialFiles
           );
-          this.deleteAllFiles();
-          this.materialsControl.removeAt(0);
+          this.deleteAllFiles(this.materialsControl);
           this.isLoading = false;
         });
       (err) => {
@@ -211,7 +203,7 @@ export class DragAndDropComponent implements OnInit {
         this.assignmentMaterialsService.onAssignmentMaterialsUpdate(
           responseData.fetchedMaterialFiles
         );
-        this.deleteAllFiles();
+        this.deleteAllFiles(this.materialsControl);
         this.isLoading = false;
       });
   }
@@ -234,7 +226,7 @@ export class DragAndDropComponent implements OnInit {
         this.studentDeliveriesService.onStudentDeliveriesUpdate(
           responseData.fetchedStudentDeliveryFiles
         );
-        this.deleteAllFiles();
+        this.deleteAllFiles(this.currentStudentDeliveryControl);
         this.isLoading = false;
       });
   }
@@ -249,7 +241,10 @@ export class DragAndDropComponent implements OnInit {
     this.currentStudentDeliveryControl.removeAt(index);
   }
 
-  deleteAllFiles() {
+  deleteAllFiles(formArray: FormArray) {
+    for (let i = 0; i <= formArray.length; i++) {
+      formArray.removeAt(i);
+    }
     this.files = [];
   }
 
@@ -290,8 +285,6 @@ export class DragAndDropComponent implements OnInit {
       this.files.push(item);
     }
 
-    console.log(this.currentStudentDeliveryControl);
-
     for (let i = 0; i < files.length; i++) {
       let currentStudentDeliveryFile = {
         name: files[i].name,
@@ -327,10 +320,6 @@ export class DragAndDropComponent implements OnInit {
       this.files.push(item);
     }
 
-    console.log(this.files);
-
-    console.log(this.materialsControl);
-
     for (let i = 0; i < files.length; i++) {
       let currentMaterialFile = {
         name: files[i].name,
@@ -343,7 +332,6 @@ export class DragAndDropComponent implements OnInit {
       // update and validate the image field value
       this.materialsControl.updateValueAndValidity();
     }
-    console.log(this.materialsControl);
     this.uploadFilesSimulator(0);
   }
 
@@ -359,8 +347,6 @@ export class DragAndDropComponent implements OnInit {
 
     const file = files[0];
 
-    console.log(this.currentControl);
-
     this.currentControl.patchValue({
       filePath: file,
       fileType: file.type,
@@ -369,7 +355,6 @@ export class DragAndDropComponent implements OnInit {
     // update and validate the image field value
     this.currentControl.updateValueAndValidity();
 
-    console.log(this.currentControl);
     this.uploadFilesSimulator(0);
   }
 

@@ -12,9 +12,7 @@ export class CourseTableLineomponent {
     public sharedService: SharedService,
     public dialogRef: MatDialogRef<CourseTableLineomponent>,
     @Inject(MAT_DIALOG_DATA) public data: DialogData
-  ) {
-    console.log(data);
-  }
+  ) {}
 
   onNoClick(): void {
     this.sharedService.onNoButtonClick();

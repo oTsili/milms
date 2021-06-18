@@ -54,10 +54,7 @@ export class MyStudentDeliveryListComponent implements OnInit, OnDestroy {
       .subscribe((studentDeliveryFiles) => {
         console.log('deliveries updated!!!!!!!!!!!!!!!!!!!');
 
-        console.log(studentDeliveryFiles);
         this.studentDeliveryFiles = studentDeliveryFiles;
-
-        console.log(this.studentDeliveryFiles);
       });
 
     // save the courseId and the assignmentId from the parent component assignmentForm
@@ -83,7 +80,6 @@ export class MyStudentDeliveryListComponent implements OnInit, OnDestroy {
         if (response) {
           this.studentDeliveryFiles = response.studentDeliveryFiles;
         }
-        console.log(this.studentDeliveryFiles);
       });
   }
 

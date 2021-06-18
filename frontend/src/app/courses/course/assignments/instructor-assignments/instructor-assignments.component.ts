@@ -112,7 +112,6 @@ export class InstructorAssignmentsComponent implements OnInit, OnDestroy {
     this.assignmentsService
       .getAssignments(this.assignmentsPerPage, this.currentPage, this.courseId)
       .subscribe((response) => {
-        console.log(response);
         this.assignments = response.assignments;
         this.totalAssignments = response.maxAssignments;
 
@@ -122,7 +121,6 @@ export class InstructorAssignmentsComponent implements OnInit, OnDestroy {
           }
         }
         this.dataSource = new MatTableDataSource(this.assignments);
-        console.log(this.dataSource);
         this.isLoading = false;
       });
 
@@ -208,13 +206,10 @@ export class InstructorAssignmentsComponent implements OnInit, OnDestroy {
         if (this.mode !== 'upload') {
           const { title, description } = dialogInput;
           const resultArray = [title, description];
-          console.log('resultArray', resultArray);
           formIsInvalid = resultArray.some(
             (item) => item === undefined || item === null
           );
         } else {
-          console.log(dialogInput);
-
           const {
             courseId,
             description,
@@ -316,14 +311,10 @@ export class InstructorAssignmentsComponent implements OnInit, OnDestroy {
 
     let currentControl = this.assignmentControls.get(`${assignmentIndex}`);
 
-    console.log(currentAssignment, assignmentIndex);
-
     this.isLoading = true;
     // update request
     this.assignmentsService.onUpdateAssignment(currentAssignment).subscribe(
       (response) => {
-        console.log(response);
-
         if (response.fetchedAssignment.title) {
           // update the form control
           currentControl.patchValue({
@@ -331,8 +322,6 @@ export class InstructorAssignmentsComponent implements OnInit, OnDestroy {
             description: response.fetchedAssignment.description,
           });
         }
-
-        console.log(currentControl);
 
         // update the table
         this.assignmentsService
@@ -347,7 +336,6 @@ export class InstructorAssignmentsComponent implements OnInit, OnDestroy {
 
             // update the table
             this.dataSource = new MatTableDataSource(this.assignments);
-            console.log(this.dataSource);
             this.isLoading = false;
           });
       },
@@ -363,7 +351,6 @@ export class InstructorAssignmentsComponent implements OnInit, OnDestroy {
     this.assignmentsService
       .addAssignment(assignmentInput, this.courseId)
       .subscribe((response) => {
-        console.log(response);
         newControl.patchValue({
           id: response.createdAssignment.id,
         });
@@ -422,14 +409,13 @@ export class InstructorAssignmentsComponent implements OnInit, OnDestroy {
   }
 
   onDownloadAssignment(assignment: Assignment) {
-    console.log(assignment);
-    // this.isLoading = true;
-    // this.assignmentsService
-    //   .downloadAssignment(assignment)
-    //   .subscribe((response: Blob) => {
-    //     saveAs(response, assignment.title);
-    //     this.isLoading = false;
-    //   });
+    this.isLoading = true;
+    this.assignmentsService
+      .downloadAssignment(this.courseId, assignment)
+      .subscribe((response: Blob) => {
+        saveAs(response, assignment.title);
+        this.isLoading = false;
+      });
   }
 
   // fetches the assignments of the corresponding page of the pagination
