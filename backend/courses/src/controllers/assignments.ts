@@ -43,7 +43,6 @@ export const createAssignment = catchAsync(
       fileType,
       instructorId,
       courseId,
-      lastUpdate: toHumanDateTime(new Date()),
     });
 
     const createdAssignment = await newAssignment.save();
@@ -53,7 +52,7 @@ export const createAssignment = catchAsync(
         id: createdAssignment.id!,
         title: createdAssignment.title,
         description: createdAssignment.description!,
-        lastUpdate: createdAssignment.lastUpdate.toString(),
+        lastUpdate: toHumanDateTime(createdAssignment.lastUpdate!),
         // rank: createdAssignment.rank!, // TODO: delete the rank, update the common lib, and make a subject assignment-delivery
         time: new Date(),
       });

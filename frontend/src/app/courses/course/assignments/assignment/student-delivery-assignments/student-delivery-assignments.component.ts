@@ -24,7 +24,7 @@ import { RankTableLineomponent } from 'src/app/shared/matDialog/rankTableLine/ra
 export class StudentDeliveryAssignmentsComponent implements OnInit, OnDestroy {
   @ViewChild(MatSort) sort: MatSort;
   @Input() displayedColumns: string[];
-  @Input() user_role: string;
+  @Input() userRole: string;
   dataSource: MatTableDataSource<StudentDeliveryAssignment>;
   emptyStudentDeliveryAssignment: StudentDeliveryAssignment = {
     id: null,
@@ -48,6 +48,7 @@ export class StudentDeliveryAssignmentsComponent implements OnInit, OnDestroy {
   studentDeliveryAssignmentsControls: FormArray;
   studentDeliveryAssignmentsForm: FormGroup;
   totalStudentDeliveryAssignments: number;
+  pageSizeOptions = environment.PAGE_SIZE_OPTIONS;
   studentDeliveryAssignments: StudentDeliveryAssignment[];
   totalStudentDeliveries = environment.TOTAL_COURSES;
   studentDeliveryAssignmentsPerPage = environment.COURSES_PER_PAGE;
@@ -73,14 +74,16 @@ export class StudentDeliveryAssignmentsComponent implements OnInit, OnDestroy {
     });
 
     this.sharedService.getUserRole().subscribe((response) => {
-      this.user_role = response.userRole;
+      this.userRole = response.userRole;
     });
 
     this.userRoleSubscription = this.sharedService
       .getUserRoleListener()
       .subscribe((response) => {
-        this.user_role = response;
+        this.userRole = response;
       });
+
+    this.initializeControls();
 
     this.studentDeliveryAssignmentUpdateSubscription =
       this.studentDeliveryAssignmentService
@@ -97,6 +100,12 @@ export class StudentDeliveryAssignmentsComponent implements OnInit, OnDestroy {
             .subscribe((response) => {
               this.studentDeliveryAssignments = response.studentDeliveries;
               this.totalStudentDeliveries = response.maxStudentDeliveries;
+
+              if (this.totalStudentDeliveries > 0) {
+                for (let delivery of this.studentDeliveryAssignments) {
+                  this.addItem(delivery);
+                }
+              }
               this.dataSource = new MatTableDataSource(
                 this.studentDeliveryAssignments
               );
@@ -114,11 +123,22 @@ export class StudentDeliveryAssignmentsComponent implements OnInit, OnDestroy {
       .subscribe((response) => {
         this.studentDeliveryAssignments = response.studentDeliveries;
         this.totalStudentDeliveries = response.maxStudentDeliveries;
+
+        if (this.totalStudentDeliveries > 0) {
+          for (let delivery of this.studentDeliveryAssignments) {
+            this.addItem(delivery);
+          }
+        }
+
         this.dataSource = new MatTableDataSource(
           this.studentDeliveryAssignments
         );
-        console.log(this.dataSource);
       });
+
+    this.studentDeliveryAssignmentsControls =
+      this.studentDeliveryAssignmentsForm.get(
+        'studentDeliveryAssignmentsFormArray'
+      ) as FormArray;
   }
   ngOnDestroy() {
     this.studentDeliveryAssignmentUpdateSubscription.unsubscribe();
@@ -196,7 +216,6 @@ export class StudentDeliveryAssignmentsComponent implements OnInit, OnDestroy {
         return;
       }
 
-      dialogInput.lastUpdate = new Date().toString();
       this.saveStudentDeliveryAssignment(
         this.studentDeliveryAssignmentsControls.length,
         dialogInput,
@@ -208,7 +227,7 @@ export class StudentDeliveryAssignmentsComponent implements OnInit, OnDestroy {
   initializeControls() {
     // define and initialize the form group and formArray
     this.studentDeliveryAssignmentsForm = this.formBuilder.group({
-      coursesFormArray: this.formBuilder.array([]),
+      studentDeliveryAssignmentsFormArray: this.formBuilder.array([]),
     });
   }
 
@@ -244,6 +263,10 @@ export class StudentDeliveryAssignmentsComponent implements OnInit, OnDestroy {
       this.studentDeliveryAssignmentsControls.get(
         `${studentDeliveryAssignmentIndex}`
       ).value.id;
+
+    currentStudentDeliveryAssignment.courseId = this.courseId;
+    currentStudentDeliveryAssignment.assignmentId = this.assignmentId;
+
     this.studentDeliveryAssignmentService
       .onUpdateStudentDeliveryAssignment(currentStudentDeliveryAssignment)
       .subscribe(
@@ -270,6 +293,7 @@ export class StudentDeliveryAssignmentsComponent implements OnInit, OnDestroy {
               this.dataSource = new MatTableDataSource(
                 this.studentDeliveryAssignments
               );
+
               this.isLoading = false;
             });
         },
@@ -289,12 +313,7 @@ export class StudentDeliveryAssignmentsComponent implements OnInit, OnDestroy {
 
   // check specific controls, to be regarded valid
   formIsValid = (newControl: AbstractControl): boolean => {
-    if (
-      newControl.get('title').valid &&
-      newControl.get('description').valid &&
-      newControl.get('semester').valid &&
-      newControl.get('year').valid
-    ) {
+    if (newControl.get('rank').valid) {
       return true;
     }
 

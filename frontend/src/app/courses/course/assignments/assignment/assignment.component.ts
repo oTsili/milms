@@ -22,6 +22,7 @@ export class AssignmentComponent implements OnInit, OnDestroy {
   isLoading: boolean = false;
   userRole: string;
   course: Course;
+  pageSizeOptions = environment.PAGE_SIZE_OPTIONS;
   totalCourses = environment.TOTAL_COURSES;
   coursesPerPage = environment.COURSES_PER_PAGE;
   currentPage = environment.CURRENT_PAGE;

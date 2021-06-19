@@ -15,7 +15,7 @@ import { SharedService } from 'src/app/shared/services/shared.service';
 export class StudentDeliveryFilesComponent implements OnInit, OnDestroy {
   @ViewChild(MatSort) sort: MatSort;
   @Input() displayedColumns: string;
-  @Input() user_role: string;
+  @Input() userRole: string;
   userRoleSubscription: Subscription;
   studentDeliveryUpdateSubscription: Subscription;
   courseId: string;
@@ -24,6 +24,7 @@ export class StudentDeliveryFilesComponent implements OnInit, OnDestroy {
   // userRole: string;
   dataSource: MatTableDataSource<StudentDeliveryFile>;
   studentDeliveries: StudentDeliveryFile[];
+  pageSizeOptions = environment.PAGE_SIZE_OPTIONS;
   totalStudentDeliveries = environment.TOTAL_COURSES;
   studentDeliveriesPerPage = environment.COURSES_PER_PAGE;
   currentPage = environment.CURRENT_PAGE;
@@ -45,13 +46,13 @@ export class StudentDeliveryFilesComponent implements OnInit, OnDestroy {
     });
 
     this.sharedService.getUserRole().subscribe((response) => {
-      this.user_role = response.userRole;
+      this.userRole = response.userRole;
     });
 
     this.userRoleSubscription = this.sharedService
       .getUserRoleListener()
       .subscribe((response) => {
-        this.user_role = response;
+        this.userRole = response;
       });
 
     this.studentDeliveryUpdateSubscription = this.studentDeliveriesService
@@ -66,7 +67,6 @@ export class StudentDeliveryFilesComponent implements OnInit, OnDestroy {
             this.assignmentId
           )
           .subscribe((response) => {
-            console.log(response);
             this.studentDeliveries = response.studentDeliveries;
             this.totalStudentDeliveries = response.maxStudentDeliveries;
             this.dataSource = new MatTableDataSource(this.studentDeliveries);
@@ -85,7 +85,6 @@ export class StudentDeliveryFilesComponent implements OnInit, OnDestroy {
         this.studentDeliveries = response.studentDeliveries;
         this.totalStudentDeliveries = response.maxStudentDeliveries;
         this.dataSource = new MatTableDataSource(this.studentDeliveries);
-        console.log(this.dataSource);
       });
   }
   ngOnDestroy() {

@@ -18,6 +18,7 @@ export class CourseComponent implements OnInit, OnDestroy {
   course: Course;
   isLoading: boolean = false;
   userRole: string;
+  pageSizeOptions = environment.PAGE_SIZE_OPTIONS;
   totalCourses = environment.TOTAL_COURSES;
   coursesPerPage = environment.COURSES_PER_PAGE;
   currentPage = environment.CURRENT_PAGE;

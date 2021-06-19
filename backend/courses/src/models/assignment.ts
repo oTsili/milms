@@ -13,7 +13,7 @@ export interface AssignmentAttrs {
   fileType?: string;
   instructorId: string | UserDoc;
   courseId?: string;
-  lastUpdate: string;
+  lastUpdate?: Date;
 }
 
 // An interface that describes the properties
@@ -30,7 +30,7 @@ export interface AssignmentDoc extends mongoose.Document {
   description?: string;
   // filePath: string;
   // fileType: string;
-  lastUpdate: string;
+  lastUpdate?: Date;
   createdAt: string;
   courseId: string;
   instructorId?: string | UserDoc;
@@ -55,8 +55,8 @@ export const assignmentSchema = new mongoose.Schema(
       // required: true,
     },
     lastUpdate: {
-      type: String,
-      default: Date.now().toString(),
+      type: Date,
+      default: Date.now(),
     },
     createdAt: {
       type: String,

@@ -57,7 +57,6 @@ export class StudentDeliveriesService {
       )
       .pipe(
         map((studentDeliveriesData) => {
-          console.log(studentDeliveriesData);
           if (studentDeliveriesData.fetchedStudentDeliveryFiles) {
             return {
               studentDeliveries:

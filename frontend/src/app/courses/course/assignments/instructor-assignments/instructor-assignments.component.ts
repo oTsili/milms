@@ -154,12 +154,25 @@ export class InstructorAssignmentsComponent implements OnInit, OnDestroy {
         JSON.stringify(sort)
       )
       .subscribe((response) => {
-        this.assignments = response.assignments;
-        // this.clearFormArray(this.assignmentControls);
-        // for (let i = 0; i < this.assignments.length; i++) {
-        //   this.addItem(this.assignments[i]);
-        // }
-        this.isLoading = false;
+        // fetch the assignments
+        this.assignmentsService
+          .getAssignments(
+            this.assignmentsPerPage,
+            this.currentPage,
+            this.courseId
+          )
+          .subscribe((response) => {
+            this.assignments = response.assignments;
+            this.totalAssignments = response.maxAssignments;
+
+            if (this.totalAssignments > 0) {
+              for (let assignment of this.assignments) {
+                this.addItem(assignment);
+              }
+            }
+            this.dataSource = new MatTableDataSource(this.assignments);
+            this.isLoading = false;
+          });
       });
   }
 

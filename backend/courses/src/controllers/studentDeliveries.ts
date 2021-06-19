@@ -173,8 +173,7 @@ export const getStudentDeliveries = catchAsync(
       .populate('courseId');
 
     res.status(200).json({
-      message:
-        "Assignment's total StudentDeliveryFiles fetched successfully!",
+      message: "Assignment's total StudentDeliveryFiles fetched successfully!",
       fetchedStudentDeliveryFiles,
       countStudentDeliveryFiles,
     });
@@ -232,6 +231,34 @@ export const getStudentDeliveryAssignments = catchAsync(
         "Assignment's total StudentDeliveryAssignments fetched successfully!",
       fetchedStudentDeliveryAssignments,
       countStudentDeliveryAssignments,
+    });
+  }
+);
+
+export const updateStudentDeliveryAssignment = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const deliveryId = req.params.deliveryId;
+
+    console.log(req.body);
+
+    const { lastUpdate, rank } = req.body;
+
+    const filter = { _id: deliveryId };
+    const update = { rank, lastUpdate };
+
+    await StudentDeliveryAssignment.updateOne(
+      // matching requirements
+      filter,
+      // the new values of assigment object
+      update
+    );
+
+    const fetchedStudentDeliveryAssignment =
+      await StudentDeliveryAssignment.findById(deliveryId);
+
+    res.status(200).json({
+      message: 'update successful!',
+      fetchedStudentDeliveryAssignment,
     });
   }
 );

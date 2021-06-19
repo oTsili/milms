@@ -22,7 +22,7 @@
   <mat-tab label="Deliveries">
     <app-student-delivery-files
       *ngIf="userRole"
-      [user_role]="userRole"
+      [userRole]="userRole"
       [displayedColumns]="
         userRole === 'admin' || userRole === 'instructor'
           ? ['position', 'name', 'studentName', 'lastUpdate', 'options']
@@ -38,7 +38,7 @@
   ></mat-tab>
   <mat-tab label="Ranks">
     <app-student-delivery-assignments
-      [user_role]="userRole"
+      [userRole]="userRole"
       [displayedColumns]="
         userRole === 'admin' || userRole === 'instructor'
           ? [
@@ -49,9 +49,9 @@
               'rank',
               'options'
             ]
-          : ['position', 'assignmentName', 'lastUpdate', 'rank', 'options']
+          : ['position', 'assignmentName', 'lastUpdate', 'rank']
       "
-      *ngIf="userRole && (userRole === 'instructor' || userRole === 'admin')"
+      *ngIf="userRole"
     ></app-student-delivery-assignments
   ></mat-tab>
 </mat-tab-group>

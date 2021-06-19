@@ -22,6 +22,7 @@ export class AssignmentMaterialsComponent implements OnInit, OnDestroy {
   isLoading: boolean = false;
   materials: Material[];
   dataSource;
+  pageSizeOptions = environment.PAGE_SIZE_OPTIONS;
   totalMaterials = environment.TOTAL_COURSES;
   materialsPerPage = environment.COURSES_PER_PAGE;
   currentPage = environment.CURRENT_PAGE;

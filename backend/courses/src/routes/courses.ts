@@ -192,6 +192,13 @@ router.get(
   StudentDeliveriesController.getStudentDeliveryAssignments
 );
 
+router.put(
+  '/:courseId/assignments/:assignmentId/student-delivery-assignments/:deliveryId',
+  currentUser,
+  requireAuth,
+  StudentDeliveriesController.updateStudentDeliveryAssignment
+);
+
 /////////////// Events ///////////////
 
 router.post(

@@ -10,7 +10,7 @@ import { CourseDoc } from './course';
 export interface StudentDeliveryFileAttrs {
   id?: string;
   name: string;
-  lastUpdate?: string;
+  lastUpdate?: Date;
   filePath?: string;
   fileType?: string;
   courseId?: string | CourseDoc;
@@ -31,7 +31,7 @@ export interface StudentDeliveryFileModel
 export interface StudentDeliveryFileDoc extends mongoose.Document {
   id?: string;
   name: string;
-  lastUpdate?: string;
+  lastUpdate?: Date;
   filePath?: string;
   fileType?: string;
   courseId?: string | CourseDoc;
@@ -46,8 +46,8 @@ export const StudentDeliveryFileSchema = new mongoose.Schema(
       type: String,
     },
     lastUpdate: {
-      type: String,
-      default: Date.now().toString(),
+      type: Date,
+      default: Date.now(),
     },
     filePath: {
       type: String,

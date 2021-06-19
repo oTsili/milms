@@ -5,6 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { Sort } from '@angular/material/sort';
 import { map } from 'rxjs/operators';
+import { SharedService } from 'src/app/shared/services/shared.service';
 
 const BACKEND_URL = environment.ASSIGNMENT_BASE_URL + '/api/courses';
 
@@ -14,7 +15,7 @@ export class StudentDeliveryAssignmentService {
     StudentDeliveryAssignment[]
   >();
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private sharedService: SharedService) {}
 
   getStudentDeliveryAssignmentsListener() {
     return this.studentDeliveryAssignmentsListener.asObservable();
@@ -39,7 +40,7 @@ export class StudentDeliveryAssignmentService {
       .get<{
         message: string;
         fetchedStudentDeliveryAssignments: any;
-        countStudentDeliveryAssignment: number;
+        countStudentDeliveryAssignments: number;
       }>(
         `${BACKEND_URL}/${courseId}/assignments/${assignmentId}/student-delivery-assignments${queryParams}`,
         {
@@ -60,17 +61,20 @@ export class StudentDeliveryAssignmentService {
                       name: studentDelivery.name,
                       filePath: studentDelivery.filePath,
                       fileType: studentDelivery.fileType,
-                      lastUpdate: studentDelivery.lastUpdate,
+                      lastUpdate: this.sharedService.toHumanDateTime(
+                        studentDelivery.lastUpdate
+                      ),
                       assignmentId: studentDelivery.assignmentId,
                       courseId: studentDelivery.courseId,
                       id: studentDelivery.id,
                       studentId: studentDelivery.studentId,
                       studentName,
+                      rank: studentDelivery.rank,
                     };
                   }
                 ),
               maxStudentDeliveries:
-                studentDeliveryData.fetchedStudentDeliveryAssignments,
+                studentDeliveryData.countStudentDeliveryAssignments,
             };
           }
           // if there are no any studentDelivery yet in the assigment
@@ -82,13 +86,17 @@ export class StudentDeliveryAssignmentService {
   onUpdateStudentDeliveryAssignment(
     studentDeliveryAssignment: StudentDeliveryAssignment
   ) {
-    const { id } = studentDeliveryAssignment;
+    const { id, courseId, assignmentId } = studentDeliveryAssignment;
 
     return this.http.put<{
       message: string;
       updatedStudentDeliveryAssignment: StudentDeliveryAssignment;
-    }>(`${BACKEND_URL}/${id}`, studentDeliveryAssignment, {
-      withCredentials: true,
-    });
+    }>(
+      `${BACKEND_URL}/${courseId}/assignments/${assignmentId}/student-delivery-assignments/${id}`,
+      studentDeliveryAssignment,
+      {
+        withCredentials: true,
+      }
+    );
   }
 }

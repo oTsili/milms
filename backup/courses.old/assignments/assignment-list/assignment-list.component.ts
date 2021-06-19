@@ -94,7 +94,7 @@ export class AssignmentListComponent implements OnInit, OnDestroy {
     });
 
     this.sharedService.enableBreadcrumb(true);
-    let currentDate = this.sharedService.toHumanDateTime(new Date().toString());
+    let currentDate = this.sharedService.toHumanDateTime(new Date());
 
     // initialize the boolean custom attributes of control array
     for (let i = 1; i < this.assignmentsPerPage - 1; i++) {

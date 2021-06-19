@@ -11,7 +11,7 @@ import { StudentDeliveryFileDoc } from './studentDeliveryFile';
 export interface StudentDeliveryAssignmentAttrs {
   id?: string;
   name: string;
-  lastUpdate?: string;
+  lastUpdate?: Date;
   rank?: number;
   studentId?: UserDoc | string;
   courseId?: CourseDoc | string;
@@ -34,7 +34,7 @@ export interface StudentDeliveryAssignmentDoc extends mongoose.Document {
   _id: string;
   id?: string;
   name: string;
-  lastUpdate?: string;
+  lastUpdate?: Date;
   rank?: number;
   studentId?: UserDoc | string;
   courseId?: CourseDoc | string;
@@ -50,8 +50,8 @@ export const StudentDeliveryAssignmentSchema = new mongoose.Schema(
       type: String,
     },
     lastUpdate: {
-      type: String,
-      default: Date.now().toString(),
+      type: Date,
+      default: Date.now(),
     },
     rank: { type: Number },
     studentId: {

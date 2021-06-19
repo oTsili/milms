@@ -14,7 +14,6 @@ export class SharedService {
   private userRoleListener = new Subject<string>();
   private NoButtonListener = new Subject<boolean>();
   private userRole: string = '';
-  private user_role: string = '';
 
   getBreadcrumbDisability(): Observable<boolean> {
     return this.breadcrumbIsEnabled.asObservable();
@@ -29,18 +28,20 @@ export class SharedService {
     this.NoButtonListener.next(true);
   }
 
-  toHumanDateTime(date: string) {
-    let month = (new Date(date).getMonth() + 1).toString();
+  toHumanDateTime(providedDate: string) {
+    const date = new Date(providedDate);
 
-    let newDateArray = new Date(date).toDateString().split(' ');
+    const month = (date.getMonth() + 1).toString();
+
+    const newDateArray = date.toDateString().split(' ');
     // delete the day name
     newDateArray.splice(0, 1);
     // change the month name to month numbers
     newDateArray.splice(0, 1, month);
     // monve the month to the center
     this.monveInArray(newDateArray, 0, 1);
-    let newDate = newDateArray.join(' ').replace(/\ /g, '/');
-    let newTime = new Date(date).toTimeString().split(' ')[0];
+    const newDate = newDateArray.join(' ').replace(/\ /g, '/');
+    const newTime = date.toTimeString().split(' ')[0];
 
     return `${newDate} ${newTime}`;
   }

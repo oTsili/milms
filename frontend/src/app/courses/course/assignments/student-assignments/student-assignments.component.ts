@@ -45,6 +45,7 @@ export class StudentAssignmentsComponent implements OnInit, OnDestroy {
   private _mobileQueryListener: () => void;
   assignmentsUpdateSubscription: Subscription;
   assignments: Assignment[];
+  pageSizeOptions = environment.PAGE_SIZE_OPTIONS;
   totalAssignments = environment.TOTAL_COURSES;
   assignmentsPerPage = environment.COURSES_PER_PAGE;
   currentPage = environment.CURRENT_PAGE;

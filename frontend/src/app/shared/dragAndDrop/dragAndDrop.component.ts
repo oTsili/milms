@@ -291,7 +291,6 @@ export class DragAndDropComponent implements OnInit {
         name: files[i].name,
         filePath: files[i],
         fileType: files[i].type,
-        lastUpdate: this.sharedService.toHumanDateTime(new Date().toString()),
       };
       this.currentStudentDeliveryControl.push(
         this.createStudentDelivery(currentStudentDeliveryFile)
@@ -326,7 +325,6 @@ export class DragAndDropComponent implements OnInit {
         name: files[i].name,
         filePath: files[i],
         fileType: files[i].type,
-        lastUpdate: this.sharedService.toHumanDateTime(new Date().toString()),
       };
       this.materialsControl.push(this.createMaterial(currentMaterialFile));
 

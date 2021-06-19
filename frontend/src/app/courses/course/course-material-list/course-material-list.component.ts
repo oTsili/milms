@@ -35,6 +35,7 @@ export class CourseMaterialListComponent implements OnInit, OnDestroy {
   courseId: string;
   assignmentId: string;
   isLoading: boolean = false;
+  pageSizeOptions = environment.PAGE_SIZE_OPTIONS;
   totalMaterials = environment.TOTAL_COURSES;
   materialsPerPage = environment.COURSES_PER_PAGE;
   currentPage = environment.CURRENT_PAGE;
