@@ -15,6 +15,9 @@ spec:
         app: auth-riak-query-coordinator
     spec:
       volumes:
+        - name: auth-riak-query-schemas
+          persistentVolumeClaim:
+            claimName: auth-riak-query-schemas-pvc
         - name: auth-riak-query-storage
           persistentVolumeClaim:
             claimName: auth-riak-query-pvc
@@ -29,7 +32,7 @@ spec:
             - containerPort: 8098
           resources: {}
           volumeMounts:
-            - name: auth-riak-query-storage
+            - name: auth-riak-query-schemas
               mountPath: /etc/riak/schemas
             - name: auth-riak-query-storage
               mountPath: /var/lib/riak

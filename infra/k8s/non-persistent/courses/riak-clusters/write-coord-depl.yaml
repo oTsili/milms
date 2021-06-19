@@ -15,6 +15,9 @@ spec:
         app: courses-riak-write-coordinator
     spec:
       volumes:
+        - name: courses-riak-write-schemas
+          persistentVolumeClaim:
+            claimName: courses-riak-write-schemas-pvc
         - name: courses-riak-write-storage
           persistentVolumeClaim:
             claimName: courses-riak-write-pvc
