@@ -9,6 +9,7 @@ export interface CourseUpdatedEvent {
     semester: string;
     year: string;
     createdAt: Date;
+    instructorId: string;
     time: Date;
   };
 }
