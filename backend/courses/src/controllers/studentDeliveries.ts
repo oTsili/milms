@@ -136,6 +136,7 @@ export const getStudentDeliveries = catchAsync(
     const user = await User.findById(userId);
 
     let studentDeliveryFilesQuery;
+    let countStudentDeliveryFiles;
 
     if (user) {
       if (user.role === 'admin' || user.role === 'instructor') {
@@ -143,14 +144,40 @@ export const getStudentDeliveries = catchAsync(
           assignmentId,
           courseId,
         });
+
+        countStudentDeliveryFiles =
+          await StudentDeliveryAssignment.countDocuments({
+            assignmentId,
+            courseId,
+          });
       } else if (user.role === 'student') {
         studentDeliveryFilesQuery = StudentDeliveryFile.find({
           assignmentId,
           courseId,
           studentId: userId,
         });
+
+        countStudentDeliveryFiles =
+          await StudentDeliveryAssignment.countDocuments({
+            assignmentId,
+            courseId,
+            studentId: userId,
+          });
       }
     }
+
+    let fetchedStudentDeliveryFiles = await studentDeliveryFilesQuery
+      .populate('studentId')
+      .populate('studentDeliveryAssignmentId')
+      .populate('assignmentId')
+      .populate('courseId');
+
+    res.status(200).json({
+      message:
+        "Assignment's total StudentDeliveryFiles fetched successfully!",
+      fetchedStudentDeliveryFiles,
+      countStudentDeliveryFiles,
+    });
   }
 );
 
@@ -197,7 +224,7 @@ export const getStudentDeliveryAssignments = catchAsync(
       await studentDeliveryAssignmentsQuery
         .populate('instructorId')
         .populate('studentId')
-        .populate('instructorId')
+        .populate('assignmentId')
         .populate('courseId');
 
     res.status(200).json({

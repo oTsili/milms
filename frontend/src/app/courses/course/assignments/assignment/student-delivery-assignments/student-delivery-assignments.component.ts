@@ -62,8 +62,6 @@ export class StudentDeliveryAssignmentsComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    console.log(this.dataSource);
-
     this.route.paramMap.subscribe((paraMap: ParamMap) => {
       if (paraMap.has('courseId') && paraMap.has('assignmentId')) {
         this.courseId = paraMap.get('courseId');
@@ -119,6 +117,7 @@ export class StudentDeliveryAssignmentsComponent implements OnInit, OnDestroy {
         this.dataSource = new MatTableDataSource(
           this.studentDeliveryAssignments
         );
+        console.log(this.dataSource);
       });
   }
   ngOnDestroy() {

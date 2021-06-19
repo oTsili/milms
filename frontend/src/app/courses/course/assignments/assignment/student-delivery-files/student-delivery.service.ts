@@ -48,7 +48,7 @@ export class StudentDeliveriesService {
       .get<{
         message: string;
         fetchedStudentDeliveryFiles: any;
-        countStudentDeliveryFile: number;
+        countStudentDeliveryFiles: number;
       }>(
         `${BACKEND_URL}/${courseId}/assignments/${assignmentId}/student-deliveries${queryParams}`,
         {
@@ -80,7 +80,7 @@ export class StudentDeliveriesService {
                   }
                 ),
               maxStudentDeliveries:
-                studentDeliveriesData.countStudentDeliveryFile,
+                studentDeliveriesData.countStudentDeliveryFiles,
             };
           }
           // if there are no any studentDelivery yet in the assigment

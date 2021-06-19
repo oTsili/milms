@@ -65,7 +65,6 @@ export class AssignmentComponent implements OnInit, OnDestroy {
 
     this.sharedService.getUserRole().subscribe((response) => {
       this.userRole = response.userRole;
-      console.log(this.userRole);
     });
     this.userRoleSubscription = this.sharedService
       .getUserRoleListener()
