@@ -24,7 +24,7 @@ export class CourseMaterialsService {
     materialCount: number;
   }>();
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private sharedService: SharedService) {}
 
   getCourseMaterialListener() {
     return this.materialsListener.asObservable();
@@ -51,7 +51,6 @@ export class CourseMaterialsService {
       )
       .pipe(
         map((materialData) => {
-
           if (materialData.fetchedMaterials) {
             return {
               materials: materialData.fetchedMaterials.map(
@@ -61,7 +60,9 @@ export class CourseMaterialsService {
                     name: material.name,
                     filePath: material.filePath,
                     fileType: material.fileType,
-                    lastUpdate: material.lastUpdate,
+                    lastUpdate: this.sharedService.toHumanDateTime(
+                      material.lastUpdate
+                    ),
                     assignmentId: material.assignmentId,
                     courseId: material.courseId,
                     id: material.id,
@@ -78,7 +79,6 @@ export class CourseMaterialsService {
   }
 
   addCourseMaterials(currentCourse: Course, materialsControl: FormArray) {
-
     const { id } = currentCourse;
 
     const materialsData = new FormData();
@@ -91,14 +91,7 @@ export class CourseMaterialsService {
     for (let i = 0; i < materialsControl.length; i++) {
       let materialFile = materialsControl.value[i];
 
-
-
       if (!materialFile.creatorId) {
-
-        materialsData.append(
-          'lastUpdates[]',
-          (materialFile as Material).lastUpdate
-        );
         materialsData.append('names[]', (materialFile as Material).name);
         materialsData.append(
           'fileTypes[]',
@@ -111,7 +104,6 @@ export class CourseMaterialsService {
         );
       }
     }
-
 
     // const params = new HttpParams();
 
@@ -130,14 +122,12 @@ export class CourseMaterialsService {
         }>(`${BACKEND_URL}/${id}/materials`, materialsData, options)
         .pipe(
           map((materialsFileData) => {
-
             return {
               fetchedMaterialFiles: materialsFileData.fetchedMaterialFiles.map(
                 (materialFile) => {
                   return {
                     id: materialFile.id,
                     name: materialFile.name,
-                    lastUpdate: materialFile.lastUpdate,
                     filePath: materialFile.filePath,
                     fileType: materialFile.fileType,
                     assignmentId: materialFile.assignmentId,
@@ -151,7 +141,7 @@ export class CourseMaterialsService {
   }
 
   updateCourseMaterial(currentMaterial: Material) {
-    const { id, name, filePath, fileType, lastUpdate, assignmentId, courseId } =
+    const { id, name, filePath, fileType, assignmentId, courseId } =
       currentMaterial;
 
     let materialData: Material | FormData;
@@ -163,16 +153,14 @@ export class CourseMaterialsService {
       // the 3rd argument is the filename we pass to the backend
       materialData.append('filePath', filePath as File, name.split('.')[0]);
       materialData.append('fileType', (filePath as File).type);
-      materialData.append('lastUpdate', lastUpdate);
-      materialData.append('lastUpdate', assignmentId);
-      materialData.append('lastUpdate', courseId);
+      materialData.append('assignmentId', assignmentId);
+      materialData.append('courseId', courseId);
     } else {
       materialData = {
         id,
         name,
         filePath,
         fileType,
-        lastUpdate,
         courseId,
         assignmentId,
       };
@@ -188,7 +176,6 @@ export class CourseMaterialsService {
   }
 
   deleteCourseMaterial(material: Material) {
-
     return this.http.delete(
       `${BACKEND_URL}/${material.courseId}/materials/${material.id}`,
       {

@@ -71,11 +71,10 @@ export const createStudentDelivery = catchAsync(
     let studentDeliveryFiles: StudentDeliveryFileDoc[] = [];
 
     // 5) iterate through the files and build a db model for each
-    const { names, lastUpdates, fileTypes, comment } = req.body;
+    const { names, fileTypes, comment } = req.body;
 
     for (let i = 0; i < req.files.length; i++) {
       const name = names[i];
-      const lastUpdate = lastUpdates[i];
       const filePath = `api/courses/public/student-deliveries/${req.files[i].filename}`;
       const fileType = fileTypes[i];
 
@@ -83,7 +82,6 @@ export const createStudentDelivery = catchAsync(
         name,
         filePath,
         fileType,
-        lastUpdate,
         courseId,
         assignmentId,
         studentDeliveryAssignmentId,
@@ -241,10 +239,10 @@ export const updateStudentDeliveryAssignment = catchAsync(
 
     console.log(req.body);
 
-    const { lastUpdate, rank } = req.body;
+    const { rank } = req.body;
 
     const filter = { _id: deliveryId };
-    const update = { rank, lastUpdate };
+    const update = { rank };
 
     await StudentDeliveryAssignment.updateOne(
       // matching requirements

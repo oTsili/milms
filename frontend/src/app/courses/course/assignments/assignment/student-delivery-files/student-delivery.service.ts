@@ -25,7 +25,7 @@ export class StudentDeliveriesService {
     studentDeliveriesCount: number;
   }>();
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private sharedService: SharedService) {}
 
   getStudentDeliverieslListener() {
     return this.studentDeliveriesListener.asObservable();
@@ -69,7 +69,9 @@ export class StudentDeliveriesService {
                       name: studentDelivery.name,
                       filePath: studentDelivery.filePath,
                       fileType: studentDelivery.fileType,
-                      lastUpdate: studentDelivery.lastUpdate,
+                      lastUpdate: this.sharedService.toHumanDateTime(
+                        studentDelivery.lastUpdate
+                      ),
                       assignmentId: studentDelivery.assignmentId,
                       courseId: studentDelivery.courseId,
                       id: studentDelivery.id,
@@ -103,10 +105,6 @@ export class StudentDeliveriesService {
       let studentDeliveryFile = studentDeliveriesControl.value[i];
 
       if (!studentDeliveryFile.creatorId) {
-        studentDeliveriesData.append(
-          'lastUpdates[]',
-          (studentDeliveryFile as StudentDeliveryFile).lastUpdate
-        );
         studentDeliveriesData.append(
           'names[]',
           (studentDeliveryFile as StudentDeliveryFile).name
@@ -151,7 +149,6 @@ export class StudentDeliveriesService {
                     return {
                       id: studentDeliveriesFile.id,
                       name: studentDeliveriesFile.name,
-                      lastUpdate: studentDeliveriesFile.lastUpdate,
                       filePath: studentDeliveriesFile.filePath,
                       fileType: studentDeliveriesFile.fileType,
                       courseId: studentDeliveriesFile.courseId,
@@ -182,7 +179,6 @@ export class StudentDeliveriesService {
         name.split('.')[0]
       );
       studentDeliveriesData.append('fileType', (filePath as File).type);
-      studentDeliveriesData.append('lastUpdate', lastUpdate);
       studentDeliveriesData.append('assignmentId', assignmentId as string);
       studentDeliveriesData.append('courseId', courseId);
     } else {
@@ -191,7 +187,6 @@ export class StudentDeliveriesService {
         name,
         filePath,
         fileType,
-        lastUpdate,
         courseId,
         assignmentId: assignmentId as string,
       };

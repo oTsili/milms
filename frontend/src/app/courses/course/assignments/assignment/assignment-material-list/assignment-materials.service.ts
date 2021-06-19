@@ -24,7 +24,7 @@ export class AssignmentMaterialsService {
     materialCount: number;
   }>();
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private sharedService: SharedService) {}
 
   getAssignmentMaterialListener() {
     return this.materialsListener.asObservable();
@@ -62,7 +62,8 @@ export class AssignmentMaterialsService {
                     name: material.name,
                     filePath: material.filePath,
                     fileType: material.fileType,
-                    lastUpdate: material.lastUpdate,
+                    lastUpdate:
+                      this.sharedService.toHumanDateTime(material.lastUpdate),
                     assignmentId: material.assignmentId,
                     courseId: material.courseId,
                     id: material.id,
@@ -99,10 +100,6 @@ export class AssignmentMaterialsService {
 
       if (!materialFile.creatorId) {
 
-        materialsData.append(
-          'lastUpdates[]',
-          (materialFile as Material).lastUpdate
-        );
         materialsData.append('names[]', (materialFile as Material).name);
         materialsData.append(
           'fileTypes[]',
@@ -145,7 +142,6 @@ export class AssignmentMaterialsService {
                   return {
                     id: materialFile.id,
                     name: materialFile.name,
-                    lastUpdate: materialFile.lastUpdate,
                     filePath: materialFile.filePath,
                     fileType: materialFile.fileType,
                     assignmentId: materialFile.assignmentId,
@@ -171,7 +167,6 @@ export class AssignmentMaterialsService {
       // the 3rd argument is the filename we pass to the backend
       materialData.append('filePath', filePath as File, name.split('.')[0]);
       materialData.append('fileType', (filePath as File).type);
-      materialData.append('lastUpdate', lastUpdate);
       materialData.append('assignmentId', assignmentId);
       materialData.append('courseId', courseId);
     } else {
@@ -180,7 +175,6 @@ export class AssignmentMaterialsService {
         name,
         filePath,
         fileType,
-        lastUpdate,
         courseId,
         assignmentId,
       };

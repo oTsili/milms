@@ -6,6 +6,7 @@ import { Assignment } from 'src/app/models/assignment.model';
 import { environment } from 'src/environments/environment';
 import { map } from 'rxjs/operators';
 import { User } from 'src/app/models/auth-data.model';
+import { SharedService } from 'src/app/shared/services/shared.service';
 
 const BACKEND_URL = environment.COURSES_BASE_URL + '/api/courses';
 
@@ -15,7 +16,7 @@ export class AssignmentsService {
     assignments: Assignment[];
     maxAssignments: number;
   }>();
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private sharedService: SharedService) {}
 
   /////// Subscriptions /////////
 
@@ -66,7 +67,9 @@ export class AssignmentsService {
                 id: assignment.id,
                 filePath: assignment.filePath,
                 fileType: assignment.fileType,
-                lastUpdate: assignment.lastUpdate,
+                lastUpdate: this.sharedService.toHumanDateTime(
+                  assignment.lastUpdate
+                ),
                 instructor,
               };
             }),
@@ -94,7 +97,7 @@ export class AssignmentsService {
       filePath,
       fileType,
       instructorId,
-      lastUpdate,
+  
       // position,
     } = assignment;
 
