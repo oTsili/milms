@@ -3,6 +3,7 @@ import { User } from './auth-data.model';
 import { Assignment } from './assignment.model';
 
 export interface StudentDeliveryAssignment {
+  position?: number;
   id?: string;
   name: string;
   lastUpdate?: string;
@@ -12,8 +13,6 @@ export interface StudentDeliveryAssignment {
   assignmentId?: Assignment | string;
   instructorId?: User | string;
   studentName?: string;
-  comment?: string;
-  children?: StudentDeliveryAssignment[];
 }
 
 export interface StudentDeliveryFile {

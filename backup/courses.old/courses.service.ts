@@ -3,9 +3,9 @@ import { Injectable } from '@angular/core';
 import { FormArray } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { environment } from '../../environments/environment.prod';
-import { Course } from '../models/course.model';
-import { SharedService } from '../shared/services/shared.service';
+import { environment } from '../../frontend/src/environments/environment.prod';
+import { Course } from '../../frontend/src/app/models/course.model';
+import { SharedService } from '../../frontend/src/app/shared/services/shared.service';
 
 const BACKEND_URL = environment.COURSES_BASE_URL + '/api/courses';
 

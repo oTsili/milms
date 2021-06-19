@@ -13,4 +13,5 @@ export interface DialogData {
   instructor?: string;
   lastUpdate?: string;
   currentControl?: AbstractControl;
+  rank?: number;
 }

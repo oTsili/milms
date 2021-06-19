@@ -22,7 +22,7 @@ import { StudentDeliveryAssignment } from 'src/app/models/student-delivery.model
 import { CoursesService } from 'src/app/courses/courses.service';
 import { Course } from 'src/app/models/course.model';
 import { AssignmentMaterialsService } from 'src/app/courses/course/assignments/assignment/assignment-material-list/assignment-materials.service';
-import { StudentDeliveriesService } from 'src/app/courses/course/assignments/assignment/student-deliveries-list/student-delivery.service';
+import { StudentDeliveriesService } from 'src/app/courses/course/assignments/assignment/student-delivery-files/student-delivery.service';
 
 @Component({
   selector: 'app-dragAndDrop',
@@ -145,6 +145,7 @@ export class DragAndDropComponent implements OnInit {
    * handle file from browsing
    */
   fileBrowseHandler(files) {
+    console.log(this.component);
     if (this.component === 'material') {
       this.prepareMaterialFilesList(files);
     } else if (this.component === 'student-delivery') {

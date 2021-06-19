@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
-import { SharedService } from '../shared/services/shared.service';
+import { SharedService } from '../../frontend/src/app/shared/services/shared.service';
 import { Sort } from '@angular/material/sort';
-import { Course, Task, Year } from '../models/course.model';
+import { Course, Task, Year } from '../../frontend/src/app/models/course.model';
 import { CoursesService } from './courses.service';
 import {
   FormArray,
@@ -14,7 +14,7 @@ import {
 import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 import { MediaMatcher } from '@angular/cdk/layout';
-import { HeaderService } from '../header/header.service';
+import { HeaderService } from '../../frontend/src/app/header/header.service';
 
 @Component({
   selector: 'app-courses',

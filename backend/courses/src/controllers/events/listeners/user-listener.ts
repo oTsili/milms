@@ -161,7 +161,6 @@ export class UserUpdateListener extends Listener<UserUpdateEvent> {
   queueGroupName = 'update';
 
   async onMessage(data: UserUpdateEvent['data'], msg: Message) {
-    console.log(data);
     const { id, firstName, lastName, email, role, time } = data;
 
     let updatedUser = await User.updateOne(
@@ -177,7 +176,7 @@ export class UserUpdateListener extends Listener<UserUpdateEvent> {
     );
 
     // console.log('updatedUser: ', updatedUser);
-    
+
     // TODO: create a 'role' row in the RIAK table and include it in the eventUser below
 
     // filter the user information to be saved in RIAK DB as event

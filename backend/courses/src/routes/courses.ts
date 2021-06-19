@@ -184,6 +184,16 @@ router.post(
   StudentDeliveriesController.downloadStudentDeliveryFile
 );
 
+/////////////// Student Delivery Assignments ///////////////
+router.get(
+  '/:courseId/assignments/:assignmentId/student-delivery-assignments',
+  currentUser,
+  requireAuth,
+  StudentDeliveriesController.getStudentDeliveryAssignments
+);
+
+/////////////// Events ///////////////
+
 router.post(
   '/events',
   currentUser,

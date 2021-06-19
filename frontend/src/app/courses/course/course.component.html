@@ -21,6 +21,11 @@
     label="Assignments"
     color="primary"
     matTooltip="upload your assignment delivery"
-    ><app-assignments></app-assignments>
+    ><app-instructor-assignments
+      *ngIf="userRole === 'instructor' || userRole === 'admin'"
+    ></app-instructor-assignments>
+    <app-student-assignments
+      *ngIf="userRole === 'student'"
+    ></app-student-assignments>
   </mat-tab>
 </mat-tab-group>

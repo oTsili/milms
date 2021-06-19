@@ -84,12 +84,4 @@ export class SharedService {
     ];
     this.dialog.open(NotificationComponent, { data: currentError });
   }
-
-  setUerRolelocally(role: string) {
-    this.user_role = role;
-  }
-
-  getLocallyUserRole() {
-    return this.user_role;
-  }
 }

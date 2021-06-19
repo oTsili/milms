@@ -14,6 +14,7 @@ import { PdfViewerComponent } from './pdf-viewer/pdf-viewer.component';
 import { CourseTableLineomponent } from './matDialog/courseTableLine/courseTableLine.component';
 import { AssignmentTableLineComponent } from './matDialog/assignmentTableLine/assignmentTableLine.component';
 import { fileTableLineComponent } from './matDialog/fileTableLine/fileTableLine.component';
+import { RankTableLineomponent } from './matDialog/rankTableLine/rankTableLine.component';
 
 @NgModule({
   declarations: [
@@ -23,6 +24,7 @@ import { fileTableLineComponent } from './matDialog/fileTableLine/fileTableLine.
     CourseTableLineomponent,
     AssignmentTableLineComponent,
     fileTableLineComponent,
+    RankTableLineomponent,
   ],
   imports: [
     ReactiveFormsModule,

@@ -151,21 +151,60 @@ export const getStudentDeliveries = catchAsync(
         });
       }
     }
+  }
+);
 
-    let fetchedStudentDeliveryFiles = await studentDeliveryFilesQuery
-      .populate('studentDeliveryAssignmentId')
-      .populate('assignmentId')
-      .populate('studentId');
+export const getStudentDeliveryAssignments = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const courseId = req.params.courseId;
+    const assignmentId = req.params.assignmentId;
+    const userId = req.currentUser!.id;
 
-    let countStudentDeliveryFile = await StudentDeliveryFile.countDocuments({
-      assignmentId,
-      courseId,
-    });
+    // get user role
+    const user = await User.findById(userId);
+
+    let studentDeliveryAssignmentsQuery;
+    let countStudentDeliveryAssignments;
+
+    if (user) {
+      if (user.role === 'admin' || user.role === 'instructor') {
+        studentDeliveryAssignmentsQuery = StudentDeliveryAssignment.find({
+          assignmentId,
+          courseId,
+        });
+
+        countStudentDeliveryAssignments =
+          await StudentDeliveryAssignment.countDocuments({
+            assignmentId,
+            courseId,
+          });
+      } else if (user.role === 'student') {
+        studentDeliveryAssignmentsQuery = StudentDeliveryAssignment.find({
+          assignmentId,
+          courseId,
+          studentId: userId,
+        });
+
+        countStudentDeliveryAssignments =
+          await StudentDeliveryAssignment.countDocuments({
+            assignmentId,
+            courseId,
+            studentId: userId,
+          });
+      }
+    }
+    let fetchedStudentDeliveryAssignments =
+      await studentDeliveryAssignmentsQuery
+        .populate('instructorId')
+        .populate('studentId')
+        .populate('instructorId')
+        .populate('courseId');
 
     res.status(200).json({
-      message: "Assignment's total studentDeliveryFiles fetched successfully!",
-      fetchedStudentDeliveryFiles,
-      countStudentDeliveryFile,
+      message:
+        "Assignment's total StudentDeliveryAssignments fetched successfully!",
+      fetchedStudentDeliveryAssignments,
+      countStudentDeliveryAssignments,
     });
   }
 );

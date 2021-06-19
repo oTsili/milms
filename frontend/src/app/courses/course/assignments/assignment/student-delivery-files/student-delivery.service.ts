@@ -57,7 +57,7 @@ export class StudentDeliveriesService {
       )
       .pipe(
         map((studentDeliveriesData) => {
-
+          console.log(studentDeliveriesData);
           if (studentDeliveriesData.fetchedStudentDeliveryFiles) {
             return {
               studentDeliveries:
@@ -94,7 +94,6 @@ export class StudentDeliveriesService {
     assignmentId: string,
     studentDeliveriesControl: FormArray
   ) {
-
     const studentDeliveriesData = new FormData();
 
     studentDeliveriesData.append('courseId', courseId as string);
@@ -104,10 +103,7 @@ export class StudentDeliveriesService {
     for (let i = 0; i < studentDeliveriesControl.length; i++) {
       let studentDeliveryFile = studentDeliveriesControl.value[i];
 
-
-
       if (!studentDeliveryFile.creatorId) {
-
         studentDeliveriesData.append(
           'lastUpdates[]',
           (studentDeliveryFile as StudentDeliveryFile).lastUpdate
@@ -127,7 +123,6 @@ export class StudentDeliveriesService {
         );
       }
     }
-
 
     // const params = new HttpParams();
 
@@ -150,7 +145,6 @@ export class StudentDeliveriesService {
         )
         .pipe(
           map((studentDeliveriesFileData) => {
-
             return {
               fetchedStudentDeliveryFiles:
                 studentDeliveriesFileData.fetchedStudentDeliveryFiles.map(
@@ -217,7 +211,6 @@ export class StudentDeliveriesService {
   }
 
   deleteStudentDelivery(studentDelivery: StudentDeliveryFile) {
-
     return this.http.delete(
       `${BACKEND_URL}/${studentDelivery.courseId}/assignments/${studentDelivery.assignmentId}/student-deliveries/${studentDelivery.id}`,
       {

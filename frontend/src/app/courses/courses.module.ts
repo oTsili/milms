@@ -12,10 +12,11 @@ import { CourseComponent } from 'src/app/courses/course/course.component';
 import { CourseMaterialListComponent } from 'src/app/courses/course/course-material-list/course-material-list.component';
 import { StudentAssignmentsComponent } from 'src/app/courses/course/assignments/student-assignments/student-assignments.component';
 import { InstructorAssignmentsComponent } from 'src/app/courses/course/assignments/instructor-assignments/instructor-assignments.component';
-import { AssignmentsComponent } from 'src/app/courses/course/assignments/assignments.component';
+
 import { AssignmentComponent } from './course/assignments/assignment/assignment.component';
 import { AssignmentMaterialsComponent } from './course/assignments/assignment/assignment-material-list/assignment-material-list.component';
-import { StudentDeliveryListComponent } from './course/assignments/assignment/student-deliveries-list/student-deliveries-list.component';
+import { StudentDeliveryFilesComponent } from './course/assignments/assignment/student-delivery-files/student-delivery-files.component';
+import { StudentDeliveryAssignmentsComponent } from './course/assignments/assignment/student-delivery-assignments/student-delivery-assignments.component';
 
 @NgModule({
   declarations: [
@@ -26,10 +27,10 @@ import { StudentDeliveryListComponent } from './course/assignments/assignment/st
     CourseMaterialListComponent,
     StudentAssignmentsComponent,
     InstructorAssignmentsComponent,
-    AssignmentsComponent,
     AssignmentComponent,
     AssignmentMaterialsComponent,
-    StudentDeliveryListComponent,
+    StudentDeliveryFilesComponent,
+    StudentDeliveryAssignmentsComponent,
   ],
   imports: [
     ReactiveFormsModule,

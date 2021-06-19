@@ -20,12 +20,38 @@
   ></mat-tab>
 
   <mat-tab label="Deliveries">
-    <app-student-delivery-list></app-student-delivery-list
+    <app-student-delivery-files
+      *ngIf="userRole"
+      [user_role]="userRole"
+      [displayedColumns]="
+        userRole === 'admin' || userRole === 'instructor'
+          ? ['position', 'name', 'studentName', 'lastUpdate', 'options']
+          : ['position', 'name', 'lastUpdate', 'options']
+      "
+    ></app-student-delivery-files
   ></mat-tab>
   <mat-tab *ngIf="userRole === 'student'" label="Upload Delivery">
     <app-dragAndDrop
       [component]="'student-delivery'"
       [parentComponent]="'assignment'"
     ></app-dragAndDrop
+  ></mat-tab>
+  <mat-tab label="Ranks">
+    <app-student-delivery-assignments
+      [user_role]="userRole"
+      [displayedColumns]="
+        userRole === 'admin' || userRole === 'instructor'
+          ? [
+              'position',
+              'studentName',
+              'assignmentName',
+              'lastUpdate',
+              'rank',
+              'options'
+            ]
+          : ['position', 'assignmentName', 'lastUpdate', 'rank', 'options']
+      "
+      *ngIf="userRole && (userRole === 'instructor' || userRole === 'admin')"
+    ></app-student-delivery-assignments
   ></mat-tab>
 </mat-tab-group>

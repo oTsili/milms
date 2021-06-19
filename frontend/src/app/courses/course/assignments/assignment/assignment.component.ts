@@ -65,7 +65,7 @@ export class AssignmentComponent implements OnInit, OnDestroy {
 
     this.sharedService.getUserRole().subscribe((response) => {
       this.userRole = response.userRole;
-      this.sharedService.setUerRolelocally(this.userRole);
+      console.log(this.userRole);
     });
     this.userRoleSubscription = this.sharedService
       .getUserRoleListener()
@@ -79,7 +79,6 @@ export class AssignmentComponent implements OnInit, OnDestroy {
   }
 
   updateMatBreadcrumb(assignment: Assignment) {
-
     this.coursesService
       .getCourse(assignment.courseId as string)
       .subscribe((response) => {
