@@ -81,3 +81,8 @@ ul {
   outline: 3px solid #c58f55;
   outline-offset: 3px;
 }
+
+.flex-center {
+  display: flex;
+  justify-content: center;
+}

@@ -88,7 +88,6 @@ export const updateAssignment = catchAsync(
       _id: req.params.assignmentId,
       title: req.body.title,
       description: req.body.description,
-      lastUpdate: toHumanDateTime(new Date()),
       instructorId: userId,
       filePath: newFilePath,
       fileType: fileType,

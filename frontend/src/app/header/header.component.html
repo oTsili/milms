@@ -17,9 +17,14 @@
       >
     </li>
 
-    <li *ngIf="userIsAuthenticated">
+    <li *ngIf="userIsAuthenticated" class="flex-center">
       <button mat-button routerLink="/courses" routerLinkActive="mat-accent">
         Courses
+      </button>
+    </li>
+    <li *ngIf="userIsAuthenticated" class="flex-center">
+      <button mat-button routerLink="/events" routerLinkActive="mat-accent">
+        Events
       </button>
     </li>
 
@@ -32,11 +37,9 @@
 </mat-toolbar>
 
 <mat-menu #personalOptions="matMenu">
+  <div id="userName" *ngIf="usrName">{{ usrName.split(' ')[0] }}</div>
   <hr />
   <div id="navPersonal">
-    <button mat-menu-item routerLink="/events" routerLinkActive="mat-accent">
-      Events
-    </button>
     <button mat-menu-item [matMenuTriggerFor]="testPreferences">
       Preferences
     </button>
@@ -46,7 +49,11 @@
 
 <mat-menu #testPreferences="matMenu">
   <div>
-    <button mat-menu-item (click)="onUserRoleUpdate('admin')">Become Admin</button>
-    <button mat-menu-item (click)="onUserRoleUpdate('student')">Become Student</button>
+    <button mat-menu-item (click)="onUserRoleUpdate('admin')">
+      Become Admin
+    </button>
+    <button mat-menu-item (click)="onUserRoleUpdate('student')">
+      Become Student
+    </button>
   </div>
 </mat-menu>

@@ -34,7 +34,6 @@ export const createCourseMaterials = catchAsync(
 
     for (let i = 0; i < req.files.length; i++) {
       const name = names[i];
-      const lastUpdate = lastUpdates[i];
       const filePath = `api/courses/public/course-materials/${req.files[i].filename}`;
       const fileType = fileTypes[i];
 
@@ -42,7 +41,6 @@ export const createCourseMaterials = catchAsync(
         name,
         filePath,
         fileType,
-        lastUpdate,
         courseId,
         creatorId,
       });
@@ -169,11 +167,10 @@ export const createAssignmentMaterials = catchAsync(
     let materialFiles: MaterialDoc[] = [];
 
     // 5) iterate through the files and build a db model for each
-    const { names, lastUpdates, fileTypes } = req.body;
+    const { names, fileTypes } = req.body;
 
     for (let i = 0; i < req.files.length; i++) {
       const name = names[i];
-      const lastUpdate = lastUpdates[i];
       const filePath = `api/courses/public/assignment-materials/${req.files[i].filename}`;
       const fileType = fileTypes[i];
 
@@ -181,7 +178,6 @@ export const createAssignmentMaterials = catchAsync(
         name,
         filePath,
         fileType,
-        lastUpdate,
         courseId,
         assignmentId,
         creatorId,
