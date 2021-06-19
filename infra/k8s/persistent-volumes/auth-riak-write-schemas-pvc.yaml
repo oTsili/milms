@@ -1,0 +1,28 @@
+#### Auth RIAK-quey  Schemas #####
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: auth-riak-write-schemas-pv
+spec:
+  # persistentVolumeReclaimPolicy: Retain
+  storageClassName: auth-riak-write-schemas-class
+  capacity:
+    storage: 50Mi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: /mnt/milms/riak/auth/riak-write/schemas
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: auth-riak-write-schemas-pvc
+  labels:
+    app: auth-riak-write-schemas-pvc
+spec:
+  storageClassName: auth-riak-write-schemas-class
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 50Mi

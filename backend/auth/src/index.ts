@@ -4,8 +4,37 @@ import { catchAsync } from '@otmilms/common';
 
 import { natsWrapper } from './nats-wrapper';
 import { riakWrapper } from './riak-wrapper';
-import { AssignmentCreateListener } from './controllers/events/listeners/assignment-listener';
+import {
+  AssignmentCreateListener,
+  AssignmentDeleteListener,
+  AssignmentUpdateListener,
+} from './controllers/events/listeners/assignment.listener';
 import { app } from './app';
+import {
+  CourseCreateListener,
+  CourseDeleteListener,
+  CourseUpdateListener,
+} from './controllers/events/listeners/course.listener';
+import {
+  CourseMaterialUpdateListener,
+  CourseMaterialCreateListener,
+  CourseMaterialDeleteListener,
+} from './controllers/events/listeners/course-material.listener';
+import {
+  AssignmentMaterialCreateListener,
+  AssignmentMaterialDeleteListener,
+  AssignmentMaterialUpdateListener,
+} from './controllers/events/listeners/assignment-material.listener';
+import {
+  StudentDeliveryAssignmentCreateListener,
+  StudentDeliveryAssignmentDeleteListener,
+  StudentDeliveryAssignmentUpdateListener,
+} from './controllers/events/listeners/student-delivery-assignment.listener';
+import {
+  StudentDeliveryFileCreateListener,
+  StudentDeliveryFileDeleteListener,
+  StudentDeliveryFileUpdateListener,
+} from './controllers/events/listeners/student-delivery-file.listener';
 
 logger.remove(logger.transports.Console);
 logger.add(logger.transports.Console, {
@@ -83,8 +112,42 @@ const start = async () => {
     });
   });
 
+  // intitialize an event listener for every new assignment-material:create event
+  new AssignmentMaterialCreateListener(natsWrapper.client).listen();
+  // intitialize an event listener for every new assignment-material:update event
+  new AssignmentMaterialUpdateListener(natsWrapper.client).listen();
+  // intitialize an event listener for every new assignment-material:delete event
+  new AssignmentMaterialDeleteListener(natsWrapper.client).listen();
   // intitialize an event listener for every new assignment-create event
   new AssignmentCreateListener(natsWrapper.client).listen();
+  // intitialize an event listener for every new assignment-update event
+  new AssignmentUpdateListener(natsWrapper.client).listen();
+  // intitialize an event listener for every new assignment-dekete event
+  new AssignmentDeleteListener(natsWrapper.client).listen();
+  // intitialize an event listener for every new course-material-create event
+  new CourseMaterialCreateListener(natsWrapper.client).listen();
+  // intitialize an event listener for every new course-material-update event
+  new CourseMaterialUpdateListener(natsWrapper.client).listen();
+  // intitialize an event listener for every new course-material-delete event
+  new CourseMaterialDeleteListener(natsWrapper.client).listen();
+  // intitialize an event listener for every new course-create event
+  new CourseCreateListener(natsWrapper.client).listen();
+  // intitialize an event listener for every new course-update event
+  new CourseUpdateListener(natsWrapper.client).listen();
+  // intitialize an event listener for every new course-delete event
+  new CourseDeleteListener(natsWrapper.client).listen();
+  // intitialize an event listener for every new student-delivery-assignment-create event
+  new StudentDeliveryAssignmentCreateListener(natsWrapper.client).listen();
+  // intitialize an event listener for every new student-delivery-assignment-update event
+  new StudentDeliveryAssignmentUpdateListener(natsWrapper.client).listen();
+  // intitialize an event listener for every new student-delivery-assignment-delete event
+  new StudentDeliveryAssignmentDeleteListener(natsWrapper.client).listen();
+  // intitialize an event listener for every new  student-delivery-assignment-create event
+  new StudentDeliveryFileCreateListener(natsWrapper.client).listen();
+  // intitialize an event listener for every new  student-delivery-assignment-update event
+  new StudentDeliveryFileUpdateListener(natsWrapper.client).listen();
+  // intitialize an event listener for every new  student-delivery-assignment-delete event
+  new StudentDeliveryFileDeleteListener(natsWrapper.client).listen();
 
   // connet to mongoose/MongoDB
   await mongoose.connect(process.env.MONGO_URI, {

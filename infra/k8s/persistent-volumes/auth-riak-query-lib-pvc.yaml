@@ -1,0 +1,28 @@
+#####  Auth RIAK - query lib #####
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: auth-riak-query-pv
+spec:
+  # persistentVolumeReclaimPolicy: Retain
+  storageClassName: auth-riak-query-class
+  capacity:
+    storage: 200Mi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: /mnt/milms/riak/auth/riak-query/lib
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: auth-riak-query-pvc
+  labels:
+    app: auth-riak-query-pvc
+spec:
+  storageClassName: auth-riak-query-class
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 200Mi

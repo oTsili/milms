@@ -9,20 +9,31 @@ import {
 } from '../models/assignment';
 import { MaterialModel, MaterialDoc, materialSchema } from './material';
 import {
-  StudentDeliveryModel,
-  StudentDeliveryDoc,
-  studentDeliverySchema,
-} from './studentDelivery';
+  StudentDeliveryAssignmentModel,
+  StudentDeliveryAssignmentDoc,
+  StudentDeliveryAssignmentSchema,
+} from './studentDeliveryAssignment';
+import {
+  StudentDeliveryFileModel,
+  StudentDeliveryFileDoc,
+  StudentDeliveryFileSchema,
+} from './studentDeliveryFile';
 
 // Register all the mongoose schemas together
 const Assignment = mongoose.model<AssignmentDoc, AssignmentModel>(
   'Assignment',
   assignmentSchema
 );
-const StudentDelivery = mongoose.model<
-  StudentDeliveryDoc,
-  StudentDeliveryModel
->('StudentDelivery', studentDeliverySchema);
+const StudentDeliveryAssignment = mongoose.model<
+  StudentDeliveryAssignmentDoc,
+  StudentDeliveryAssignmentModel
+>('StudentDeliveryAssignment', StudentDeliveryAssignmentSchema);
+
+const StudentDeliveryFile = mongoose.model<
+  StudentDeliveryFileDoc,
+  StudentDeliveryFileModel
+>('StudentDeliveryFile', StudentDeliveryFileSchema);
+
 const User = mongoose.model<UserDoc, UserModel>('User', userSchema);
 
 const Course = mongoose.model<CourseDoc, CourseModel>('Course', courseSchema);
@@ -32,4 +43,11 @@ const Material = mongoose.model<MaterialDoc, MaterialModel>(
   materialSchema
 );
 
-export { Course, User, Assignment, StudentDelivery, Material };
+export {
+  Course,
+  User,
+  Assignment,
+  StudentDeliveryAssignment,
+  StudentDeliveryFile,
+  Material,
+};

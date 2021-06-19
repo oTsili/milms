@@ -4,7 +4,8 @@ import { Course } from './models';
 // An interface that describes the properties
 // that are requried to create a new Course
 export interface CourseAttrs {
-  courseTitle: string;
+  id: string;
+  title: string;
   description: string;
   semester: string;
   year: string;
@@ -21,7 +22,8 @@ export interface CourseModel extends mongoose.Model<CourseDoc> {
 // An interface that describes the properties
 // that a Course Document has
 export interface CourseDoc extends mongoose.Document {
-  courseTitle: string;
+  id: string;
+  title: string;
   description: string;
   semester: string;
   year: string;
@@ -31,7 +33,7 @@ export interface CourseDoc extends mongoose.Document {
 
 export const courseSchema = new mongoose.Schema(
   {
-    courseTitle: {
+    title: {
       type: String,
       required: true,
     },

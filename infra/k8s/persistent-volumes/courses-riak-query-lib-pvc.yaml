@@ -1,0 +1,31 @@
+---
+### courses RIAK-quey #####
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: courses-riak-query-pv
+spec:
+  # persistentVolumeReclaimPolicy: Retain
+  storageClassName: courses-riak-query-class
+  capacity:
+    storage: 200Mi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: /mnt/milms/riak/courses/riak-query/lib
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: courses-riak-query-pvc
+  labels:
+    app: courses-riak-query-pvc
+spec:
+  storageClassName: courses-riak-query-class
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 200Mi
+---
+

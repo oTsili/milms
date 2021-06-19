@@ -1,0 +1,29 @@
+#### courses RIAK - write #####
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: courses-riak-write-pv
+spec:
+  # persistentVolumeReclaimPolicy: Retain
+  storageClassName: courses-riak-write-class
+  capacity:
+    storage: 200Mi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    # path: '/hosthome/odysseas/milms-mnt/courses/files'
+    path: /mnt/milms/riak/courses/riak-write/lib
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: courses-riak-write-pvc
+  labels:
+    app: courses-riak-write-pvc
+spec:
+  storageClassName: courses-riak-write-class
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 200Mi

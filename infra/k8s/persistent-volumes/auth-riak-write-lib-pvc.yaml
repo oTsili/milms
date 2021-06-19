@@ -1,0 +1,29 @@
+#### Auth RIAK - write #####
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: auth-riak-write-pv
+spec:
+  # persistentVolumeReclaimPolicy: Retain
+  storageClassName: auth-riak-write-class
+  capacity:
+    storage: 200Mi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    # path: '/hosthome/odysseas/milms-mnt/auth/files'
+    path: /mnt/milms/riak/auth/riak-write/lib
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: auth-riak-write-pvc
+  labels:
+    app: auth-riak-write-pvc
+spec:
+  storageClassName: auth-riak-write-class
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 200Mi
