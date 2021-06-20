@@ -1,7 +1,6 @@
 import mongoose from 'mongoose';
 import { Assignment } from './models';
 import { MaterialDoc } from './material';
-import { StudentDeliveryDoc } from '../models/studentDelivery';
 
 // An interface that describes the properties
 // that are requried to create a new Assignment
@@ -11,12 +10,9 @@ export interface AssignmentAttrs {
   description?: string;
   // filePath: string;
   // fileType: string;
-  creatorId?: string;
+  instructorId?: string;
   courseId?: string;
   lastUpdate: Date;
-  rank?: number;
-  studentDeliveries?: StudentDeliveryDoc[];
-  materials?: MaterialDoc[];
 }
 
 // An interface that describes the properties
@@ -32,14 +28,9 @@ export interface AssignmentDoc extends mongoose.Document {
   description?: string;
   // filePath: string;
   // fileType: string;
-  lastUpdate: Date;
-  createdAt: Date;
-  rank?: number;
-  creatorId: string;
+  instructorId: string;
   courseId: string;
-  graderId?: string;
-  studentDeliveries?: StudentDeliveryDoc[];
-  materials?: MaterialDoc[];
+  lastUpdate: Date;
 }
 
 export const assignmentSchema = new mongoose.Schema(
@@ -60,15 +51,8 @@ export const assignmentSchema = new mongoose.Schema(
       type: String,
       // required: true,
     },
-    lastUpdate: {
-      type: Date,
-      default: Date.now(),
-    },
-    createdAt: {
-      type: Date,
-    },
-    rank: { type: Number },
-    creatorId: {
+
+    instructorId: {
       // required: true,
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
@@ -78,9 +62,9 @@ export const assignmentSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Course',
     },
-    graderId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+    lastUpdate: {
+      type: Date,
+      default: Date.now(),
     },
   },
 
@@ -96,11 +80,5 @@ export const assignmentSchema = new mongoose.Schema(
 );
 
 assignmentSchema.statics.build = (attrs: AssignmentAttrs) => {
-  return new Assignment({
-    _id: attrs.id,
-    title: attrs.title,
-    description: attrs.description,
-    lastUpdate: attrs.lastUpdate,
-    rank: attrs.rank,
-  });
+  return new Assignment(attrs);
 };

@@ -52,7 +52,7 @@ export const createAssignment = catchAsync(
         id: createdAssignment.id!,
         title: createdAssignment.title,
         description: createdAssignment.description!,
-        lastUpdate: toHumanDateTime(createdAssignment.lastUpdate!),
+        lastUpdate: createdAssignment.lastUpdate!,
         // rank: createdAssignment.rank!, // TODO: delete the rank, update the common lib, and make a subject assignment-delivery
         time: new Date(),
       });

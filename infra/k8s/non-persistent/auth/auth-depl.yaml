@@ -29,9 +29,9 @@ spec:
               mountPath: /app/src/public/img/users
           env:
             - name: QUERY_RIAK_URI
-              value: 'auth-riak-query-srv:8087'
+              value: 'auth-riak-query-coordinator-srv:8087'
             - name: WRITE_RIAK_URI
-              value: 'auth-riak-write-srv:8087'
+              value: 'auth-riak-write-coordinator-srv:8087'
             - name: MONGO_URI
               value: 'mongodb://auth-mongo-srv:27017/auth'
             - name: NATS_CLUSTER_ID

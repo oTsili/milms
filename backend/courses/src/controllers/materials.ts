@@ -32,23 +32,25 @@ export const createCourseMaterials = catchAsync(
     // 5) iterate through the files and build a db model for each
     const { names, lastUpdates, fileTypes } = req.body;
 
-    for (let i = 0; i < req.files.length; i++) {
-      const name = names[i];
-      const filePath = `api/courses/public/course-materials/${req.files[i].filename}`;
-      const fileType = fileTypes[i];
+    if (req.files) {
+      for (let i = 0; i < req.files.length; i++) {
+        const name = names[i];
+        const filePath = `api/courses/public/course-materials/${req.files[i].filename}`;
+        const fileType = fileTypes[i];
 
-      const createdStudentDeliveryFile = Material.build({
-        name,
-        filePath,
-        fileType,
-        courseId,
-        creatorId,
-      });
+        const createdStudentDeliveryFile = Material.build({
+          name,
+          filePath,
+          fileType,
+          courseId,
+          creatorId,
+        });
 
-      const updatedStudentDeliveryFile =
-        await createdStudentDeliveryFile.save();
+        const updatedStudentDeliveryFile =
+          await createdStudentDeliveryFile.save();
 
-      materialFiles.push(updatedStudentDeliveryFile);
+        materialFiles.push(updatedStudentDeliveryFile);
+      }
     }
 
     const fetchedMaterialFiles = await Material.find({
@@ -168,25 +170,26 @@ export const createAssignmentMaterials = catchAsync(
 
     // 5) iterate through the files and build a db model for each
     const { names, fileTypes } = req.body;
+    if (req.files) {
+      for (let i = 0; i < req.files.length; i++) {
+        const name = names[i];
+        const filePath = `api/courses/public/assignment-materials/${req.files[i].filename}`;
+        const fileType = fileTypes[i];
 
-    for (let i = 0; i < req.files.length; i++) {
-      const name = names[i];
-      const filePath = `api/courses/public/assignment-materials/${req.files[i].filename}`;
-      const fileType = fileTypes[i];
+        const createdStudentDeliveryFile = Material.build({
+          name,
+          filePath,
+          fileType,
+          courseId,
+          assignmentId,
+          creatorId,
+        });
 
-      const createdStudentDeliveryFile = Material.build({
-        name,
-        filePath,
-        fileType,
-        courseId,
-        assignmentId,
-        creatorId,
-      });
+        const updatedStudentDeliveryFile =
+          await createdStudentDeliveryFile.save();
 
-      const updatedStudentDeliveryFile =
-        await createdStudentDeliveryFile.save();
-
-      materialFiles.push(updatedStudentDeliveryFile);
+        materialFiles.push(updatedStudentDeliveryFile);
+      }
     }
 
     const fetchedMaterialFiles = await Material.find({

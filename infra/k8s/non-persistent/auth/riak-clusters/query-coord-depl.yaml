@@ -18,9 +18,9 @@ spec:
         - name: auth-riak-query-schemas
           persistentVolumeClaim:
             claimName: auth-riak-query-schemas-pvc
-        - name: auth-riak-query-storage
-          persistentVolumeClaim:
-            claimName: auth-riak-query-pvc
+        # - name: auth-riak-query-storage
+        #   persistentVolumeClaim:
+        #     claimName: auth-riak-query-pvc
       containers:
         - env:
             - name: CLUSTER_NAME
@@ -34,8 +34,8 @@ spec:
           volumeMounts:
             - name: auth-riak-query-schemas
               mountPath: /etc/riak/schemas
-            - name: auth-riak-query-storage
-              mountPath: /var/lib/riak
+            # - name: auth-riak-query-storage
+            #   mountPath: /var/lib/riak
       restartPolicy: Always
 ---
 apiVersion: v1

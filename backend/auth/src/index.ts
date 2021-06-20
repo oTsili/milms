@@ -67,11 +67,11 @@ const start = async () => {
     throw new Error('WRITE_RIAK_URI must be defined');
   }
 
-  // // connect to RIAK query storage singleton in a mongoose style connection
-  // await riakWrapper.connectQueryNode([process.env.QUERY_RIAK_URI]);
+  // connect to RIAK query storage singleton in a mongoose style connection
+  await riakWrapper.connectQueryNode([process.env.QUERY_RIAK_URI]);
 
-  // // connect to RIAK write storage singleton in a mongoose style connection
-  // await riakWrapper.connectWriteNode([process.env.WRITE_RIAK_URI]);
+  // connect to RIAK write storage singleton in a mongoose style connection
+  await riakWrapper.connectWriteNode([process.env.WRITE_RIAK_URI]);
 
   // connect to NATS singleton in a mongoose style
   await natsWrapper.connect(

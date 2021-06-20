@@ -72,26 +72,27 @@ export const createStudentDelivery = catchAsync(
 
     // 5) iterate through the files and build a db model for each
     const { names, fileTypes, comment } = req.body;
+    if (req.files) {
+      for (let i = 0; i < req.files.length; i++) {
+        const name = names[i];
+        const filePath = `api/courses/public/student-deliveries/${req.files[i].filename}`;
+        const fileType = fileTypes[i];
 
-    for (let i = 0; i < req.files.length; i++) {
-      const name = names[i];
-      const filePath = `api/courses/public/student-deliveries/${req.files[i].filename}`;
-      const fileType = fileTypes[i];
+        const createdStudentDeliveryFile = StudentDeliveryFile.build({
+          name,
+          filePath,
+          fileType,
+          courseId,
+          assignmentId,
+          studentDeliveryAssignmentId,
+          studentId,
+        });
 
-      const createdStudentDeliveryFile = StudentDeliveryFile.build({
-        name,
-        filePath,
-        fileType,
-        courseId,
-        assignmentId,
-        studentDeliveryAssignmentId,
-        studentId,
-      });
+        const updatedStudentDeliveryFile =
+          await createdStudentDeliveryFile.save();
 
-      const updatedStudentDeliveryFile =
-        await createdStudentDeliveryFile.save();
-
-      studentDeliveryFiles.push(updatedStudentDeliveryFile);
+        studentDeliveryFiles.push(updatedStudentDeliveryFile);
+      }
     }
 
     const fetchedStudentDeliveryFiles = await StudentDeliveryFile.find({

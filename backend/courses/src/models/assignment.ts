@@ -30,10 +30,9 @@ export interface AssignmentDoc extends mongoose.Document {
   description?: string;
   // filePath: string;
   // fileType: string;
-  lastUpdate?: Date;
-  createdAt: string;
-  courseId: string;
   instructorId?: string | UserDoc;
+  courseId: string;
+  lastUpdate?: Date;
 }
 
 export const assignmentSchema = new mongoose.Schema(

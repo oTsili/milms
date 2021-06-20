@@ -42,11 +42,12 @@ class RiakWrapper {
         if (err) {
           logger.error('RIAK Write Client could not be connected');
           reject(err);
+        } else {
+          // 'this.queryStorage' and 'c' are the same object
+          logger.info('Connected: RIAK Write Client');
+          // console.log(c);
+          resolve();
         }
-        // 'this.queryStorage' and 'c' are the same object
-        logger.info('Connected: RIAK Write Client');
-        // console.log(c);
-        resolve();
       });
     });
   }

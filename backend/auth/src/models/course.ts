@@ -61,10 +61,6 @@ export const courseSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
     },
-    assignmentId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Assignment',
-    },
   },
 
   {

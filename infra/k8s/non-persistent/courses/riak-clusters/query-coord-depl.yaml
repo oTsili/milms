@@ -18,9 +18,9 @@ spec:
         - name: courses-riak-query-schemas
           persistentVolumeClaim:
             claimName: courses-riak-query-schemas-pvc
-        - name: courses-riak-query-storage
-          persistentVolumeClaim:
-            claimName: courses-riak-query-pvc
+        # - name: courses-riak-query-storage
+        #   persistentVolumeClaim:
+        #     claimName: courses-riak-query-pvc
       containers:
         - env:
             - name: CLUSTER_NAME
@@ -34,8 +34,8 @@ spec:
           volumeMounts:
             - name: courses-riak-query-schemas
               mountPath: /etc/riak/schemas
-            - name: courses-riak-query-storage
-              mountPath: /var/lib/riak
+            # - name: courses-riak-query-storage
+            #   mountPath: /var/lib/riak
       restartPolicy: Always
 ---
 apiVersion: v1
