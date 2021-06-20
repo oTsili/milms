@@ -8,7 +8,7 @@ export interface CourseUpdatedEvent {
     description: string;
     semester: string;
     year: string;
-    createdAt: Date;
+    lastUpdate: Date;
     instructorId: string;
     time: Date;
   };
