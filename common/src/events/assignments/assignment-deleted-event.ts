@@ -7,7 +7,6 @@ export interface AssignmentDeletedEvent {
     title: string;
     description: string;
     lastUpdate: Date;
-    rank: number;
     time: Date;
   };
 }
