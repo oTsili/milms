@@ -2,21 +2,19 @@ import { Request, Response, NextFunction } from 'express';
 import path from 'path';
 var logger = require('winston');
 const Riak = require('basho-riak-client');
-import {
-  BadRequestError,
-  catchAsync,
-  extractFile,
-  NotFoundError,
-} from '@otmilms/common';
-import mongoose from 'mongoose';
+import { BadRequestError, catchAsync, NotFoundError } from '@otmilms/common';
 
 // import { courseCreatedPublisher } from './events/publishers/courses-publisher';
-import { natsWrapper } from '../nats-wrapper';
 import { CourseDoc } from '../models/course';
-import { AssignmentDoc } from '../models/assignment';
-import { Assignment, Course, User } from '../models/models';
+import { Course, User } from '../models/models';
 import { UserDoc } from '../models/user';
 import { riakWrapper } from '../riak-wrapper';
+import {
+  CourseCreatedPublisher,
+  CourseDeletedPublisher,
+  CourseUpdatedPublisher,
+} from './events/publishers/course-publisher';
+import { natsWrapper } from '../nats-wrapper';
 
 export const getCourses = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -77,13 +75,15 @@ export const getCourse = catchAsync(
 export const createCourse = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const instructorId = req.currentUser!.id;
+
+    const user = await User.findById(instructorId);
     // const userId = mongoose.Types.ObjectId(req.body.userId);
     const currentInstructor = await User.findById(instructorId);
     if (!currentInstructor) {
       throw new Error('Instructor not found');
     }
 
-    let { title, description, semester, year, createdAt, instructor } =
+    let { title, description, semester, year, lastUpdate, instructor } =
       req.body;
 
     const course = Course.build({
@@ -91,7 +91,7 @@ export const createCourse = catchAsync(
       description,
       semester,
       year,
-      createdAt,
+      lastUpdate,
       instructorId,
     });
 
@@ -99,12 +99,18 @@ export const createCourse = catchAsync(
 
     // populate the user's information
 
-    // if (createdCourse.id && createdCourse.description) {
-    // await new courseCreatedPublisher(natsWrapper.client).publish({
-    //   id: createdCourse.id!,
-    //   title: createdCourse.title,
-    // });
-    // }
+    await new CourseCreatedPublisher(natsWrapper.client).publish({
+      id: course.id,
+      title: course.title,
+      description: course.description,
+      semester: course.semester,
+      year: course.year,
+      lastUpdate: course.lastUpdate,
+      instructorId: course.instructorId as string,
+      user: `${user!.firstName} ${user!.lastName}`,
+      email: user!.email,
+      time: new Date(),
+    });
 
     res.status(201).json({
       message: 'course added successfuly',
@@ -119,23 +125,37 @@ export const createCourse = catchAsync(
 export const deleteCourse = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const courseId = req.params.id;
-    const userId = (<any>req).currentUser.id;
+    const userId = req.currentUser!.id;
 
+    const user = await User.findById(userId);
     const course = await Course.findById(courseId).populate('instructorId');
 
     if (!course) {
       throw new BadRequestError('The course was not found!');
     }
-    const user = course!.instructorId as UserDoc;
+    const instructorId = course!.instructorId;
 
     let result;
 
     if (
-      user.role === 'admin' ||
-      (user.role === 'instructor' && `${user.id}` === `${userId}`)
+      user!.role === 'admin' ||
+      (user!.role === 'instructor' && `${user!.id}` === `${instructorId}`)
     ) {
       result = await Course.deleteOne({ _id: courseId });
     }
+
+    await new CourseDeletedPublisher(natsWrapper.client).publish({
+      id: course.id,
+      title: course.title,
+      description: course.description,
+      semester: course.semester,
+      year: course.year,
+      lastUpdate: course.lastUpdate,
+      instructorId: course.instructorId as string,
+      user: `${user!.firstName} ${user!.lastName}`,
+      email: user!.email,
+      time: new Date(),
+    });
 
     if (result.n! > 0) {
       res.status(200).json({ message: 'Deletion successfull' });
@@ -147,9 +167,8 @@ export const deleteCourse = catchAsync(
 
 export const updateCourse = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const userId = (<any>req).currentUser.id;
-    // const user = await User.findById(userId);
-    // const userId = mongoose.Types.ObjectId(req.body.id);
+    const userId = req.currentUser!.id;
+    const user = await User.findById(userId);
 
     // create a course instance
     const updatedCourse = new Course({
@@ -158,7 +177,7 @@ export const updateCourse = catchAsync(
       description: req.body.description,
       semester: req.body.semester,
       year: req.body.year,
-      createdAt: req.body.createdAt,
+      lastUpdate: req.body.lastUpdate,
       instructorId: userId,
     });
 
@@ -172,6 +191,19 @@ export const updateCourse = catchAsync(
       updatedCourse
     );
 
+    await new CourseUpdatedPublisher(natsWrapper.client).publish({
+      id: updatedCourse.id,
+      title: updatedCourse.title,
+      description: updatedCourse.description,
+      semester: updatedCourse.semester,
+      year: updatedCourse.year,
+      lastUpdate: updatedCourse.lastUpdate,
+      instructorId: updatedCourse.instructorId as string,
+      user: `${user!.firstName} ${user!.lastName}`,
+      email: user!.email,
+      time: new Date(),
+    });
+
     res.status(200).json({
       message: 'update successful!',
       updatedCourse,
@@ -183,18 +215,74 @@ export const updateCourse = catchAsync(
 );
 
 export const getAuthEvents = catchAsync(async (req: Request, res: Response) => {
-  const userId = (<any>req).currentUser.id;
+  const pageSize = +req.query.pagesize!;
+  const currentPage = +req.query.page!;
+  const userId = req.currentUser!.id;
   const user = await User.findById(userId);
 
   const startDate = new Date(req.body.startDate).getTime();
   const endDate = new Date(req.body.endDate).getTime();
 
-  var query =
-    'select * from user where time >' + startDate + 'and time < ' + endDate;
+  let eventsQuery;
+
+  const countEventsQuery =
+    'SELECT COUNT(*) FROM user WHERE time >' +
+    startDate +
+    'AND time < ' +
+    endDate;
+
+  /* if provided sosrt object send events sorted */
+  let sortObj;
+  if (`${req.query.sort}` !== '') {
+    sortObj = JSON.parse(`${req.query.sort}`);
+
+    let orderByElement;
+    if (sortObj.active === 'user') {
+      orderByElement = 'firstName';
+    } else {
+      orderByElement = sortObj.active;
+    }
+
+    if (sortObj.direction === 'asc') {
+      eventsQuery =
+        'SELECT * FROM user WHERE time >' +
+        startDate +
+        'AND time < ' +
+        endDate +
+        'ORDER BY ' +
+        orderByElement +
+        ' ASC LIMIT ' +
+        pageSize +
+        ' OFFSET ' +
+        pageSize * (currentPage - 1);
+    } else if (sortObj.direction === 'desc') {
+      eventsQuery =
+        'SELECT * FROM user WHERE time >' +
+        startDate +
+        'AND time < ' +
+        endDate +
+        'ORDER BY ' +
+        orderByElement +
+        ' DESC LIMIT ' +
+        pageSize +
+        ' OFFSET ' +
+        pageSize * (currentPage - 1);
+    }
+  } else {
+    eventsQuery =
+      'SELECT * FROM user WHERE time >' +
+      startDate +
+      'AND time < ' +
+      endDate +
+      ' ORDER BY time DESC LIMIT ' +
+      pageSize +
+      ' OFFSET ' +
+      pageSize * (currentPage - 1);
+  }
 
   let userEvents: { [k: string]: any }[] = [];
-
-  var cb = function (err, rslt) {
+  let maxEvents;
+  var eventsCb = function (err, rslt) {
     if (err) {
       console.log(err);
     } else {
@@ -214,20 +302,39 @@ export const getAuthEvents = catchAsync(async (req: Request, res: Response) => {
       });
     }
 
-    // send a response with the found events
-    res.status(200).json({
-      message: 'Events fetched successfully!',
-      events: userEvents,
-    });
+    /* START of count Events */
+    var countEventsCb = function (err, rslt) {
+      if (err) {
+        console.log(err);
+      } else {
+        maxEvents = rslt.rows;
+
+        // send a response with the found events
+        res.status(200).json({
+          message: 'Events fetched successfully!',
+          events: userEvents,
+          maxEvents: maxEvents[0][0].low,
+        });
+      }
+    };
+
+    const countEventsCmd = new Riak.Commands.TS.Query.Builder()
+      .withQuery(countEventsQuery)
+      .withCallback(countEventsCb)
+      .build();
+
+    riakWrapper.queryClient.execute(countEventsCmd);
+
+    /*   END of count Events */
   };
 
-  var cmd = new Riak.Commands.TS.Query.Builder()
-    .withQuery(query)
-    .withCallback(cb)
+  const eventsCmd = new Riak.Commands.TS.Query.Builder()
+    .withQuery(eventsQuery)
+    .withCallback(eventsCb)
     .build();
 
   if (user) {
-    riakWrapper.queryClient.execute(cmd);
+    riakWrapper.queryClient.execute(eventsCmd);
   } else {
     throw new Error('user not found');
   }

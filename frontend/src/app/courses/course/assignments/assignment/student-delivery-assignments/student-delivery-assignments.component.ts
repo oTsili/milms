@@ -281,18 +281,23 @@ export class StudentDeliveryAssignmentsComponent implements OnInit, OnDestroy {
             .subscribe((fetchedStudentDeliveryAssignments) => {
               this.studentDeliveryAssignments =
                 fetchedStudentDeliveryAssignments.studentDeliveries;
+
               this.totalStudentDeliveryAssignments =
                 fetchedStudentDeliveryAssignments.maxStudentDeliveries;
-
-              // remove from the formArray
-              this.studentDeliveryAssignmentsControls.removeAt(
-                studentDeliveryAssignmentIndex
-              );
 
               // update the table
               this.dataSource = new MatTableDataSource(
                 this.studentDeliveryAssignments
               );
+
+              // update the control
+              this.studentDeliveryAssignmentsControls
+                .get(`${studentDeliveryAssignmentIndex}`)
+                .patchValue({
+                  rank: this.studentDeliveryAssignments[
+                    studentDeliveryAssignmentIndex
+                  ].rank,
+                });
 
               this.isLoading = false;
             });

@@ -73,7 +73,7 @@ export class CoursesService {
                 description: course.description,
                 instructor,
 
-                createdAt: course.createdAt,
+                lastUpdate: course.lastUpdate,
                 year: course.year,
                 semester: course.semester,
               };

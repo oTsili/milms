@@ -8,10 +8,9 @@ export interface DialogData {
   description: string;
   semester: string;
   year: string;
-  createdAt: string;
+  lastUpdate: string;
   instructorId?: string | User;
   instructor?: string;
-  lastUpdate?: string;
   currentControl?: AbstractControl;
   rank?: number;
 }

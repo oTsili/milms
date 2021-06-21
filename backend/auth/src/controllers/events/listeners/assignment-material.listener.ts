@@ -8,15 +8,27 @@ import {
 } from '@otmilms/common';
 import { Material } from '../../../models/models';
 import { riakWrapper } from '../../../riak-wrapper';
+import { RiakEvent } from './models-listeners';
 const Riak = require('basho-riak-client');
 
 export class AssignmentMaterialCreateListener extends Listener<AssignmentMaterialsCreatedEvent> {
   readonly subject = Subjects.AssignmentMaterialCreated;
-  queueGroupName = 'assignment-material:create';
+  queueGroupName = 'assignment-material-created';
 
   async onMessage(data: AssignmentMaterialsCreatedEvent['data'], msg: Message) {
-    const { id, name, lastUpdate, courseId, assignmentId, creatorId, time } =
-      data;
+    const {
+      id,
+      name,
+      lastUpdate,
+      courseId,
+      assignmentId,
+      creatorId,
+      time,
+      email,
+      user,
+      filePath,
+      fileType,
+    } = data;
 
     const material = Material.build({
       id,
@@ -25,38 +37,39 @@ export class AssignmentMaterialCreateListener extends Listener<AssignmentMateria
       courseId,
       assignmentId,
       creatorId,
+      filePath,
+      fileType,
     });
 
     await material.save();
 
     // filter the user information to be saved in RIAK DB as event
-    const eventMaterial = {
-      name: material.name,
-      lastUpdate: material.lastUpdate,
-      courseId: material.courseId,
-      assignmentId: material.assignmentId,
-      creatorId: material.creatorId,
+    const eventMaterial: RiakEvent = {
+      user,
+      email,
       time: new Date(time),
     };
 
     var cb = function (err, rslt) {
       // NB: rslt will be true when successful
+      if (err) {
+        console.log([err]);
+      } else {
+        console.log({ rslt });
+      }
     };
 
     var rows = [
       [
         eventMaterial.time,
-        'assignment-material:create',
-        eventMaterial.name,
-        eventMaterial.lastUpdate,
-        eventMaterial.courseId,
-        eventMaterial.assignmentId,
-        eventMaterial.creatorId,
+        'assignment-material-created',
+        eventMaterial.user,
+        eventMaterial.email,
       ],
     ];
 
     var cmd = new Riak.Commands.TS.Store.Builder()
-      .withTable('assignmentMaterial')
+      .withTable('course')
       .withRows(rows)
       .withCallback(cb)
       .build();
@@ -69,11 +82,20 @@ export class AssignmentMaterialCreateListener extends Listener<AssignmentMateria
 
 export class AssignmentMaterialUpdateListener extends Listener<AssignmentMaterialsUpdatedEvent> {
   readonly subject = Subjects.AssignmentMaterialUpdated;
-  queueGroupName = 'assignment-material:update';
+  queueGroupName = 'assignment-material-updated';
 
   async onMessage(data: AssignmentMaterialsUpdatedEvent['data'], msg: Message) {
-    const { id, name, lastUpdate, courseId, assignmentId, creatorId, time } =
-      data;
+    const {
+      id,
+      name,
+      lastUpdate,
+      courseId,
+      assignmentId,
+      creatorId,
+      time,
+      user,
+      email,
+    } = data;
 
     const material = Material.updateOne(
       {
@@ -89,33 +111,32 @@ export class AssignmentMaterialUpdateListener extends Listener<AssignmentMateria
     );
 
     // filter the user information to be saved in RIAK DB as event
-    const eventMaterial = {
-      name,
-      lastUpdate,
-      courseId,
-      assignmentId,
-      creatorId,
+    const eventMaterial: RiakEvent = {
+      email,
+      user,
       time: new Date(time),
     };
 
     var cb = function (err, rslt) {
       // NB: rslt will be true when successful
+      if (err) {
+        console.log([err]);
+      } else {
+        console.log({ rslt });
+      }
     };
 
     var rows = [
       [
         eventMaterial.time,
-        'assignment-material:update',
-        eventMaterial.name,
-        eventMaterial.lastUpdate,
-        eventMaterial.courseId,
-        eventMaterial.assignmentId,
-        eventMaterial.creatorId,
+        'assignment-material:updated',
+        eventMaterial.user,
+        eventMaterial.email,
       ],
     ];
 
     var cmd = new Riak.Commands.TS.Store.Builder()
-      .withTable('assignmentMaterial')
+      .withTable('course')
       .withRows(rows)
       .withCallback(cb)
       .build();
@@ -128,44 +149,52 @@ export class AssignmentMaterialUpdateListener extends Listener<AssignmentMateria
 
 export class AssignmentMaterialDeleteListener extends Listener<AssignmentMaterialsDeletedEvent> {
   readonly subject = Subjects.AssignmentMaterialDeleted;
-  queueGroupName = 'assignment-material:delete';
+  queueGroupName = 'assignment-material-deleted';
 
   async onMessage(data: AssignmentMaterialsDeletedEvent['data'], msg: Message) {
-    const { id, name, lastUpdate, courseId, assignmentId, creatorId, time } =
-      data;
+    const {
+      id,
+      name,
+      lastUpdate,
+      courseId,
+      assignmentId,
+      creatorId,
+      time,
+      user,
+      email,
+    } = data;
 
     const material = Material.deleteOne({
       id,
     });
 
     // filter the user information to be saved in RIAK DB as event
-    const eventMaterial = {
-      name,
-      lastUpdate,
-      courseId,
-      assignmentId,
-      creatorId,
+    const eventMaterial: RiakEvent = {
+      user,
+      email,
       time: new Date(time),
     };
 
     var cb = function (err, rslt) {
       // NB: rslt will be true when successful
+      if (err) {
+        console.log([err]);
+      } else {
+        console.log({ rslt });
+      }
     };
 
     var rows = [
       [
         eventMaterial.time,
-        'assignment-material:delete',
-        eventMaterial.name,
-        eventMaterial.lastUpdate,
-        eventMaterial.courseId,
-        eventMaterial.assignmentId,
-        eventMaterial.creatorId,
+        'assignment-material:deleted',
+        eventMaterial.user,
+        eventMaterial.email,
       ],
     ];
 
     var cmd = new Riak.Commands.TS.Store.Builder()
-      .withTable('assignmentMaterial')
+      .withTable('course')
       .withRows(rows)
       .withCallback(cb)
       .build();

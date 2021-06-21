@@ -10,7 +10,7 @@ export interface Course {
   description: string;
   semester: string;
   year: string;
-  createdAt: string;
+  lastUpdate: string;
   instructorId?: string | User;
   instructor?: string;
   position?: number;

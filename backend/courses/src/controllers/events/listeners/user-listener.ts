@@ -36,6 +36,7 @@ export class UserSignUpListener extends Listener<UserSignUpEvent> {
     var cb = function (err, rslt) {
       // NB: rslt will be true when successful
     };
+    console.log(eventUser.time);
 
     var rows = [
       [
@@ -187,6 +188,8 @@ export class UserUpdateListener extends Listener<UserUpdateEvent> {
       time: new Date(time),
       role: role,
     };
+
+    console.log(typeof time);
 
     var cb = function (err, rslt) {
       // NB: rslt will be true when successful

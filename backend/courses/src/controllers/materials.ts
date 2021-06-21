@@ -7,7 +7,13 @@ import { catchAsync } from '@otmilms/common';
 
 import { Assignment, User, Course, Material } from '../models/models';
 import { UserDoc } from '../models/user';
-import { AssignmentCreatedPublisher } from './events/publishers/assignments-publisher';
+import {
+  AssignmentCreatedPublisher,
+  AssignmentMaterialCreatedPublisher,
+  AssignmentMaterialDeletedPublisher,
+  CourseMaterialCreatedPublisher,
+  CourseMaterialdeletedPublisher,
+} from './events/publishers/course-publisher';
 import { natsWrapper } from '../nats-wrapper';
 
 // import APIFeatures from '../utils/apiFeatures';
@@ -23,7 +29,7 @@ export const createCourseMaterials = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const courseId = req.params.courseId;
     const creatorId = req.currentUser!.id;
-
+    const user = await User.findById(creatorId);
     // TODO: use fs.mkdir to create a directory of "courseName/assignmentName" instead of "courseName-assignmentName"
 
     // 4) create an array to keep account of the saved materialFiles
@@ -46,31 +52,29 @@ export const createCourseMaterials = catchAsync(
           creatorId,
         });
 
-        const updatedStudentDeliveryFile =
-          await createdStudentDeliveryFile.save();
+        const updatedMaterialFile = await createdStudentDeliveryFile.save();
 
-        materialFiles.push(updatedStudentDeliveryFile);
+        materialFiles.push(updatedMaterialFile);
+
+        // 6)  publish the event
+        await new CourseMaterialCreatedPublisher(natsWrapper.client).publish({
+          id: updatedMaterialFile.id,
+          name: updatedMaterialFile.name,
+          lastUpdate: updatedMaterialFile.lastUpdate as Date,
+          courseId: updatedMaterialFile.courseId,
+          creatorId: updatedMaterialFile.creatorId as string,
+          user: `${user!.firstName} ${user!.lastName}`,
+          email: user!.email,
+          filePath: updatedMaterialFile.filePath,
+          fileType: updatedMaterialFile.fileType,
+          time: new Date(),
+        });
       }
     }
 
     const fetchedMaterialFiles = await Material.find({
       courseId,
     });
-
-    // 6)  publish the event
-    // // make the query again for getting the populated fields
-    // let updatedAssignment = await assignmentQuery;
-
-    // if (createdAssignment.id && createdAssignment.description) {
-    //   await new AssignmentCreatedPublisher(natsWrapper.client).publish({
-    //     id: createdAssignment.id!,
-    //     title: createdAssignment.title,
-    //     description: createdAssignment.description!,
-    //     lastUpdate: createdAssignment.lastUpdate.toString(),
-    //     rank: createdAssignment.rank!,
-    //     time: new Date(),
-    //   });
-    // }
 
     // 7) seng the response
     res.status(201).json({
@@ -124,16 +128,35 @@ export const deleteCourseMaterials = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const materialId = req.params.materialId;
     const userId = req.currentUser!.id;
+    const user = await User.findById(userId);
     const material = await Material.findById(materialId).populate('creatorId');
-    const user = material!.creatorId as UserDoc;
+    const creatorId = material!.creatorId;
 
     let result;
 
+    const materialToBeDeleted = await Material.findById(materialId);
+
     if (
-      user.role === 'admin' ||
-      (user.role === 'instructor' && user.id === userId)
+      user!.role === 'admin' ||
+      (user!.role === 'instructor' && user!.id === creatorId)
     ) {
       result = await Material.deleteOne({ _id: materialId });
+
+      // 6)  publish the event
+      if (materialToBeDeleted) {
+        await new CourseMaterialdeletedPublisher(natsWrapper.client).publish({
+          id: materialToBeDeleted.id,
+          name: materialToBeDeleted.name,
+          lastUpdate: materialToBeDeleted.lastUpdate as Date,
+          courseId: materialToBeDeleted.courseId,
+          creatorId: materialToBeDeleted.creatorId as string,
+          user: `${user!.firstName} ${user!.lastName}`,
+          email: user!.email,
+          filePath: materialToBeDeleted.filePath,
+          fileType: materialToBeDeleted.fileType,
+          time: new Date(),
+        });
+      }
     }
 
     if (result.n! > 0) {
@@ -162,7 +185,7 @@ export const createAssignmentMaterials = catchAsync(
     const courseId = req.params.courseId;
     const assignmentId = req.params.assignmentId;
     const creatorId = req.currentUser!.id;
-
+    const user = await User.findById(creatorId);
     // TODO: use fs.mkdir to create a directory of "courseName/assignmentName" instead of "courseName-assignmentName"
 
     // 4) create an array to keep account of the saved materialFiles
@@ -189,6 +212,23 @@ export const createAssignmentMaterials = catchAsync(
           await createdStudentDeliveryFile.save();
 
         materialFiles.push(updatedStudentDeliveryFile);
+
+        // 6)  publish the event
+        await new AssignmentMaterialCreatedPublisher(
+          natsWrapper.client
+        ).publish({
+          id: updatedStudentDeliveryFile.id,
+          name: updatedStudentDeliveryFile.name,
+          lastUpdate: updatedStudentDeliveryFile.lastUpdate as Date,
+          courseId: updatedStudentDeliveryFile.courseId,
+          creatorId: updatedStudentDeliveryFile.creatorId as string,
+          assignmentId: updatedStudentDeliveryFile.assignmentId as string,
+          user: `${user!.firstName} ${user!.lastName}`,
+          email: user!.email,
+          filePath: updatedStudentDeliveryFile.filePath,
+          fileType: updatedStudentDeliveryFile.fileType,
+          time: new Date(),
+        });
       }
     }
 
@@ -196,21 +236,6 @@ export const createAssignmentMaterials = catchAsync(
       courseId,
       assignmentId,
     });
-
-    // 6)  publish the event
-    // // make the query again for getting the populated fields
-    // let updatedAssignment = await assignmentQuery;
-
-    // if (createdAssignment.id && createdAssignment.description) {
-    //   await new AssignmentCreatedPublisher(natsWrapper.client).publish({
-    //     id: createdAssignment.id!,
-    //     title: createdAssignment.title,
-    //     description: createdAssignment.description!,
-    //     lastUpdate: createdAssignment.lastUpdate.toString(),
-    //     rank: createdAssignment.rank!,
-    //     time: new Date(),
-    //   });
-    // }
 
     // 7) seng the response
     res.status(201).json({
@@ -264,17 +289,38 @@ export const getAssignmentMaterials = catchAsync(
 export const deleteAssignmentMaterials = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const materialId = req.params.materialId;
-    const userId = req.currentUser!.id;
     const material = await Material.findById(materialId).populate('creatorId');
-    const user = material!.creatorId as UserDoc;
+    const userId = req.currentUser!.id;
+    const user = await User.findById(userId);
+    const creatorId = material!.creatorId;
+
+    const materialToBeDeleted = await Material.findById(materialId);
 
     let result;
-
     if (
-      user.role === 'admin' ||
-      (user.role === 'instructor' && user.id === userId)
+      user!.role === 'admin' ||
+      (user!.role === 'instructor' && user!.id === creatorId)
     ) {
       result = await Material.deleteOne({ _id: materialId });
+
+      // 6)  publish the event
+      if (materialToBeDeleted) {
+        await new AssignmentMaterialCreatedPublisher(
+          natsWrapper.client
+        ).publish({
+          id: materialToBeDeleted.id,
+          name: materialToBeDeleted.name,
+          lastUpdate: materialToBeDeleted.lastUpdate as Date,
+          courseId: materialToBeDeleted.courseId,
+          creatorId: materialToBeDeleted.creatorId as string,
+          assignmentId: materialToBeDeleted.assignmentId as string,
+          user: `${user!.firstName} ${user!.lastName}`,
+          email: user!.email,
+          filePath: materialToBeDeleted.filePath,
+          fileType: materialToBeDeleted.fileType,
+          time: new Date(),
+        });
+      }
     }
 
     if (result.n! > 0) {

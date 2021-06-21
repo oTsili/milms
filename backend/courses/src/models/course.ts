@@ -10,7 +10,7 @@ export interface CourseAttrs {
   description: string;
   semester: string;
   year: string;
-  createdAt: Date;
+  lastUpdate: Date;
   instructorId: string | UserDoc;
 }
 
@@ -27,7 +27,7 @@ export interface CourseDoc extends mongoose.Document {
   description: string;
   semester: string;
   year: string;
-  createdAt: Date;
+  lastUpdate: Date;
   instructorId: string | UserDoc;
 }
 
@@ -49,7 +49,7 @@ export const courseSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    createdAt: {
+    lastUpdate: {
       type: Date,
       default: Date.now(),
     },

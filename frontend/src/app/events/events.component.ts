@@ -1,64 +1,29 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { FormControl, FormGroup, NgForm } from '@angular/forms';
-import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
-import * as events from 'events';
-import { EventsService } from './events.service';
-
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Subscription } from 'rxjs';
+import { SharedService } from '../shared/services/shared.service';
 @Component({
   selector: 'app-events',
   templateUrl: 'events.component.html',
-  styleUrls: ['./events.component.css'],
 })
-export class EventsComponent implements OnInit {
-  displayedColumns: string[] = ['created', 'user', 'email', 'event'];
-  isLoading = false;
-  authEvents: {
-    time: string;
-    event: string;
-    email: string;
-    firstName: string;
-    lastName: string;
-  }[] = [];
-  eventObjs: {
-    time: string;
-    event: string;
-    email: string;
-    firstName: string;
-    lastName: string;
-  }[];
-  resultsLength = 30;
-  @ViewChild(MatPaginator) paginator: MatPaginator;
-  @ViewChild(MatSort) sort: MatSort;
+export class EventsComponent implements OnInit, OnDestroy {
+  userRole: string;
+  userRoleSubscription: Subscription;
 
-  constructor(private eventService: EventsService) {}
+  constructor(private sharedService: SharedService) {}
 
   ngOnInit() {
-    // this.eventService.getEvents().subscribe((data) => {
-    //   data.map((event) => {
-    //     email: event[0];
-    //     firstName: event[1];
-    //     lastName: event[2];
-    //     time: event[3];
-    //   });
-    //   console.log(data);
-    //   this.authEvents = data.events;
-    // });
-  }
-  resetPaging(): void {
-    this.paginator.pageIndex = 0;
-  }
+    this.sharedService.getUserRole().subscribe((response) => {
+      this.userRole = response.userRole;
+    });
 
-  onSubmitEvents(form: NgForm) {
-    if (form.invalid) {
-      return;
-    }
-    this.isLoading = true;
-
-    this.eventService
-      .getEvents(form.value.startDate, form.value.endDate)
-      .subscribe((data) => {
-        this.authEvents = data.events;
+    this.userRoleSubscription = this.sharedService
+      .getUserRoleListener()
+      .subscribe((response) => {
+        this.userRole = response;
       });
+  }
+
+  ngOnDestroy() {
+    this.userRoleSubscription.unsubscribe();
   }
 }

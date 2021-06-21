@@ -1,7 +1,12 @@
 import express, { NextFunction, Request, Response } from 'express';
 import { body } from 'express-validator';
 import path from 'path';
-import { validateRequest, extractFile, currentUser } from '@otmilms/common';
+import {
+  validateRequest,
+  extractFile,
+  currentUser,
+  requireAuth,
+} from '@otmilms/common';
 import * as UserController from '../controllers/user';
 
 const router = express.Router();
@@ -54,11 +59,19 @@ router.post(
   UserController.signup
 );
 
-
 router.get('/signout', currentUser, UserController.signout);
 
 router.get('/become-admin', currentUser, UserController.becomeAdmin);
 
 router.get('/become-student', currentUser, UserController.becomeStudent);
+
+/////////////// Events ///////////////
+
+router.post(
+  '/events',
+  currentUser,
+  requireAuth,
+  UserController.getCourseEvents
+);
 
 export { router as UserRouter };

@@ -13,7 +13,12 @@ import {
   StudentDeliveryFile,
 } from '../models/models';
 import { riakWrapper } from '../riak-wrapper';
-import { AssignmentCreatedPublisher } from './events/publishers/assignments-publisher';
+import {
+  StudentDeliveryAssignmentCreatedPublisher,
+  StudentDeliveryAssignmentUpdatedPublisher,
+  StudentDeliveryFileCreatedPublisher,
+  StudentDeliveryFileDeletedPublisher,
+} from './events/publishers/course-publisher';
 import { natsWrapper } from '../nats-wrapper';
 // import APIFeatures from '../utils/apiFeatures';
 // import fetch from 'node-fetch';
@@ -44,12 +49,12 @@ export const createStudentDelivery = catchAsync(
     const currentStudentDeliveryAssignment =
       await studentDeliveryAssignmentQuery;
 
-    let updatedStudentDeliveryAssignment: StudentDeliveryAssignmentDoc;
     let studentDeliveryAssignmentId: string;
-
+    let updatedStudentDeliveryAssignment: StudentDeliveryAssignmentDoc;
     // 3a) if the studentDeliveryAssignment is allready saved get the id
     if (currentStudentDeliveryAssignment) {
       studentDeliveryAssignmentId = currentStudentDeliveryAssignment!._id;
+      updatedStudentDeliveryAssignment = currentStudentDeliveryAssignment;
     } else {
       // 3b) else save a new one to the db and get the id
       const createdStudentDeliveryAssignment = StudentDeliveryAssignment.build({
@@ -77,6 +82,8 @@ export const createStudentDelivery = catchAsync(
         const name = names[i];
         const filePath = `api/courses/public/student-deliveries/${req.files[i].filename}`;
         const fileType = fileTypes[i];
+        const userId = req.currentUser!.id;
+        const user = await User.findById(userId);
 
         const createdStudentDeliveryFile = StudentDeliveryFile.build({
           name,
@@ -92,6 +99,41 @@ export const createStudentDelivery = catchAsync(
           await createdStudentDeliveryFile.save();
 
         studentDeliveryFiles.push(updatedStudentDeliveryFile);
+
+        await new StudentDeliveryFileCreatedPublisher(
+          natsWrapper.client
+        ).publish({
+          id: updatedStudentDeliveryFile.id as string,
+          name: updatedStudentDeliveryFile.name,
+          lastUpdate: updatedStudentDeliveryFile.lastUpdate as Date,
+          courseId: updatedStudentDeliveryFile.courseId as string,
+          assignmentId: updatedStudentDeliveryFile.assignmentId as string,
+          studentDeliveryAssignmentId:
+            updatedStudentDeliveryFile.studentDeliveryAssignmentId as string,
+          studentId: updatedStudentDeliveryFile.studentId as string,
+          user: `${user!.firstName} ${user!.lastName}`,
+          email: user!.email,
+          filePath: updatedStudentDeliveryFile.filePath as string,
+          fileType: updatedStudentDeliveryFile.fileType as string,
+          time: new Date(),
+        });
+
+        await new StudentDeliveryAssignmentCreatedPublisher(
+          natsWrapper.client
+        ).publish({
+          id: updatedStudentDeliveryFile.id as string,
+          name: updatedStudentDeliveryFile.name,
+          lastUpdate: updatedStudentDeliveryFile.lastUpdate as Date,
+          studentId: updatedStudentDeliveryFile.studentId as string,
+          courseId: updatedStudentDeliveryFile.courseId as string,
+          assignmentId: updatedStudentDeliveryFile.assignmentId as string,
+          instructorId: updatedStudentDeliveryAssignment!
+            .instructorId as string,
+          studentName: updatedStudentDeliveryAssignment!.studentName as string,
+          user: `${user!.firstName} ${user!.lastName}`,
+          email: user!.email,
+          time: new Date(),
+        });
       }
     }
 
@@ -100,21 +142,6 @@ export const createStudentDelivery = catchAsync(
       // assignmentId,
       studentId,
     });
-
-    // 6)  publish the event
-    // // make the query again for getting the populated fields
-    // let updatedAssignment = await assignmentQuery;
-
-    // if (createdAssignment.id && createdAssignment.description) {
-    //   await new AssignmentCreatedPublisher(natsWrapper.client).publish({
-    //     id: createdAssignment.id!,
-    //     title: createdAssignment.title,
-    //     description: createdAssignment.description!,
-    //     lastUpdate: createdAssignment.lastUpdate.toString(),
-    //     rank: createdAssignment.rank!,
-    //     time: new Date(),
-    //   });
-    // }
 
     // 7) seng the response
     res.status(201).json({
@@ -237,8 +264,8 @@ export const getStudentDeliveryAssignments = catchAsync(
 export const updateStudentDeliveryAssignment = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const deliveryId = req.params.deliveryId;
-
-    console.log(req.body);
+    const userId = req.currentUser!.id;
+    const user = await User.findById(userId);
 
     const { rank } = req.body;
 
@@ -255,6 +282,24 @@ export const updateStudentDeliveryAssignment = catchAsync(
     const fetchedStudentDeliveryAssignment =
       await StudentDeliveryAssignment.findById(deliveryId);
 
+    if (fetchedStudentDeliveryAssignment) {
+      await new StudentDeliveryAssignmentUpdatedPublisher(
+        natsWrapper.client
+      ).publish({
+        id: fetchedStudentDeliveryAssignment.id as string,
+        name: fetchedStudentDeliveryAssignment.name,
+        lastUpdate: fetchedStudentDeliveryAssignment.lastUpdate as Date,
+        studentId: fetchedStudentDeliveryAssignment.studentId as string,
+        courseId: fetchedStudentDeliveryAssignment.courseId as string,
+        assignmentId: fetchedStudentDeliveryAssignment.assignmentId as string,
+        instructorId: fetchedStudentDeliveryAssignment!.instructorId as string,
+        studentName: fetchedStudentDeliveryAssignment!.studentName as string,
+        user: `${user!.firstName} ${user!.lastName}`,
+        email: user!.email,
+        time: new Date(),
+      });
+    }
+
     res.status(200).json({
       message: 'update successful!',
       fetchedStudentDeliveryAssignment,
@@ -266,6 +311,7 @@ export const deleteStudentDelivery = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.currentUser!.id;
     const fileId = req.params.fileId;
+    const user = await User.findById(userId);
 
     // 1) get the student id from the db
     const studentDeliveryFile = await StudentDeliveryFile.findById(fileId);
@@ -284,6 +330,26 @@ export const deleteStudentDelivery = catchAsync(
       result = await StudentDeliveryFile.deleteOne({
         _id: fileId,
       });
+
+      if (studentDeliveryFile) {
+        await new StudentDeliveryFileDeletedPublisher(
+          natsWrapper.client
+        ).publish({
+          id: studentDeliveryFile.id as string,
+          name: studentDeliveryFile.name,
+          lastUpdate: studentDeliveryFile.lastUpdate as Date,
+          courseId: studentDeliveryFile.courseId as string,
+          assignmentId: studentDeliveryFile.assignmentId as string,
+          studentDeliveryAssignmentId:
+            studentDeliveryFile.studentDeliveryAssignmentId as string,
+          studentId: studentDeliveryFile.studentId as string,
+          user: `${user!.firstName} ${user!.lastName}`,
+          email: user!.email,
+          filePath: studentDeliveryFile.filePath as string,
+          fileType: studentDeliveryFile.fileType as string,
+          time: new Date(),
+        });
+      }
     } else {
       throw new BadRequestError('Not permitted to delete!');
     }
@@ -417,43 +483,3 @@ const monveInArray = (arr: string[], from: number, to: number): void => {
 
   arr.splice(to, 0, item[0]);
 };
-
-// export const   paginate = catchAsync(async (req: Request, res: Response) =>  {
-//     const page = this.queryString.page * 1 || 1;
-//     const limit = this.queryString.limit * 1 || 100;
-//     const skip = (page - 1) * limit;
-
-//     this.query = this.query.skip(skip).limit(limit);
-
-//     return this;
-//   }
-
-// export const extractFileController = catchAsync(
-//   async (req: Request, res: Response, next: NextFunction) => {
-//     let courseId = req.params.id;
-
-//     let courseAssignmentsQuery =
-//       Course.findById(courseId).populate('assignments');
-
-//     let currentCourse = await courseAssignmentsQuery;
-//     let dir = '';
-
-//     if (currentCourse) {
-//       dir = `src/public/courses/${currentCourse.courseTitle}/assignments`;
-//     }
-
-//     access(dir, constants.F_OK, (err) => {
-//       console.log(`${dir} ${err ? 'does not exist' : 'exists'}`);
-//       mkdir(dir, { recursive: true }, (err) => {
-//         if (err) {
-//           return console.error(err);
-//         }
-//         console.log('Directory created successfully!');
-
-//         extractFile(MIME_TYPE_MAP, dir, 'filePath');
-//       });
-//     });
-
-//     next();
-//   }
-// );

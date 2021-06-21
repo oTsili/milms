@@ -9,11 +9,11 @@ import { NotFoundComponent } from './not-found/not-found.component';
 // import { ConferenceComponent } from './conference/conference.component';
 // import { CallDashComponent } from './conference/call-dash/call-dash.component';
 import { JitsiMeetComponent } from './conference/jitsi-meet/jitsi-meet.componenet';
-import { EventsComponent } from './events/events.component';
 import { PdfViewerComponent } from './shared/pdf-viewer/pdf-viewer.component';
 import { CoursesComponent } from './courses/courses.component';
 import { CourseComponent } from './courses/course/course.component';
 import { AssignmentComponent } from './courses/course/assignments/assignment/assignment.component';
+import { EventsComponent } from './events/events.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -111,6 +111,15 @@ const routes: Routes = [
     path: 'events',
     component: EventsComponent,
     canActivate: [AuthGuard],
+    data: {
+      title: 'Events',
+      breadcrumb: [
+        {
+          label: 'Events',
+          url: 'events',
+        },
+      ],
+    },
   },
   { path: '404', component: NotFoundComponent },
   { path: '**', redirectTo: '/404' },

@@ -6,7 +6,12 @@ const Riak = require('basho-riak-client');
 import { BadRequestError, catchAsync } from '@otmilms/common';
 
 import { Assignment, User, Course } from '../models/models';
-import { AssignmentCreatedPublisher } from './events/publishers/assignments-publisher';
+import {
+  AssignmentCreatedPublisher,
+  AssignmentDeletedPublisher,
+  AssignmentUpdatedPublisher,
+  StudentDeliveryAssignmentDeletedPublisher,
+} from './events/publishers/course-publisher';
 import { natsWrapper } from '../nats-wrapper';
 import { toHumanDateTime } from './courses';
 // import APIFeatures from '../utils/apiFeatures';
@@ -18,7 +23,9 @@ import { UserDoc } from '../models/user';
 export const createAssignment = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     let courseId = req.params.courseId;
+    const userId = req.currentUser!.id;
 
+    const user = await User.findById(userId);
     // let dir = '';
     // if (currentCourse) {
     //   dir = `src/public/assignments`;
@@ -53,6 +60,8 @@ export const createAssignment = catchAsync(
         title: createdAssignment.title,
         description: createdAssignment.description!,
         lastUpdate: createdAssignment.lastUpdate!,
+        user: `${user!.firstName} ${user!.lastName}`,
+        email: user!.email,
         // rank: createdAssignment.rank!, // TODO: delete the rank, update the common lib, and make a subject assignment-delivery
         time: new Date(),
       });
@@ -73,8 +82,9 @@ export const updateAssignment = catchAsync(
     let newFilePath = req.body.filePath;
     let fileType = req.body.fileType;
     let materials = req.body.materials;
-
     const userId = req.currentUser!.id;
+
+    const user = await User.findById(userId);
 
     if (req.file) {
       // the path of files folder and filename
@@ -107,6 +117,16 @@ export const updateAssignment = catchAsync(
     const fetchedAssignment = await Assignment.findById(
       req.params.assignmentId
     );
+
+    await new AssignmentUpdatedPublisher(natsWrapper.client).publish({
+      id: updatedAssignment.id!,
+      title: updatedAssignment.title,
+      description: updatedAssignment.description!,
+      lastUpdate: updatedAssignment.lastUpdate!,
+      user: `${user!.firstName} ${user!.lastName}`,
+      email: user!.email,
+      time: new Date(),
+    });
 
     res.status(200).json({
       message: 'update successful!',
@@ -176,20 +196,35 @@ export const getAssignment = catchAsync(
 export const deleteAssignment = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const assignmentId = req.params.assignmentId;
-    const userId = (<any>req).currentUser.courseId;
+    const userId = req.currentUser!.id;
+
+    const user = await User.findById(userId);
 
     const assignment = await Assignment.findById(assignmentId).populate(
       'instructorId'
     );
-    const user = assignment!.instructorId as UserDoc;
+    const instructorId = assignment!.instructorId;
+
+    const assignmentToBeDeleted = await Assignment.findById(assignmentId);
 
     let result;
-
     if (
-      user.role === 'admin' ||
-      (user.role === 'instructor' && user.id === userId)
+      user!.role === 'admin' ||
+      (user!.role === 'instructor' && user!.id === instructorId)
     ) {
       result = await Assignment.deleteOne({ _id: assignmentId });
+    }
+
+    if (assignmentToBeDeleted) {
+      await new AssignmentDeletedPublisher(natsWrapper.client).publish({
+        id: assignmentToBeDeleted.id as string,
+        title: assignmentToBeDeleted.title,
+        description: assignmentToBeDeleted.description as string,
+        lastUpdate: assignmentToBeDeleted.lastUpdate as Date,
+        user: `${user!.firstName} ${user!.lastName}`,
+        email: user!.email,
+        time: new Date(),
+      });
     }
 
     if (result.n! > 0) {

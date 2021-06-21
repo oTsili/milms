@@ -57,9 +57,6 @@ export const assignmentSchema = new mongoose.Schema(
       type: Date,
       default: Date.now(),
     },
-    createdAt: {
-      type: String,
-    },
     instructorId: {
       // required: true,
       type: mongoose.Schema.Types.ObjectId,

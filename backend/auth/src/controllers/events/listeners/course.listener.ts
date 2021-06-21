@@ -8,11 +8,12 @@ import {
 } from '@otmilms/common';
 import { Course } from '../../../models/models';
 import { riakWrapper } from '../../../riak-wrapper';
+import { RiakEvent } from './models-listeners';
 const Riak = require('basho-riak-client');
 
 export class CourseCreateListener extends Listener<CourseCreatedEvent> {
   readonly subject = Subjects.CourseCreated;
-  queueGroupName = 'course-create';
+  queueGroupName = 'course-created';
 
   async onMessage(data: CourseCreatedEvent['data'], msg: Message) {
     const {
@@ -21,9 +22,11 @@ export class CourseCreateListener extends Listener<CourseCreatedEvent> {
       description,
       semester,
       year,
-      createdAt,
+      lastUpdate,
       instructorId,
       time,
+      user,
+      email,
     } = data;
 
     const course = Course.build({
@@ -32,37 +35,30 @@ export class CourseCreateListener extends Listener<CourseCreatedEvent> {
       description,
       semester,
       year,
-      createdAt,
+      lastUpdate,
       instructorId,
     });
 
     await course.save();
 
     // filter the user information to be saved in RIAK DB as event
-    const eventCourse = {
-      title: course.title,
-      description: course.description,
-      semester: course.semester,
-      year: course.year,
-      createdAt: course.createdAt,
-      instructorId: course.instructorId,
+    const eventCourse: RiakEvent = {
+      user,
+      email,
       time: new Date(time),
     };
 
     var cb = function (err, rslt) {
       // NB: rslt will be true when successful
+      if (err) {
+        console.log([err]);
+      } else {
+        console.log({ rslt });
+      }
     };
 
     var rows = [
-      [
-        eventCourse.time,
-        'course:created',
-        eventCourse.description,
-        eventCourse.semester,
-        eventCourse.year,
-        eventCourse.createdAt,
-        eventCourse.instructorId,
-      ],
+      [eventCourse.time, 'course:created', eventCourse.user, eventCourse.email],
     ];
 
     var cmd = new Riak.Commands.TS.Store.Builder()
@@ -88,9 +84,11 @@ export class CourseUpdateListener extends Listener<CourseUpdatedEvent> {
       description,
       semester,
       year,
-      createdAt,
+      lastUpdate,
       instructorId,
       time,
+      user,
+      email,
     } = data;
 
     const updatedCourse = Course.updateOne(
@@ -102,37 +100,28 @@ export class CourseUpdateListener extends Listener<CourseUpdatedEvent> {
         description,
         semester,
         year,
-        createdAt,
-        instructorId,
+        lastUpdate,
       }
     );
 
     // filter the user information to be saved in RIAK DB as event
-    const eventCourse = {
-      title,
-      description,
-      semester,
-      year,
-      createdAt,
-      instructorId,
+    const eventCourse: RiakEvent = {
+      user,
+      email,
       time: new Date(time),
     };
 
     var cb = function (err, rslt) {
       // NB: rslt will be true when successful
+      if (err) {
+        console.log([err]);
+      } else {
+        console.log({ rslt });
+      }
     };
 
     var rows = [
-      [
-        eventCourse.time,
-        'course:updated',
-        eventCourse.description,
-        eventCourse.semester,
-        eventCourse.year,
-        eventCourse.semester,
-        eventCourse.createdAt,
-        eventCourse.instructorId,
-      ],
+      [eventCourse.time, 'course:updated', eventCourse.user, eventCourse.email],
     ];
 
     var cmd = new Riak.Commands.TS.Store.Builder()
@@ -158,9 +147,10 @@ export class CourseDeleteListener extends Listener<CourseDeletedEvent> {
       description,
       semester,
       year,
-      createdAt,
-      instructorId,
+      lastUpdate,
       time,
+      user,
+      email,
     } = data;
 
     const deltedCourse = Course.deleteOne({
@@ -168,31 +158,19 @@ export class CourseDeleteListener extends Listener<CourseDeletedEvent> {
     });
 
     // filter the user information to be saved in RIAK DB as event
-    const eventCourse = {
-      title,
-      description,
-      semester,
-      year,
-      createdAt,
-      instructorId,
-      time: new Date(time),
-    };
+    const eventCourse: RiakEvent = { user, email, time: new Date(time) };
 
     var cb = function (err, rslt) {
       // NB: rslt will be true when successful
+      if (err) {
+        console.log([err]);
+      } else {
+        console.log({ rslt });
+      }
     };
 
     var rows = [
-      [
-        eventCourse.time,
-        'course:deleted',
-        eventCourse.description,
-        eventCourse.semester,
-        eventCourse.year,
-        eventCourse.semester,
-        eventCourse.createdAt,
-        eventCourse.instructorId,
-      ],
+      [eventCourse.time, 'course:deleted', eventCourse.user, eventCourse.email],
     ];
 
     var cmd = new Riak.Commands.TS.Store.Builder()

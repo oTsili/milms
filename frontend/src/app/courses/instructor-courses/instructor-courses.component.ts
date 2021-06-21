@@ -45,7 +45,7 @@ export class InstructorCoursesComponent implements OnInit, OnDestroy {
     description: null,
     semester: null,
     year: null,
-    createdAt: null,
+    lastUpdate: null,
     instructor: null,
   };
 
@@ -188,7 +188,7 @@ export class InstructorCoursesComponent implements OnInit, OnDestroy {
         return;
       }
 
-      dialogInput.createdAt = new Date().toString();
+      dialogInput.lastUpdate = new Date().toString();
       dialogInput.instructor = this.user.userName;
       this.saveCourse(this.courseControls.length, dialogInput, controlIndex);
     });
@@ -340,7 +340,7 @@ export class InstructorCoursesComponent implements OnInit, OnDestroy {
       description: [item.description, Validators.required],
       semester: [item.semester, Validators.required],
       year: [item.year, Validators.required],
-      createdAt: [item.createdAt, Validators.required],
+      lastUpdate: [item.lastUpdate, Validators.required],
       instructor: [item.instructor, Validators.required],
     });
   }

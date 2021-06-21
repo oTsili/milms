@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: auth-riak-query-member-depl
 spec:
-  replicas: 1
+  replicas: 5
   selector:
     matchLabels:
       app: auth-riak-query-member
