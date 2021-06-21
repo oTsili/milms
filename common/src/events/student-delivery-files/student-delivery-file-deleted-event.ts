@@ -10,6 +10,8 @@ export interface StudentDeliveryFileDeletedEvent {
     assignmentId: string;
     studentDeliveryAssignmentId: string;
     studentId: string;
+    user: string;
+    email: string;
     time: Date;
   };
 }

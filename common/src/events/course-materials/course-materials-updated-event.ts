@@ -8,6 +8,8 @@ export interface CourseMaterialsUpdatedEvent {
     lastUpdate: Date;
     courseId: string;
     creatorId: string;
+    user: string;
+    email: string;
     time: Date;
   };
 }

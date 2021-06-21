@@ -11,6 +11,8 @@ export interface StudentDeliveryAssignmentCreatedEvent {
     assignmentId: string;
     instructorId: string;
     studentName: string;
+    user: string;
+    email: string;
     time: Date;
   };
 }

@@ -10,6 +10,8 @@ export interface StudentDeliveryFileUpdatedEvent {
     assignmentId: string;
     studentDeliveryAssignmentId: string;
     studentId: string;
+    user: string;
+    email: string;
     time: Date;
   };
 }

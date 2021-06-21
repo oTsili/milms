@@ -7,6 +7,8 @@ export interface AssignmentUpdatedEvent {
     title: string;
     description: string;
     lastUpdate: Date;
+    user: string;
+    email: string;
     time: Date;
   };
 }

@@ -10,6 +10,8 @@ export interface CourseUpdatedEvent {
     year: string;
     lastUpdate: Date;
     instructorId: string;
+    user: string;
+    email: string;
     time: Date;
   };
 }

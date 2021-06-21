@@ -9,6 +9,8 @@ export interface AssignmentMaterialsCreatedEvent {
     courseId: string;
     assignmentId: string;
     creatorId: string;
+    user: string;
+    email: string;
     time: Date;
   };
 }

@@ -10,6 +10,8 @@ export interface CourseDeletedEvent {
     year: string;
     lastUpdate: Date;
     instructorId: string;
+    user: string;
+    email: string;
     time: Date;
   };
 }
