@@ -12,6 +12,8 @@ export interface StudentDeliveryFileDeletedEvent {
     studentId: string;
     user: string;
     email: string;
+    filePath: string;
+    fileType: string;
     time: Date;
   };
 }

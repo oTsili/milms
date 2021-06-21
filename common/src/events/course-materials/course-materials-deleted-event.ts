@@ -10,6 +10,8 @@ export interface CourseMaterialsDeletedEvent {
     creatorId: string;
     user: string;
     email: string;
+    filePath: string;
+    fileType: string;
     time: Date;
   };
 }

@@ -12,6 +12,8 @@ export interface StudentDeliveryFileCreatedEvent {
     studentId: string;
     user: string;
     email: string;
+    filePath: string;
+    fileType: string;
     time: Date;
   };
 }
