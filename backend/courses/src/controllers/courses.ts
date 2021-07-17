@@ -1,14 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
-import path from 'path';
-var logger = require('winston');
-const Riak = require('basho-riak-client');
 import { BadRequestError, catchAsync, NotFoundError } from '@otmilms/common';
-
-// import { courseCreatedPublisher } from './events/publishers/courses-publisher';
 import { CourseDoc } from '../models/course';
 import { Course, User } from '../models/models';
-import { UserDoc } from '../models/user';
-import { riakWrapper } from '../riak-wrapper';
 import {
   CourseCreatedPublisher,
   CourseDeletedPublisher,
@@ -20,8 +13,28 @@ export const getCourses = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const pageSize = +req.query.pagesize!;
     const currentPage = +req.query.page!;
+    let filterValues = req.query.filter! as string;
 
-    let courseQuery = Course.find();
+    const { years, semesters } = distinguishFilterValues(filterValues);
+
+    let courseQuery;
+
+    if (semesters.length > 0) {
+      courseQuery = Course.find({
+        semester: { $in: semesters },
+      });
+    } else if (years.length > 0) {
+      courseQuery = Course.find({
+        year: { $in: years },
+      });
+    } else if (years.length > 0 && semesters.length > 0) {
+      courseQuery = Course.find({
+        semester: { $in: semesters },
+        year: { $in: years },
+      });
+    } else {
+      courseQuery = Course.find();
+    }
 
     let sortObj;
     if (`${req.query.sort}` !== '') {
@@ -39,7 +52,6 @@ export const getCourses = catchAsync(
     let fetchedCourses: CourseDoc[];
 
     fetchedCourses = await courseQuery
-      // .populate({ path: 'assignments', model: 'Assignment', key: 'id' })
       .populate('instructorId')
       .populate('assignments')
       .populate('studentId')
@@ -214,150 +226,21 @@ export const updateCourse = catchAsync(
   }
 );
 
-export const getAuthEvents = catchAsync(async (req: Request, res: Response) => {
-  const pageSize = +req.query.pagesize!;
-  const currentPage = +req.query.page!;
-  const userId = req.currentUser!.id;
-  const user = await User.findById(userId);
+const distinguishFilterValues = (
+  filterValues: string
+): { years: string[]; semesters: string[] } => {
+  // const years = filterValues.filter(
+  //   (value) => typeof parseInt(value) === 'number'
+  // );
+  const years = filterValues
+    .replace(/\D+/g, ' ')
+    .split(' ')
+    .filter((year) => year !== ''); // replace non-digits with space
 
-  const startDate = new Date(req.body.startDate).getTime();
-  const endDate = new Date(req.body.endDate).getTime();
+  const semesters = filterValues
+    .split(',')
+    .filter((value) => !years.includes(value))
+    .filter((value) => value !== '');
 
-  let eventsQuery;
-
-  const countEventsQuery =
-    'SELECT COUNT(*) FROM user WHERE time >' +
-    startDate +
-    'AND time < ' +
-    endDate;
-
-  /* if provided sosrt object send events sorted */
-  let sortObj;
-  if (`${req.query.sort}` !== '') {
-    sortObj = JSON.parse(`${req.query.sort}`);
-
-    let orderByElement;
-    if (sortObj.active === 'user') {
-      orderByElement = 'firstName';
-    } else {
-      orderByElement = sortObj.active;
-    }
-
-    if (sortObj.direction === 'asc') {
-      eventsQuery =
-        'SELECT * FROM user WHERE time >' +
-        startDate +
-        'AND time < ' +
-        endDate +
-        'ORDER BY ' +
-        orderByElement +
-        ' ASC LIMIT ' +
-        pageSize +
-        ' OFFSET ' +
-        pageSize * (currentPage - 1);
-    } else if (sortObj.direction === 'desc') {
-      eventsQuery =
-        'SELECT * FROM user WHERE time >' +
-        startDate +
-        'AND time < ' +
-        endDate +
-        'ORDER BY ' +
-        orderByElement +
-        ' DESC LIMIT ' +
-        pageSize +
-        ' OFFSET ' +
-        pageSize * (currentPage - 1);
-    }
-  } else {
-    eventsQuery =
-      'SELECT * FROM user WHERE time >' +
-      startDate +
-      'AND time < ' +
-      endDate +
-      ' ORDER BY time DESC LIMIT ' +
-      pageSize +
-      ' OFFSET ' +
-      pageSize * (currentPage - 1);
-  }
-
-  let userEvents: { [k: string]: any }[] = [];
-  let maxEvents;
-  var eventsCb = function (err, rslt) {
-    if (err) {
-      console.log(err);
-    } else {
-      rslt.rows.forEach((row: string) => {
-        let cols = row.toString().split(',');
-        userEvents.push(
-          Object.fromEntries(
-            new Map([
-              ['time', toHumanDateTime(new Date(+cols[0]))],
-              ['event', cols[1]],
-              ['email', cols[2]],
-              ['firstName', cols[3]],
-              ['lastName', cols[4]],
-            ])
-          )
-        );
-      });
-    }
-
-    /* START of count Events */
-    var countEventsCb = function (err, rslt) {
-      if (err) {
-        console.log(err);
-      } else {
-        maxEvents = rslt.rows;
-
-        // send a response with the found events
-        res.status(200).json({
-          message: 'Events fetched successfully!',
-          events: userEvents,
-          maxEvents: maxEvents[0][0].low,
-        });
-      }
-    };
-
-    const countEventsCmd = new Riak.Commands.TS.Query.Builder()
-      .withQuery(countEventsQuery)
-      .withCallback(countEventsCb)
-      .build();
-
-    riakWrapper.queryClient.execute(countEventsCmd);
-
-    /*   END of count Events */
-  };
-
-  const eventsCmd = new Riak.Commands.TS.Query.Builder()
-    .withQuery(eventsQuery)
-    .withCallback(eventsCb)
-    .build();
-
-  if (user) {
-    riakWrapper.queryClient.execute(eventsCmd);
-  } else {
-    throw new Error('user not found');
-  }
-});
-
-export const toHumanDateTime = (date: Date) => {
-  let month = (date.getMonth() + 1).toString();
-
-  let newDateArray = date.toDateString().split(' ');
-  // delete the day name
-  newDateArray.splice(0, 1);
-  // change the month name to month numbers
-  newDateArray.splice(0, 1, month);
-  // monve the month to the center
-  monveInArray(newDateArray, 0, 1);
-  let newDate = newDateArray.join(' ').replace(/\ /g, '/');
-  let newTime = date.toTimeString().split(' ')[0];
-
-  return `${newDate} ${newTime}`;
-};
-
-const monveInArray = (arr: string[], from: number, to: number): void => {
-  let item = arr.splice(from, 1);
-
-  arr.splice(to, 0, item[0]);
+  return { years, semesters };
 };

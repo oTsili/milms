@@ -8,6 +8,7 @@ import {
   requireAuth,
 } from '@otmilms/common';
 import * as UserController from '../controllers/user';
+import * as EventsController from '../controllers/events';
 
 const router = express.Router();
 const MIME_TYPE_MAP: { [key: string]: any } = {
@@ -71,7 +72,7 @@ router.post(
   '/events',
   currentUser,
   requireAuth,
-  UserController.getCourseEvents
+  EventsController.getCourseEvents
 );
 
 export { router as UserRouter };

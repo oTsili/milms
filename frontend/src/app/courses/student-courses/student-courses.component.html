@@ -4,7 +4,7 @@
       <mat-icon>menu</mat-icon>
     </button>
     <form
-      (submit)="onCoursesUpdate(updateCoursesForm)"
+      (submit)="onCoursesFilter(updateCoursesForm)"
       #updateCoursesForm="ngForm"
     >
       <mat-sidenav
@@ -80,9 +80,9 @@
           </span>
           <button
             mat-raised-button
-            type="submit"
             color="accent"
             matTooltip="update the list of courses"
+            type="submit"
           >
             Update
           </button>

@@ -48,8 +48,13 @@ export class CoursesService {
 
   //////// Functions //////////
 
-  getCourses(coursesPerPage: number, currentPage: number, sort: string = '') {
-    const queryParams = `?pagesize=${coursesPerPage}&page=${currentPage}&sort=${sort}`;
+  getCourses(
+    coursesPerPage: number,
+    currentPage: number,
+    sort: string = '',
+    filterValues: string[] = []
+  ) {
+    const queryParams = `?pagesize=${coursesPerPage}&page=${currentPage}&sort=${sort}&filter=${filterValues}`;
 
     return this.http
       .get<{ message: string; courses: Course[]; maxCourses: number }>(

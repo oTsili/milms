@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from 'express';
-
 import { catchAsync } from '@otmilms/common';
 import { User } from '../models/models';
 

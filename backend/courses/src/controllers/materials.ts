@@ -1,26 +1,16 @@
 import { Request, Response, NextFunction } from 'express';
 import path from 'path';
-var logger = require('winston');
-const Riak = require('basho-riak-client');
-
 import { catchAsync } from '@otmilms/common';
-
-import { Assignment, User, Course, Material } from '../models/models';
-import { UserDoc } from '../models/user';
+import { User, Material } from '../models/models';
 import {
-  AssignmentCreatedPublisher,
   AssignmentMaterialCreatedPublisher,
-  AssignmentMaterialDeletedPublisher,
   CourseMaterialCreatedPublisher,
   CourseMaterialdeletedPublisher,
 } from './events/publishers/course-publisher';
 import { natsWrapper } from '../nats-wrapper';
-
 // import APIFeatures from '../utils/apiFeatures';
 // import fetch from 'node-fetch';
 import { access, constants, mkdir } from 'fs';
-
-import { riakWrapper } from '../riak-wrapper';
 import { MaterialDoc } from '../models/material';
 
 ///////////////// Course Materials /////////////////

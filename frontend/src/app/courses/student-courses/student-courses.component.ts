@@ -188,8 +188,28 @@ export class StudentCoursesComponent implements OnInit, OnDestroy {
   }
   // end checkbox
 
-  onCoursesUpdate(form: NgForm) {
-    console.log(form);
+  onCoursesFilter(form: NgForm) {
+    if (form.invalid) {
+      console.log('form invalid');
+      return;
+    }
+
+    const filterValues = Object.keys(form.value);
+    const trueValues = filterValues.filter((key) => {
+      return form.value[key];
+    });
+
+    this.isLoading = true;
+    this.coursesService
+      .getCourses(this.coursesPerPage, this.currentPage, '', trueValues)
+      .subscribe((response) => {
+        this.courses = response.courses;
+        // this.clearFormArray(this.assignmentControls);
+        // for (let i = 0; i < this.assignments.length; i++) {
+        //   this.addItem(this.assignments[i]);
+        // }
+        this.isLoading = false;
+      });
   }
 
   initializeControls() {

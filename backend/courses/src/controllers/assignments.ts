@@ -1,11 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import path from 'path';
-var logger = require('winston');
-const Riak = require('basho-riak-client');
-
-import { BadRequestError, catchAsync } from '@otmilms/common';
-
-import { Assignment, User, Course } from '../models/models';
+import { catchAsync } from '@otmilms/common';
+import { Assignment, User } from '../models/models';
 import {
   AssignmentCreatedPublisher,
   AssignmentDeletedPublisher,
@@ -13,12 +9,9 @@ import {
   StudentDeliveryAssignmentDeletedPublisher,
 } from './events/publishers/course-publisher';
 import { natsWrapper } from '../nats-wrapper';
-import { toHumanDateTime } from './courses';
 // import APIFeatures from '../utils/apiFeatures';
 // import fetch from 'node-fetch';
 import { access, constants, mkdir } from 'fs';
-
-import { UserDoc } from '../models/user';
 
 export const createAssignment = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {

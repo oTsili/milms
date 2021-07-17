@@ -291,5 +291,5 @@ mat-divider {
 } */
 
 .buttons-line button {
-  margin: 1% auto auto 1%;
+  margin: 1% auto auto auto;
 }
