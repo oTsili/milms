@@ -15,7 +15,7 @@ import {
 } from './events/publishers/user-publisher';
 import { natsWrapper } from '../nats-wrapper';
 
-const expiration_token = process.env.EXPIRES_IN || '3600';
+const expiration_token = process.env.EXPIRES_IN || '10800';
 dotenv.config();
 
 // export const resizeUserPhoto = catchAsync(

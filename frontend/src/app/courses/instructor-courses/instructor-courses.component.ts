@@ -81,6 +81,7 @@ export class InstructorCoursesComponent implements OnInit, OnDestroy {
 
     // update the null values of the current user to be used in new assignments
     this.user = this.headerService.getUserData();
+
     // define custom subscriptions
     this.coursesUpdateSubscription = this.coursesService
       .getCoursesListener()

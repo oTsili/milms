@@ -16,10 +16,9 @@ import { SharedService } from '../shared/services/shared.service';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private authStatusListener = new Subject<boolean>();
-  private isAuthenticated = false;
-  private userId: string;
   private tokenTimer: NodeJS.Timer;
   user: UserPayload;
+  private isAuthenticated = false;
 
   constructor(
     private http: HttpClient,
@@ -32,16 +31,14 @@ export class AuthService {
     return this.authStatusListener.asObservable();
   }
 
-  getIsLoggedIn() {
-    return this.isAuthenticated;
-    // console.log(this.authStatusListener);
+  /**
+   * set authentication status
+   * @param auth (true after the user has authenticated, otherwise false)
+   */
+  authenticate(auth: boolean) {
+    this.authStatusListener.next(auth);
   }
 
-  getUserId() {
-    return this.userId;
-  }
-
-  // get auth by requesting to the node server
   getIsAuth(local: boolean = false) {
     if (local) {
       return this.isAuthenticated;
@@ -98,9 +95,7 @@ export class AuthService {
       )
       .subscribe(
         (data) => {
-          this.isAuthenticated = true;
           this.authStatusListener.next(true);
-          this.userId = data.existingUser.id;
           this.router.navigate(['/']);
           let duration = parseInt(data.expiresIn);
           this.setAuthTimer(duration);
@@ -121,10 +116,8 @@ export class AuthService {
         withCredentials: true,
       })
       .subscribe((data: { existingUser: User; expiresIn: string }) => {
-        this.isAuthenticated = true;
         this.authStatusListener.next(true);
         this.router.navigate(['/']);
-        this.userId = data.existingUser.id;
         this.headerService.setUserData(
           data.existingUser.photoPath,
           `${data.existingUser.firstName} ${data.existingUser.lastName}`
@@ -144,9 +137,7 @@ export class AuthService {
       })
       .subscribe(
         (data) => {
-          this.isAuthenticated = false;
           this.authStatusListener.next(false);
-          this.userId = null;
         },
         (error) => {
           this.authStatusListener.next(false);
@@ -164,7 +155,6 @@ export class AuthService {
     if (expiration) {
       const expiresIn = expiration.expirationDate.getTime() - now.getTime();
       if (expiresIn > 0) {
-        this.isAuthenticated = true;
         this.authStatusListener.next(true);
         this.setAuthTimer(expiresIn / 1000);
       }

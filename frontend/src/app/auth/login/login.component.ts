@@ -23,9 +23,13 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.authStatusSub = this.authService
       .getAuthStatusListener()
       .subscribe((authStatus) => {
+        this.userIsAuthenticated = authStatus;
         this.isLoading = false;
       });
-    this.userIsAuthenticated = this.authService.getIsLoggedIn();
+  }
+
+  ngOnDestroy() {
+    this.authStatusSub.unsubscribe();
   }
 
   onLogin(form: NgForm) {
@@ -36,13 +40,5 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     this.authService.login(form.value.email, form.value.password);
     this.isLoading = false;
-    // this.isLoading = false;
-    this.authService
-      .getAuthStatusListener()
-      .subscribe((authStstus) => (this.isLoading = false));
-  }
-
-  ngOnDestroy() {
-    this.authStatusSub.unsubscribe();
   }
 }

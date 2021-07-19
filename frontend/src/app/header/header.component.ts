@@ -27,8 +27,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    // get the authentication state from the frontend (not the backend)
-    this.userIsAuthenticated = this.authService.getIsAuth(true);
     this.visibilitySubs = this.headerService
       .getIsHeaderVisible()
       .subscribe((isVisible) => {
