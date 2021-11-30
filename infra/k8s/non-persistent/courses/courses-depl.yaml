@@ -54,7 +54,11 @@ spec:
   selector:
     app: courses
   ports:
-    - name: courses
+    - name: http-courses
       protocol: TCP
       port: 3000
       targetPort: 3000
+    # - name: https-courses
+    #   protocol: TCP
+    #   port: 3000
+    #   targetPort: 3000
