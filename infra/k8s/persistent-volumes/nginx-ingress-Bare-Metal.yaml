@@ -272,8 +272,9 @@ metadata:
   name: ingress-nginx-controller
   namespace: ingress-nginx
 spec:
-  # externalIPs:
-  #   - 65.108.88.0
+  externalIPs:
+    # - 65.108.88.0
+    - 192.168.99.7
   type: LoadBalancer
   # type: NodePort
   ipFamilyPolicy: SingleStack
