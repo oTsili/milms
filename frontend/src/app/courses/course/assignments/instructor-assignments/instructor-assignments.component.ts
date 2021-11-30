@@ -21,6 +21,7 @@ import { AssignmentsService } from 'src/app/courses/course/assignments/assignmen
 import { AssignmentTableLineComponent } from 'src/app/shared/matDialog/assignmentTableLine/assignmentTableLine.component';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { fileTableLineComponent } from 'src/app/shared/matDialog/fileTableLine/fileTableLine.component';
+import * as saveAs from 'file-saver';
 
 @Component({
   selector: 'app-instructor-assignments',
