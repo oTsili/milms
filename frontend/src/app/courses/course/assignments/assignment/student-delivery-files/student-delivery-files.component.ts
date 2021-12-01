@@ -7,7 +7,6 @@ import { StudentDeliveryFile } from 'src/app/models/student-delivery.model';
 import { MatTableDataSource } from '@angular/material/table';
 import { Sort, MatSort } from '@angular/material/sort';
 import { SharedService } from 'src/app/shared/services/shared.service';
-import * as saveAs from 'file-saver';
 @Component({
   selector: 'app-student-delivery-files',
   templateUrl: './student-delivery-files.component.html',

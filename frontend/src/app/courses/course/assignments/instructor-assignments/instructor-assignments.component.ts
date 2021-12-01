@@ -11,7 +11,6 @@ import { MatSort, Sort } from '@angular/material/sort';
 import { Subscription } from 'rxjs';
 import { MatTableDataSource } from '@angular/material/table';
 import { PageEvent } from '@angular/material/paginator';
-
 import { CoursesService } from 'src/app/courses/courses.service';
 import { HeaderService } from 'src/app/header/header.service';
 import { Assignment } from 'src/app/models/assignment.model';
@@ -21,7 +20,6 @@ import { AssignmentsService } from 'src/app/courses/course/assignments/assignmen
 import { AssignmentTableLineComponent } from 'src/app/shared/matDialog/assignmentTableLine/assignmentTableLine.component';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { fileTableLineComponent } from 'src/app/shared/matDialog/fileTableLine/fileTableLine.component';
-import * as saveAs from 'file-saver';
 
 @Component({
   selector: 'app-instructor-assignments',

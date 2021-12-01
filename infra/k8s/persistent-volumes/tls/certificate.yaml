@@ -1,14 +1,14 @@
-# apiVersion: cert-manager.io/v1
- 
-# kind: Certificate
-# metadata:
-#   name: milms-tech-tls
-# spec:
-#   secretName: milms-tech
-#   issuerRef:
-#     name: letsencrypt-prod
-#     kind: ClusterIssuer
-#   commonName: milms.tech
-#   dnsNames:
-#     - milms.tech
-#     - www.milms.tech
+apiVersion: cert-manager.io/v1
+
+kind: Certificate
+metadata:
+  name: milms-tech-tls
+spec:
+  secretName: milms-tech
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  commonName: milms.tech
+  dnsNames:
+    - milms.tech
+    - www.milms.tech

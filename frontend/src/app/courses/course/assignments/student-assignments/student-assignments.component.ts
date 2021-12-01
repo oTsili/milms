@@ -9,9 +9,7 @@ import {
 } from '@angular/forms';
 import { Sort } from '@angular/material/sort';
 import { ActivatedRoute, ParamMap } from '@angular/router';
-import * as saveAs from 'file-saver';
 import { Subscription } from 'rxjs';
-
 import { AssignmentsService } from 'src/app/courses/course/assignments/assignments.service';
 import { CoursesService } from 'src/app/courses/courses.service';
 import { HeaderService } from 'src/app/header/header.service';
