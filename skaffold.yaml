@@ -18,10 +18,10 @@ build:
         manual:
           - src: 'src/**/*.ts'
             dest: .
-    - image: otsili/frontend_v1
+    - image: otsili/frontend_dev
       context: frontend
       docker:
-        dockerfile: Dockerfile
+        dockerfile: Dockerfile.dev
       sync:
         infer:
           - src/**/*
@@ -33,7 +33,7 @@ build:
         manual:
           - src: 'src/**/*.ts'
             dest: .
-    # - image: otsili/frontend
+    # - image: otsili/frontend_prod
     #   context: frontend
     #   docker:
     #     dockerfile: Dockerfile.prod

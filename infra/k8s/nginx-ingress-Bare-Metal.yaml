@@ -269,13 +269,16 @@ metadata:
     app.kubernetes.io/version: 1.1.0
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: controller
+    # service.beta.kubernetes.io/do-loadbalancer-enable-proxy-protocol: 'true'
+    # service.beta.kubernetes.io/do-loadbalancer-hostname: 'milms.tech'
   name: ingress-nginx-controller
   namespace: ingress-nginx
 spec:
-  # externalIPs:
-  # - 65.108.88.0
-  # - 192.168.99.7
+  externalTrafficPolicy: Cluster
   type: LoadBalancer
+  externalIPs:
+    - 65.108.88.0
+    - 135.181.153.207
   # type: NodePort
   ipFamilyPolicy: SingleStack
   ipFamilies:
@@ -298,6 +301,48 @@ spec:
     app.kubernetes.io/instance: ingress-nginx
     app.kubernetes.io/component: controller
 ---
+# # Source: ingress-nginx/templates/controller-service.yaml
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   annotations:
+#   labels:
+#     helm.sh/chart: ingress-nginx-4.0.10
+#     app.kubernetes.io/name: ingress-nginx
+#     app.kubernetes.io/instance: ingress-nginx
+#     app.kubernetes.io/version: 1.1.0
+#     app.kubernetes.io/managed-by: Helm
+#     app.kubernetes.io/component: controller
+#     service.beta.kubernetes.io/do-loadbalancer-hostname: 'dashboard.milms.tech'
+#   name: ingress-nginx-controller
+#   namespace: ingress-nginx
+# spec:
+#   externalIPs:
+#     - 65.108.88.0
+#     - 135.181.153.207
+#   type: LoadBalancer
+#   # type: NodePort
+#   ipFamilyPolicy: SingleStack
+#   ipFamilies:
+#     - IPv4
+#   ports:
+#     - name: http
+#       port: 80
+#       protocol: TCP
+#       targetPort: http
+#       appProtocol: http
+#       # nodePort: 80
+#     - name: https
+#       port: 443
+#       protocol: TCP
+#       targetPort: https
+#       appProtocol: https
+#       # nodePort: 443
+#   selector:
+#     app.kubernetes.io/name: ingress-nginx
+#     app.kubernetes.io/instance: ingress-nginx
+#     app.kubernetes.io/component: controller
+# ---
 # Source: ingress-nginx/templates/controller-deployment.yaml
 apiVersion: apps/v1
 kind: Deployment

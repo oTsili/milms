@@ -7,7 +7,7 @@ metadata:
     nginx.ingress.kubernetes.io/use-regex: 'true'
     nginx.ingress.kubernetes.io/proxy-body-size: '600m'
     nginx.org/client-max-body-size: '600m'
-    nginx.ingress.kubernetes.io/rewrite-target: /
+    # nginx.ingress.kubernetes.io/rewrite-target: /
     # nginx.ingress.kubernetes.io/rewrite-target: /$2
     # ingress.kubernetes.io/ssl-redirect: "false"
     # nginx.ingress.kubernetes.io/enable-cors: "true"
@@ -99,12 +99,50 @@ spec:
                 port:
                   # number: 80
                   number: 4200
+# ---
+# kind: ConfigMap
+# apiVersion: v1
+# metadata:
+#   name: nginx-config
+# data:
+#   proxy-protocol: 'True'
+#   real-ip-header: 'proxy_protocol'
+#   set-real-ip-from: '135.181.153.207'
 ---
-kind: ConfigMap
-apiVersion: v1
+apiVersion: networking.k8s.io/v1
+kind: Ingress
 metadata:
-  name: nginx-config
-data:
-  proxy-protocol: 'True'
-  real-ip-header: 'proxy_protocol'
-  set-real-ip-from: '135.181.153.207'
+  name: kubernetes-dashboard-ingress
+  namespace: kubernetes-dashboard
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/backend-protocol: 'HTTPS'
+    cert-manager.io/cluster-issuer: 'letsencrypt-prod'
+    nginx.ingress.kubernetes.io/ssl-redirect: 'true'
+spec:
+  tls:
+    - hosts:
+        - 'dashboard.milms.tech'
+        - 'www.dashboard.milms.tech'
+      secretName: dashboard-milms-tech-tls
+  rules:
+    - host: 'dashboard.milms.tech'
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: kubernetes-dashboard
+                port:
+                  number: 443
+    - host: 'www.dashboard.milms.tech'
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: kubernetes-dashboard
+                port:
+                  number: 443
