@@ -14,8 +14,8 @@ spec:
     spec:
       containers:
         - name: frontend
-          # image: otsili/frontend
-          image: otsili/frontend_v1
+          # image: otsili/frontend_prod
+          image: otsili/frontend_dev
           imagePullPolicy: IfNotPresent
           ports:
             # - containerPort: 80
@@ -32,7 +32,8 @@ spec:
       protocol: TCP
       port: 80
       # targetPort: 80
-      targetPort: 4200
+      targetPort:
+        4200
         # targetPort: 80
     - name: https-frontend
       protocol: TCP
