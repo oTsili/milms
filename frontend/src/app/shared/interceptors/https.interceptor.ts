@@ -17,8 +17,8 @@ export class httpsInterceptor implements HttpInterceptor {
     const secureReq = req.clone({
       // url: req.url.replace('http://', 'https://'),
       url: req.url
-        .replace('http://localhost:3000', 'http://milms.tech')
-        .replace('http://localhost:4000', 'http://milms.tech'), // for local development
+        .replace('http://localhost:3000', 'https://milms.tech')
+        .replace('http://localhost:4000', 'https://milms.tech'), // for local development
     });
 
     return next.handle(secureReq);

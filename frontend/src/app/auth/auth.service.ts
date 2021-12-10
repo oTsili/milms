@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { Subject } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import {
   LoginAuthData,
   SignupAuthData,
@@ -39,32 +39,28 @@ export class AuthService {
     this.authStatusListener.next(auth);
   }
 
-  getIsAuth(local: boolean = false) {
-    if (local) {
-      return this.isAuthenticated;
-    }
-
-    this.http
-      .get(environment.AUTH_BASE_URL + '/api/users/currentuser', {
-        withCredentials: true,
-      })
-      .subscribe(
-        (data) => {
-          // if authenticated, the api returns the current user
-          if (Object.keys(data).length > 0) {
-            this.isAuthenticated = true;
-            this.authStatusListener.next(true);
-          } else {
-            // if not authenticated, the api returns an empty object
-            this.isAuthenticated = false;
-            this.authStatusListener.next(false);
+  public checkAuthentication(): Observable<boolean> {
+    return new Observable<boolean>((observer) => {
+      this.http
+        .get(environment.AUTH_BASE_URL + '/api/users/currentuser', {
+          withCredentials: true,
+        })
+        .subscribe(
+          (data) => {
+            // if authenticated, the api returns the current user
+            if (Object.keys(data).length > 0) {
+              observer.next(true);
+            } else {
+              // if not authenticated, the api returns an empty object
+              observer.next(false);
+            }
+          },
+          (error) => {
+            console.log('error');
+            observer.next(false);
           }
-        },
-        (error) => {
-          this.authStatusListener.next(false);
-        }
-      );
-    return this.isAuthenticated;
+        );
+    });
   }
 
   createUser(signupAuthData: SignupAuthData) {
