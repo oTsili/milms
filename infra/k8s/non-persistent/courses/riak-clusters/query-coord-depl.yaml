@@ -1,54 +1,54 @@
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: courses-riak-query-coordinator-depl
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: courses-riak-query-coordinator
-  strategy:
-    type: Recreate
-  template:
-    metadata:
-      labels:
-        app: courses-riak-query-coordinator
-    spec:
-      volumes:
-        - name: courses-riak-query-schemas
-          persistentVolumeClaim:
-            claimName: courses-riak-query-schemas-pvc
-        # - name: courses-riak-query-storage
-        #   persistentVolumeClaim:
-        #     claimName: courses-riak-query-pvc
-      containers:
-        - env:
-            - name: CLUSTER_NAME
-              value: courses-riak-query-cluster
-          image: basho/riak-ts
-          name: courses-riak-query-coordinator
-          ports:
-            - containerPort: 8087
-            - containerPort: 8098
-          resources: {}
-          volumeMounts:
-            - name: courses-riak-query-schemas
-              mountPath: /etc/riak/schemas
-            # - name: courses-riak-query-storage
-            #   mountPath: /var/lib/riak
-      restartPolicy: Always
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: courses-riak-query-coordinator-srv
-spec:
-  ports:
-    - name: 'protobuf'
-      port: 8087
-      targetPort: 8087
-    - name: 'http'
-      port: 8098
-      targetPort: 8098
-  selector:
-    app: courses-riak-query-coordinator
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: courses-riak-query-coordinator-depl
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: courses-riak-query-coordinator
+#   strategy:
+#     type: Recreate
+#   template:
+#     metadata:
+#       labels:
+#         app: courses-riak-query-coordinator
+#     spec:
+#       volumes:
+#         - name: courses-riak-query-schemas
+#           persistentVolumeClaim:
+#             claimName: courses-riak-query-schemas-pvc
+#         # - name: courses-riak-query-storage
+#         #   persistentVolumeClaim:
+#         #     claimName: courses-riak-query-pvc
+#       containers:
+#         - env:
+#             - name: CLUSTER_NAME
+#               value: courses-riak-query-cluster
+#           image: basho/riak-ts
+#           name: courses-riak-query-coordinator
+#           ports:
+#             - containerPort: 8087
+#             - containerPort: 8098
+#           resources: {}
+#           volumeMounts:
+#             - name: courses-riak-query-schemas
+#               mountPath: /etc/riak/schemas
+#             # - name: courses-riak-query-storage
+#             #   mountPath: /var/lib/riak
+#       restartPolicy: Always
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: courses-riak-query-coordinator-srv
+# spec:
+#   ports:
+#     - name: 'protobuf'
+#       port: 8087
+#       targetPort: 8087
+#     - name: 'http'
+#       port: 8098
+#       targetPort: 8098
+#   selector:
+#     app: courses-riak-query-coordinator

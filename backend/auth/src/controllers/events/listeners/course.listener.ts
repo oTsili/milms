@@ -7,7 +7,7 @@ import {
   CourseDeletedEvent,
 } from '@otmilms/common';
 import { Course } from '../../../models/models';
-import { riakWrapper } from '../../../riak-wrapper';
+// import { riakWrapper } from '../../../riak-wrapper';
 import { RiakEvent } from './models-listeners';
 const Riak = require('basho-riak-client');
 
@@ -41,33 +41,33 @@ export class CourseCreateListener extends Listener<CourseCreatedEvent> {
 
     await course.save();
 
-    // filter the user information to be saved in RIAK DB as event
-    const eventCourse: RiakEvent = {
-      user,
-      email,
-      time: new Date(time),
-    };
+    // // filter the user information to be saved in RIAK DB as event
+    // const eventCourse: RiakEvent = {
+    //   user,
+    //   email,
+    //   time: new Date(time),
+    // };
 
-    var cb = function (err, rslt) {
-      // NB: rslt will be true when successful
-      if (err) {
-        console.log([err]);
-      } else {
-        console.log({ rslt });
-      }
-    };
+    // var cb = function (err, rslt) {
+    //   // NB: rslt will be true when successful
+    //   if (err) {
+    //     console.log([err]);
+    //   } else {
+    //     console.log({ rslt });
+    //   }
+    // };
 
-    var rows = [
-      [eventCourse.time, 'course:created', eventCourse.user, eventCourse.email],
-    ];
+    // var rows = [
+    //   [eventCourse.time, 'course:created', eventCourse.user, eventCourse.email],
+    // ];
 
-    var cmd = new Riak.Commands.TS.Store.Builder()
-      .withTable('course')
-      .withRows(rows)
-      .withCallback(cb)
-      .build();
+    // var cmd = new Riak.Commands.TS.Store.Builder()
+    //   .withTable('course')
+    //   .withRows(rows)
+    //   .withCallback(cb)
+    //   .build();
 
-    riakWrapper.queryClient.execute(cmd);
+    // riakWrapper.queryClient.execute(cmd);
 
     msg.ack();
   }
@@ -104,33 +104,33 @@ export class CourseUpdateListener extends Listener<CourseUpdatedEvent> {
       }
     );
 
-    // filter the user information to be saved in RIAK DB as event
-    const eventCourse: RiakEvent = {
-      user,
-      email,
-      time: new Date(time),
-    };
+    // // filter the user information to be saved in RIAK DB as event
+    // const eventCourse: RiakEvent = {
+    //   user,
+    //   email,
+    //   time: new Date(time),
+    // };
 
-    var cb = function (err, rslt) {
-      // NB: rslt will be true when successful
-      if (err) {
-        console.log([err]);
-      } else {
-        console.log({ rslt });
-      }
-    };
+    // var cb = function (err, rslt) {
+    //   // NB: rslt will be true when successful
+    //   if (err) {
+    //     console.log([err]);
+    //   } else {
+    //     console.log({ rslt });
+    //   }
+    // };
 
-    var rows = [
-      [eventCourse.time, 'course:updated', eventCourse.user, eventCourse.email],
-    ];
+    // var rows = [
+    //   [eventCourse.time, 'course:updated', eventCourse.user, eventCourse.email],
+    // ];
 
-    var cmd = new Riak.Commands.TS.Store.Builder()
-      .withTable('course')
-      .withRows(rows)
-      .withCallback(cb)
-      .build();
+    // var cmd = new Riak.Commands.TS.Store.Builder()
+    //   .withTable('course')
+    //   .withRows(rows)
+    //   .withCallback(cb)
+    //   .build();
 
-    riakWrapper.queryClient.execute(cmd);
+    // riakWrapper.queryClient.execute(cmd);
 
     msg.ack();
   }
@@ -157,29 +157,29 @@ export class CourseDeleteListener extends Listener<CourseDeletedEvent> {
       id,
     });
 
-    // filter the user information to be saved in RIAK DB as event
-    const eventCourse: RiakEvent = { user, email, time: new Date(time) };
+    // // filter the user information to be saved in RIAK DB as event
+    // const eventCourse: RiakEvent = { user, email, time: new Date(time) };
 
-    var cb = function (err, rslt) {
-      // NB: rslt will be true when successful
-      if (err) {
-        console.log([err]);
-      } else {
-        console.log({ rslt });
-      }
-    };
+    // var cb = function (err, rslt) {
+    //   // NB: rslt will be true when successful
+    //   if (err) {
+    //     console.log([err]);
+    //   } else {
+    //     console.log({ rslt });
+    //   }
+    // };
 
-    var rows = [
-      [eventCourse.time, 'course:deleted', eventCourse.user, eventCourse.email],
-    ];
+    // var rows = [
+    //   [eventCourse.time, 'course:deleted', eventCourse.user, eventCourse.email],
+    // ];
 
-    var cmd = new Riak.Commands.TS.Store.Builder()
-      .withTable('course')
-      .withRows(rows)
-      .withCallback(cb)
-      .build();
+    // var cmd = new Riak.Commands.TS.Store.Builder()
+    //   .withTable('course')
+    //   .withRows(rows)
+    //   .withCallback(cb)
+    //   .build();
 
-    riakWrapper.queryClient.execute(cmd);
+    // riakWrapper.queryClient.execute(cmd);
 
     msg.ack();
   }

@@ -9,7 +9,7 @@ const router = express.Router();
 
 import * as CourseController from '../controllers/courses';
 import * as AssignmentController from '../controllers/assignments';
-import * as EventsController from '../controllers/events';
+// import * as EventsController from '../controllers/events';
 import { currentUserRouter } from './current-user';
 import * as StudentDeliveriesController from '../controllers/studentDeliveries';
 import * as MaterialsController from '../controllers/materials';
@@ -202,11 +202,11 @@ router.put(
 
 /////////////// Events ///////////////
 
-router.post(
-  '/events',
-  currentUser,
-  requireAuth,
-  EventsController.getAuthEvents
-);
+// router.post(
+//   '/events',
+//   currentUser,
+//   requireAuth,
+//   EventsController.getAuthEvents
+// );
 
 export { router as CourseRouter };

@@ -7,7 +7,7 @@ import {
   CourseMaterialsDeletedEvent,
 } from '@otmilms/common';
 import { Material } from '../../../models/models';
-import { riakWrapper } from '../../../riak-wrapper';
+// import { riakWrapper } from '../../../riak-wrapper';
 import { RiakEvent } from './models-listeners';
 const Riak = require('basho-riak-client');
 
@@ -41,38 +41,38 @@ export class CourseMaterialCreateListener extends Listener<CourseMaterialsCreate
 
     await material.save();
 
-    // filter the user information to be saved in RIAK DB as event
-    const eventMaterial: RiakEvent = {
-      user,
-      email,
-      time: new Date(time),
-    };
+    // // filter the user information to be saved in RIAK DB as event
+    // const eventMaterial: RiakEvent = {
+    //   user,
+    //   email,
+    //   time: new Date(time),
+    // };
 
-    var cb = function (err, rslt) {
-      // NB: rslt will be true when successful
-      if (err) {
-        console.log([err]);
-      } else {
-        console.log({ rslt });
-      }
-    };
+    // var cb = function (err, rslt) {
+    //   // NB: rslt will be true when successful
+    //   if (err) {
+    //     console.log([err]);
+    //   } else {
+    //     console.log({ rslt });
+    //   }
+    // };
 
-    var rows = [
-      [
-        eventMaterial.time,
-        'course-material:created',
-        eventMaterial.user,
-        eventMaterial.email,
-      ],
-    ];
+    // var rows = [
+    //   [
+    //     eventMaterial.time,
+    //     'course-material:created',
+    //     eventMaterial.user,
+    //     eventMaterial.email,
+    //   ],
+    // ];
 
-    var cmd = new Riak.Commands.TS.Store.Builder()
-      .withTable('course')
-      .withRows(rows)
-      .withCallback(cb)
-      .build();
+    // var cmd = new Riak.Commands.TS.Store.Builder()
+    //   .withTable('course')
+    //   .withRows(rows)
+    //   .withCallback(cb)
+    //   .build();
 
-    riakWrapper.queryClient.execute(cmd);
+    // riakWrapper.queryClient.execute(cmd);
 
     msg.ack();
   }
@@ -93,38 +93,38 @@ export class CourseMaterialUpdateListener extends Listener<CourseMaterialsUpdate
       { name, lastUpdate, courseId, creatorId }
     );
 
-    // filter the user information to be saved in RIAK DB as event
-    const eventMaterial: RiakEvent = {
-      user,
-      email,
-      time: new Date(time),
-    };
+    // // filter the user information to be saved in RIAK DB as event
+    // const eventMaterial: RiakEvent = {
+    //   user,
+    //   email,
+    //   time: new Date(time),
+    // };
 
-    var cb = function (err, rslt) {
-      // NB: rslt will be true when successful
-      if (err) {
-        console.log([err]);
-      } else {
-        console.log({ rslt });
-      }
-    };
+    // var cb = function (err, rslt) {
+    //   // NB: rslt will be true when successful
+    //   if (err) {
+    //     console.log([err]);
+    //   } else {
+    //     console.log({ rslt });
+    //   }
+    // };
 
-    var rows = [
-      [
-        eventMaterial.time,
-        'course-material:updated',
-        eventMaterial.user,
-        eventMaterial.email,
-      ],
-    ];
+    // var rows = [
+    //   [
+    //     eventMaterial.time,
+    //     'course-material:updated',
+    //     eventMaterial.user,
+    //     eventMaterial.email,
+    //   ],
+    // ];
 
-    var cmd = new Riak.Commands.TS.Store.Builder()
-      .withTable('course')
-      .withRows(rows)
-      .withCallback(cb)
-      .build();
+    // var cmd = new Riak.Commands.TS.Store.Builder()
+    //   .withTable('course')
+    //   .withRows(rows)
+    //   .withCallback(cb)
+    //   .build();
 
-    riakWrapper.queryClient.execute(cmd);
+    // riakWrapper.queryClient.execute(cmd);
 
     msg.ack();
   }
@@ -144,38 +144,38 @@ export class CourseMaterialDeleteListener extends Listener<CourseMaterialsDelete
       id,
     });
 
-    // filter the user information to be saved in RIAK DB as event
-    const eventMaterial: RiakEvent = {
-      user,
-      email,
-      time: new Date(time),
-    };
+    // // filter the user information to be saved in RIAK DB as event
+    // const eventMaterial: RiakEvent = {
+    //   user,
+    //   email,
+    //   time: new Date(time),
+    // };
 
-    var cb = function (err, rslt) {
-      // NB: rslt will be true when successful
-      if (err) {
-        console.log([err]);
-      } else {
-        console.log({ rslt });
-      }
-    };
+    // var cb = function (err, rslt) {
+    //   // NB: rslt will be true when successful
+    //   if (err) {
+    //     console.log([err]);
+    //   } else {
+    //     console.log({ rslt });
+    //   }
+    // };
 
-    var rows = [
-      [
-        eventMaterial.time,
-        'course-material:deleted',
-        eventMaterial.user,
-        eventMaterial.email,
-      ],
-    ];
+    // var rows = [
+    //   [
+    //     eventMaterial.time,
+    //     'course-material:deleted',
+    //     eventMaterial.user,
+    //     eventMaterial.email,
+    //   ],
+    // ];
 
-    var cmd = new Riak.Commands.TS.Store.Builder()
-      .withTable('course')
-      .withRows(rows)
-      .withCallback(cb)
-      .build();
+    // var cmd = new Riak.Commands.TS.Store.Builder()
+    //   .withTable('course')
+    //   .withRows(rows)
+    //   .withCallback(cb)
+    //   .build();
 
-    riakWrapper.queryClient.execute(cmd);
+    // riakWrapper.queryClient.execute(cmd);
 
     msg.ack();
   }

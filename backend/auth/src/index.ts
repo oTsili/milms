@@ -3,7 +3,7 @@ var logger = require('winston');
 import { catchAsync } from '@otmilms/common';
 
 import { natsWrapper } from './nats-wrapper';
-import { riakWrapper } from './riak-wrapper';
+// import { riakWrapper } from './riak-wrapper';
 import {
   AssignmentCreateListener,
   AssignmentDeleteListener,
@@ -67,11 +67,11 @@ const start = async () => {
     throw new Error('WRITE_RIAK_URI must be defined');
   }
 
-  // connect to RIAK query storage singleton in a mongoose style connection
-  await riakWrapper.connectQueryNode([process.env.QUERY_RIAK_URI]);
+  // // connect to RIAK query storage singleton in a mongoose style connection
+  // await riakWrapper.connectQueryNode([process.env.QUERY_RIAK_URI]);
 
-  // connect to RIAK write storage singleton in a mongoose style connection
-  await riakWrapper.connectWriteNode([process.env.WRITE_RIAK_URI]);
+  // // connect to RIAK write storage singleton in a mongoose style connection
+  // await riakWrapper.connectWriteNode([process.env.WRITE_RIAK_URI]);
 
   // connect to NATS singleton in a mongoose style
   await natsWrapper.connect(
@@ -89,27 +89,27 @@ const start = async () => {
   // on interupt signal gracefull shutdown nats and riak
   process.on('SIGINT', () => {
     natsWrapper.client.close();
-    riakWrapper.queryClient.stop(function () {
-      logger.info('RIAK query-client is stopped');
-      process.exit();
-    });
-    riakWrapper.writeClient.stop(function () {
-      logger.info('RIAK write-client is stopped');
-      process.exit();
-    });
+    // riakWrapper.queryClient.stop(function () {
+    //   logger.info('RIAK query-client is stopped');
+    //   process.exit();
+    // });
+    // riakWrapper.writeClient.stop(function () {
+    //   logger.info('RIAK write-client is stopped');
+    //   process.exit();
+    // });
   });
 
   // on terminate signal gracefull shutdown nats and riak
   process.on('SIGTERM', () => {
     natsWrapper.client.close();
-    riakWrapper.queryClient.stop(function () {
-      logger.info('RIAK query-client is stopped');
-      process.exit();
-    });
-    riakWrapper.writeClient.stop(function () {
-      logger.info('RIAK write-client is stopped');
-      process.exit();
-    });
+    // riakWrapper.queryClient.stop(function () {
+    //   logger.info('RIAK query-client is stopped');
+    //   process.exit();
+    // });
+    // riakWrapper.writeClient.stop(function () {
+    //   logger.info('RIAK write-client is stopped');
+    //   process.exit();
+    // });
   });
 
   // intitialize an event listener for every new assignment-material:create event

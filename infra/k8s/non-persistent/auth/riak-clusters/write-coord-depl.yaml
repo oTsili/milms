@@ -1,54 +1,54 @@
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: auth-riak-write-coordinator-depl
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: auth-riak-write-coordinator
-  strategy:
-    type: Recreate
-  template:
-    metadata:
-      labels:
-        app: auth-riak-write-coordinator
-    spec:
-      volumes:
-        - name: auth-riak-write-schemas
-          persistentVolumeClaim:
-            claimName: auth-riak-write-schemas-pvc
-        # - name: auth-riak-write-storage
-        #   persistentVolumeClaim:
-        #     claimName: auth-riak-write-pvc
-      containers:
-        - env:
-            - name: CLUSTER_NAME
-              value: auth-riak-write-cluster
-          image: basho/riak-ts
-          name: auth-riak-write-coordinator
-          ports:
-            - containerPort: 8087
-            - containerPort: 8098
-          resources: {}
-          volumeMounts:
-            - name: auth-riak-write-schemas
-              mountPath: /etc/riak/schemas
-            # - name: auth-riak-write-storage
-            #   mountPath: /var/lib/riak
-      restartPolicy: Always
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: auth-riak-write-coordinator-srv
-spec:
-  ports:
-    - name: 'protobuf'
-      port: 8087
-      targetPort: 8087
-    - name: 'http'
-      port: 8098
-      targetPort: 8098
-  selector:
-    app: auth-riak-write-coordinator
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: auth-riak-write-coordinator-depl
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: auth-riak-write-coordinator
+#   strategy:
+#     type: Recreate
+#   template:
+#     metadata:
+#       labels:
+#         app: auth-riak-write-coordinator
+#     spec:
+#       volumes:
+#         - name: auth-riak-write-schemas
+#           persistentVolumeClaim:
+#             claimName: auth-riak-write-schemas-pvc
+#         # - name: auth-riak-write-storage
+#         #   persistentVolumeClaim:
+#         #     claimName: auth-riak-write-pvc
+#       containers:
+#         - env:
+#             - name: CLUSTER_NAME
+#               value: auth-riak-write-cluster
+#           image: basho/riak-ts
+#           name: auth-riak-write-coordinator
+#           ports:
+#             - containerPort: 8087
+#             - containerPort: 8098
+#           resources: {}
+#           volumeMounts:
+#             - name: auth-riak-write-schemas
+#               mountPath: /etc/riak/schemas
+#             # - name: auth-riak-write-storage
+#             #   mountPath: /var/lib/riak
+#       restartPolicy: Always
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: auth-riak-write-coordinator-srv
+# spec:
+#   ports:
+#     - name: 'protobuf'
+#       port: 8087
+#       targetPort: 8087
+#     - name: 'http'
+#       port: 8098
+#       targetPort: 8098
+#   selector:
+#     app: auth-riak-write-coordinator

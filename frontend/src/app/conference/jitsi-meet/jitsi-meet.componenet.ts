@@ -8,7 +8,8 @@ declare var JitsiMeetExternalAPI: any;
   styleUrls: ['./jitsi-meet.component.css'],
 })
 export class JitsiMeetComponent implements OnInit, AfterViewInit {
-  domain: string = 'meet.jit.si';
+  // domain: string = 'meet.jit.si';
+  domain: string = 'jitsi.milms.tech';
   room: any;
   options: any;
   api: any;

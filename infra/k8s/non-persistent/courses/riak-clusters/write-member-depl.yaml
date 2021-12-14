@@ -1,43 +1,43 @@
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: courses-riak-write-member-depl
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: courses-riak-write-member
-  template:
-    metadata:
-      labels:
-        app: courses-riak-write-member
-    spec:
-      containers:
-        - env:
-            - name: CLUSTER_NAME
-              value: courses-riak-write-cluster
-            - name: COORDINATOR_NODE
-              value: courses-riak-write-coordinator
-          image: basho/riak-ts
-          name: courses-riak-write-member
-          ports:
-            - containerPort: 8087
-            - containerPort: 8098
-      restartPolicy: Always
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: courses-riak-write-member-srv
-spec:
-  ports:
-    - name: 'protobuf'
-      port: 8087
-      targetPort: 8087
-    - name: 'http'
-      port: 8098
-      targetPort: 8098
-  selector:
-    service: member
-status:
-  loadBalancer: {}
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: courses-riak-write-member-depl
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: courses-riak-write-member
+#   template:
+#     metadata:
+#       labels:
+#         app: courses-riak-write-member
+#     spec:
+#       containers:
+#         - env:
+#             - name: CLUSTER_NAME
+#               value: courses-riak-write-cluster
+#             - name: COORDINATOR_NODE
+#               value: courses-riak-write-coordinator
+#           image: basho/riak-ts
+#           name: courses-riak-write-member
+#           ports:
+#             - containerPort: 8087
+#             - containerPort: 8098
+#       restartPolicy: Always
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: courses-riak-write-member-srv
+# spec:
+#   ports:
+#     - name: 'protobuf'
+#       port: 8087
+#       targetPort: 8087
+#     - name: 'http'
+#       port: 8098
+#       targetPort: 8098
+#   selector:
+#     service: member
+# status:
+#   loadBalancer: {}

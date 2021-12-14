@@ -11,7 +11,7 @@ import {
 } from '@otmilms/common';
 
 import { User } from '../../../models/models';
-import { riakWrapper } from '../../../riak-wrapper';
+// import { riakWrapper } from '../../../riak-wrapper';
 
 export class UserSignUpListener extends Listener<UserSignUpEvent> {
   readonly subject = Subjects.UserSignUp;
@@ -24,38 +24,38 @@ export class UserSignUpListener extends Listener<UserSignUpEvent> {
 
     await user.save();
 
-    // filter the user information to be saved in RIAK DB as event
-    const eventUser = {
-      email: user.email,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      time: new Date(time),
-      role: role,
-    };
+    // // filter the user information to be saved in RIAK DB as event
+    // const eventUser = {
+    //   email: user.email,
+    //   firstName: user.firstName,
+    //   lastName: user.lastName,
+    //   time: new Date(time),
+    //   role: role,
+    // };
 
-    var cb = function (err, rslt) {
-      // NB: rslt will be true when successful
-    };
-    console.log(eventUser.time);
+    // var cb = function (err, rslt) {
+    //   // NB: rslt will be true when successful
+    // };
+    // console.log(eventUser.time);
 
-    var rows = [
-      [
-        eventUser.time,
-        'signup',
-        eventUser.email,
-        eventUser.firstName,
-        eventUser.lastName,
-        eventUser.role,
-      ],
-    ];
+    // var rows = [
+    //   [
+    //     eventUser.time,
+    //     'signup',
+    //     eventUser.email,
+    //     eventUser.firstName,
+    //     eventUser.lastName,
+    //     eventUser.role,
+    //   ],
+    // ];
 
-    var cmd = new Riak.Commands.TS.Store.Builder()
-      .withTable('user')
-      .withRows(rows)
-      .withCallback(cb)
-      .build();
+    // var cmd = new Riak.Commands.TS.Store.Builder()
+    //   .withTable('user')
+    //   .withRows(rows)
+    //   .withCallback(cb)
+    //   .build();
 
-    riakWrapper.queryClient.execute(cmd);
+    // riakWrapper.queryClient.execute(cmd);
 
     msg.ack();
   }
@@ -68,42 +68,42 @@ export class UserSignInListener extends Listener<UserSignInEvent> {
   async onMessage(data: UserSignInEvent['data'], msg: Message) {
     const { id, firstName, lastName, email, role, time } = data;
 
-    // filter the user information to be saved in RIAK DB as event
-    const eventUser = {
-      email: email,
-      firstName: firstName,
-      lastName: lastName,
-      time: new Date(time),
-      role: role,
-    };
+    // // filter the user information to be saved in RIAK DB as event
+    // const eventUser = {
+    //   email: email,
+    //   firstName: firstName,
+    //   lastName: lastName,
+    //   time: new Date(time),
+    //   role: role,
+    // };
 
-    var cb = function (err, rslt) {
-      // NB: rslt will be true when successful
-      if (err) {
-        console.log('error:', err);
-      } else {
-        console.log('store:', rslt);
-      }
-    };
+    // var cb = function (err, rslt) {
+    //   // NB: rslt will be true when successful
+    //   if (err) {
+    //     console.log('error:', err);
+    //   } else {
+    //     console.log('store:', rslt);
+    //   }
+    // };
 
-    var rows = [
-      [
-        eventUser.time,
-        'signin',
-        eventUser.email,
-        eventUser.firstName,
-        eventUser.lastName,
-        eventUser.role,
-      ],
-    ];
+    // var rows = [
+    //   [
+    //     eventUser.time,
+    //     'signin',
+    //     eventUser.email,
+    //     eventUser.firstName,
+    //     eventUser.lastName,
+    //     eventUser.role,
+    //   ],
+    // ];
 
-    var cmd = new Riak.Commands.TS.Store.Builder()
-      .withTable('user')
-      .withRows(rows)
-      .withCallback(cb)
-      .build();
+    // var cmd = new Riak.Commands.TS.Store.Builder()
+    //   .withTable('user')
+    //   .withRows(rows)
+    //   .withCallback(cb)
+    //   .build();
 
-    riakWrapper.queryClient.execute(cmd);
+    // riakWrapper.queryClient.execute(cmd);
 
     msg.ack();
   }
@@ -116,42 +116,42 @@ export class UserSignOutListener extends Listener<UserSignOutEvent> {
   async onMessage(data: UserSignOutEvent['data'], msg: Message) {
     const { id, firstName, lastName, email, role, time } = data;
 
-    // filter the user information to be saved in RIAK DB as event
-    const eventUser = {
-      email: email,
-      firstName: firstName,
-      lastName: lastName,
-      time: new Date(time),
-      role: role,
-    };
+    // // filter the user information to be saved in RIAK DB as event
+    // const eventUser = {
+    //   email: email,
+    //   firstName: firstName,
+    //   lastName: lastName,
+    //   time: new Date(time),
+    //   role: role,
+    // };
 
-    var cb = function (err, rslt) {
-      // NB: rslt will be true when successful
-      if (err) {
-        console.log('error:', err);
-      } else {
-        console.log('store:', rslt);
-      }
-    };
+    // var cb = function (err, rslt) {
+    //   // NB: rslt will be true when successful
+    //   if (err) {
+    //     console.log('error:', err);
+    //   } else {
+    //     console.log('store:', rslt);
+    //   }
+    // };
 
-    var rows = [
-      [
-        eventUser.time,
-        'signout',
-        eventUser.email,
-        eventUser.firstName,
-        eventUser.lastName,
-        eventUser.role,
-      ],
-    ];
+    // var rows = [
+    //   [
+    //     eventUser.time,
+    //     'signout',
+    //     eventUser.email,
+    //     eventUser.firstName,
+    //     eventUser.lastName,
+    //     eventUser.role,
+    //   ],
+    // ];
 
-    var cmd = new Riak.Commands.TS.Store.Builder()
-      .withTable('user')
-      .withRows(rows)
-      .withCallback(cb)
-      .build();
+    // var cmd = new Riak.Commands.TS.Store.Builder()
+    //   .withTable('user')
+    //   .withRows(rows)
+    //   .withCallback(cb)
+    //   .build();
 
-    riakWrapper.queryClient.execute(cmd);
+    // riakWrapper.queryClient.execute(cmd);
 
     msg.ack();
   }
@@ -180,44 +180,44 @@ export class UserUpdateListener extends Listener<UserUpdateEvent> {
 
     // TODO: create a 'role' row in the RIAK table and include it in the eventUser below
 
-    // filter the user information to be saved in RIAK DB as event
-    const eventUser = {
-      email: email,
-      firstName: firstName,
-      lastName: lastName,
-      time: new Date(time),
-      role: role,
-    };
+    // // filter the user information to be saved in RIAK DB as event
+    // const eventUser = {
+    //   email: email,
+    //   firstName: firstName,
+    //   lastName: lastName,
+    //   time: new Date(time),
+    //   role: role,
+    // };
 
-    console.log(typeof time);
+    // console.log(typeof time);
 
-    var cb = function (err, rslt) {
-      // NB: rslt will be true when successful
-      if (err) {
-        console.log('error:', err);
-      } else {
-        console.log('store:', rslt);
-      }
-    };
+    // var cb = function (err, rslt) {
+    //   // NB: rslt will be true when successful
+    //   if (err) {
+    //     console.log('error:', err);
+    //   } else {
+    //     console.log('store:', rslt);
+    //   }
+    // };
 
-    var rows = [
-      [
-        eventUser.time,
-        'update',
-        eventUser.email,
-        eventUser.firstName,
-        eventUser.lastName,
-        eventUser.role,
-      ],
-    ];
+    // var rows = [
+    //   [
+    //     eventUser.time,
+    //     'update',
+    //     eventUser.email,
+    //     eventUser.firstName,
+    //     eventUser.lastName,
+    //     eventUser.role,
+    //   ],
+    // ];
 
-    var cmd = new Riak.Commands.TS.Store.Builder()
-      .withTable('user')
-      .withRows(rows)
-      .withCallback(cb)
-      .build();
+    // var cmd = new Riak.Commands.TS.Store.Builder()
+    //   .withTable('user')
+    //   .withRows(rows)
+    //   .withCallback(cb)
+    //   .build();
 
-    riakWrapper.queryClient.execute(cmd);
+    // riakWrapper.queryClient.execute(cmd);
 
     msg.ack();
   }

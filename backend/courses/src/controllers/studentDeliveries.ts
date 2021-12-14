@@ -8,7 +8,6 @@ import {
   StudentDeliveryAssignment,
   StudentDeliveryFile,
 } from '../models/models';
-import { riakWrapper } from '../riak-wrapper';
 import {
   StudentDeliveryAssignmentCreatedPublisher,
   StudentDeliveryAssignmentUpdatedPublisher,
