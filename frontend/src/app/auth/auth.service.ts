@@ -49,15 +49,24 @@ export class AuthService {
           (data) => {
             // if authenticated, the api returns the current user
             if (Object.keys(data).length > 0) {
+              // update the authguard listener
               observer.next(true);
-            } else {
+              // update the application custom listener
+              this.authenticate(true);
               // if not authenticated, the api returns an empty object
+            } else {
+              // update the authguard listener
               observer.next(false);
+              // update the application custom listener
+              this.authenticate(false);
             }
           },
           (error) => {
             console.log('error');
+            // update the authguard listener
             observer.next(false);
+            // update the application custom listener
+            this.authenticate(false);
           }
         );
     });
