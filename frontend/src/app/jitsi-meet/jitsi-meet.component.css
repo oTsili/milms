@@ -15,3 +15,7 @@
 .red-color {
   color: red;
 }
+
+.iframe {
+  height: calc(100vh - 200px);
+}

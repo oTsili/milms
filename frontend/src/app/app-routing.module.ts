@@ -8,7 +8,7 @@ import { AuthGuard } from './auth/auth.guard';
 import { NotFoundComponent } from './not-found/not-found.component';
 // import { ConferenceComponent } from './conference/conference.component';
 // import { CallDashComponent } from './conference/call-dash/call-dash.component';
-import { JitsiMeetComponent } from './conference/jitsi-meet/jitsi-meet.componenet';
+import { JitsiMeetComponent } from './jitsi-meet/jitsi-meet.component';
 import { PdfViewerComponent } from './shared/pdf-viewer/pdf-viewer.component';
 import { CoursesComponent } from './courses/courses.component';
 import { CourseComponent } from './courses/course/course.component';
@@ -56,6 +56,11 @@ const routes: Routes = [
       ],
       children: [
         {
+          path: 'meet',
+          redirectTo: 'courses/:courseId/meet',
+          pathMatch: 'full',
+        },
+        {
           path: 'assignments/:assignmentId',
           redirectTo: 'courses/:courseId/assignments/:assignmentId',
           pathMatch: 'full',
@@ -100,12 +105,27 @@ const routes: Routes = [
     component: PdfViewerComponent,
     canActivate: [AuthGuard],
   },
-
   {
-    path: 'conference',
-    // component: ConferenceComponent,
+    path: 'courses/:courseId/meet',
     component: JitsiMeetComponent,
-    // canActivate: [AuthGuard],
+    canActivate: [AuthGuard],
+    data: {
+      title: 'meet',
+      breadcrumb: [
+        {
+          label: 'Courses',
+          url: 'courses',
+        },
+        {
+          label: '{{courseText}}',
+          url: 'courses/:courseId',
+        },
+        {
+          label: 'Meet',
+          url: 'meet',
+        },
+      ],
+    },
   },
   {
     path: 'events',

@@ -20,7 +20,7 @@ import { HomeComponent } from './home/home.component';
 import { LoginComponent } from './auth/login/login.component';
 import { SignupComponent } from './auth/signup/signup.component';
 import { FooterComponent } from './footer/footer.component';
-import { JitsiMeetComponent } from './conference/jitsi-meet/jitsi-meet.componenet';
+import { JitsiMeetComponent } from './jitsi-meet/jitsi-meet.component';
 import { EventComponent } from './events/event/event.component';
 import { SharedModule } from './shared/shared.module';
 import { CoursesModule } from './courses/courses.module';

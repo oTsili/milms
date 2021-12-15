@@ -188,7 +188,7 @@
               mat-stroked-button
               style="color: #0e51a9db"
               matTooltip="open the course's lecture page"
-              routerLink="/conference"
+              [routerLink]="['/courses', course.id, 'meet']"
             >
               Lecture
             </button>
