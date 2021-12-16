@@ -99,7 +99,8 @@ spec:
             - name: JVB_TCP_HARVESTER_DISABLED
               value: 'true'
         - name: web
-          image: jitsi/web:stable-6726
+          # image: jitsi/web:stable-6726
+          image: otsili/jitsi-meet
           imagePullPolicy: IfNotPresent
           env:
             - name: PUBLIC_URL

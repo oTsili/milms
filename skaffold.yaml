@@ -53,6 +53,16 @@ build:
     #     manual:
     #       - src: 'src/**/*.ts'
     #         dest: .
+    - image: otsili/jitsi-meet
+      context: backend/jitsi-meet
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        infer:
+          - src/**/*
+        # manual:
+        #   # - src: 'src/**/*.ts'
+        #   #   dest: .
 ---
 apiVersion: skaffold/v2beta11
 kind: Config
