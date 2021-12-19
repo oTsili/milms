@@ -1,0 +1,39 @@
+---
+# Create a namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: jitsi
+---
+# Create a persistent volume
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: jitsi-accounts-pv
+  namespace: jitsi
+spec:
+  # persistentVolumeReclaimPolicy: Retain
+  storageClassName: jitsi-accounts-class
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: /mnt/milms/jitsi-accounts
+---
+# Create a persistent volume claim
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: jitsi-accounts-pvc
+  namespace: jitsi
+  labels:
+    app: jitsi-accounts-pvc
+spec:
+  # storageClassName: jitsi-accounts-class
+  storageClassName: nfs-client
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi

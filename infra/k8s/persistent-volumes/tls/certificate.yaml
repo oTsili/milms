@@ -12,3 +12,5 @@ spec:
   dnsNames:
     - milms.tech
     - www.milms.tech
+    - conf.milms.tech
+    - www.conf.milms.tech

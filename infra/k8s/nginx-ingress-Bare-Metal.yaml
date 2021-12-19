@@ -275,11 +275,11 @@ metadata:
   namespace: ingress-nginx
 spec:
   externalTrafficPolicy: Cluster
-  type: NodePort
+  # type: NodePort
+  type: LoadBalancer
   externalIPs:
     - 65.108.88.0
     - 135.181.153.207
-  # type: NodePort
   ipFamilyPolicy: SingleStack
   ipFamilies:
     - IPv4

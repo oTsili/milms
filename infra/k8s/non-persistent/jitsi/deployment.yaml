@@ -1,10 +1,4 @@
 ---
-# Create a namespace
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: jitsi
----
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -30,21 +24,34 @@ spec:
       labels:
         k8s-app: jitsi
     spec:
+      volumes:
+        - name: jitsi-accounts-storage
+          ### for sync with the local machine ###
+          # hostPath:
+          #   path: /mnt/Data/milms/auth/files
+          # path: /hosthome/odysseas/mnt-milms/auth/files
+          ### for sync with pvc on the local machine ###
+          persistentVolumeClaim:
+            claimName: jitsi-accounts-pvc
       containers:
         - name: jicofo
           image: jitsi/jicofo:stable-6726
           imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - name: jitsi-accounts-storage
+              # mountPath: /config/data/ji%2emilms%2etech/accounts
+              mountPath: /config/data/
           env:
             - name: XMPP_SERVER
               value: localhost
             - name: XMPP_DOMAIN
-              value: meet.jitsi
+              value: ji.milms.tech
             - name: XMPP_AUTH_DOMAIN
-              value: auth.meet.jitsi
+              value: auth.ji.milms.tech
             - name: XMPP_MUC_DOMAIN
-              value: muc.meet.jitsi
+              value: muc.ji.milms.tech
             - name: XMPP_INTERNAL_MUC_DOMAIN
-              value: internal-muc.meet.jitsi
+              value: internal-muc.ji.milms.tech
             - name: JICOFO_COMPONENT_SECRET
               valueFrom:
                 secretKeyRef:
@@ -65,16 +72,22 @@ spec:
           image: jitsi/prosody:stable-6726
           imagePullPolicy: IfNotPresent
           env:
+            - name: ENABLE_AUTH
+              value: '1'
+            - name: ENABLE_GUESTS
+              value: '1'
+            - name: AUTH_TYPE
+              value: 'internal'
             - name: PUBLIC_URL
-              value: 'https://jitsi.milms.tech'
+              value: 'https://ji.milms.tech'
             - name: XMPP_DOMAIN
-              value: meet.jitsi
+              value: ji.milms.tech
             - name: XMPP_AUTH_DOMAIN
-              value: auth.meet.jitsi
+              value: auth.ji.milms.tech
             - name: XMPP_MUC_DOMAIN
-              value: muc.meet.jitsi
+              value: muc.ji.milms.tech
             - name: XMPP_INTERNAL_MUC_DOMAIN
-              value: internal-muc.meet.jitsi
+              value: internal-muc.ji.milms.tech
             - name: JICOFO_COMPONENT_SECRET
               valueFrom:
                 secretKeyRef:
@@ -99,26 +112,26 @@ spec:
             - name: JVB_TCP_HARVESTER_DISABLED
               value: 'true'
         - name: web
-          # image: jitsi/web:stable-6726
-          image: otsili/jitsi-meet
+          image: jitsi/web:stable-6726
+          # image: otsili/jitsi-meet
           imagePullPolicy: IfNotPresent
           env:
             - name: PUBLIC_URL
-              value: 'https://jitsi.milms.tech'
+              value: 'https://ji.milms.tech'
             - name: XMPP_SERVER
               value: localhost
             - name: JICOFO_AUTH_USER
               value: focus
             - name: XMPP_DOMAIN
-              value: meet.jitsi
+              value: ji.milms.tech
             - name: XMPP_AUTH_DOMAIN
-              value: auth.meet.jitsi
+              value: auth.ji.milms.tech
             - name: XMPP_INTERNAL_MUC_DOMAIN
-              value: internal-muc.meet.jitsi
+              value: internal-muc.ji.milms.tech
             - name: XMPP_BOSH_URL_BASE
               value: http://127.0.0.1:5280
             - name: XMPP_MUC_DOMAIN
-              value: muc.meet.jitsi
+              value: muc.ji.milms.tech
             - name: TZ
               value: Europe/Athens
             - name: JVB_TCP_HARVESTER_DISABLED
@@ -132,11 +145,11 @@ spec:
             - name: DOCKER_HOST_ADDRESS
               value: localhost
             - name: XMPP_DOMAIN
-              value: meet.jitsi
+              value: ji.milms.tech
             - name: XMPP_AUTH_DOMAIN
-              value: auth.meet.jitsi
+              value: auth.ji.milms.tech
             - name: XMPP_INTERNAL_MUC_DOMAIN
-              value: internal-muc.meet.jitsi
+              value: internal-muc.ji.milms.tech
             - name: JVB_STUN_SERVERS
               value: stun.l.google.com:19302,stun1.l.google.com:19302,stun2.l.google.com:19302
             - name: JICOFO_AUTH_USER
