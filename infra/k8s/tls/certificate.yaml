@@ -1,0 +1,44 @@
+# root page certificate
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: milms-tech-tls
+spec:
+  secretName: milms-tech
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  commonName: milms.tech
+  dnsNames:
+    - milms.tech
+    - www.milms.tech
+---
+# jitsi-meet page certificate
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: meet-milms-tech-tls
+spec:
+  secretName: meet-milms-tech
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  commonName: meet.milms.tech
+  dnsNames:
+    - meet.milms.tech
+    - www.meet.milms.tech
+---
+# dashboard page certificate
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: dsb-milms-tech-tls
+spec:
+  secretName: dsb-milms-tech
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  commonName: dsb.milms.tech
+  dnsNames:
+    - dsb.milms.tech
+    - www.dsb.milms.tech

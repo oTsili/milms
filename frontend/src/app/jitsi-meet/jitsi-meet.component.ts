@@ -14,7 +14,7 @@ declare var JitsiMeetExternalAPI: any;
 })
 export class JitsiMeetComponent implements OnInit, AfterViewInit {
   // domain: string = 'meet.jit.si';
-  domain: string = 'jitsi.milms.tech';
+  domain: string = 'meet.milms.tech';
   room: any;
   options: any;
   api: any;

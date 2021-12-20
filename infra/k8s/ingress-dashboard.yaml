@@ -11,10 +11,10 @@
 # spec:
 #   tls:
 #     - hosts:
-#         - 'dashboard.milms.tech'
+#         - 'dsb.milms.tech'
 #       secretName: dashboard-milms-tech-tls
 #   rules:
-#     - host: 'dashboard.milms.tech'
+#     - host: 'dsb.milms.tech'
 #       http:
 #         paths:
 #           - path: /

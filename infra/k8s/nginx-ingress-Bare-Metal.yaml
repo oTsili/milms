@@ -313,7 +313,7 @@ spec:
 #     app.kubernetes.io/version: 1.1.0
 #     app.kubernetes.io/managed-by: Helm
 #     app.kubernetes.io/component: controller
-#     service.beta.kubernetes.io/do-loadbalancer-hostname: 'dashboard.milms.tech'
+#     service.beta.kubernetes.io/do-loadbalancer-hostname: 'dsb.milms.tech'
 #   name: ingress-nginx-controller
 #   namespace: ingress-nginx
 # spec:

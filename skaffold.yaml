@@ -1,7 +1,7 @@
 apiVersion: skaffold/v2beta14
 kind: Config
 metadata:
-  name: non-persistent
+  name: dev
 deploy:
   kubectl:
     manifests:
@@ -67,8 +67,18 @@ build:
 apiVersion: skaffold/v2beta11
 kind: Config
 metadata:
-  name: persistent
+  name: pvc
 deploy:
   kubectl:
     manifests:
       - ./infra/k8s/persistent-volumes/*
+
+---
+apiVersion: skaffold/v2beta11
+kind: Config
+metadata:
+  name: tls
+deploy:
+  kubectl:
+    manifests:
+      - ./infra/k8s/tls/*

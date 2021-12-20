@@ -12,7 +12,7 @@ metadata:
   name: jitsi-accounts-pv
   namespace: jitsi
 spec:
-  # persistentVolumeReclaimPolicy: Retain
+  persistentVolumeReclaimPolicy: Retain
   storageClassName: jitsi-accounts-class
   capacity:
     storage: 1Gi
@@ -30,8 +30,8 @@ metadata:
   labels:
     app: jitsi-accounts-pvc
 spec:
-  # storageClassName: jitsi-accounts-class
-  storageClassName: nfs-client
+  storageClassName: jitsi-accounts-class
+  # storageClassName: nfs-client
   accessModes:
     - ReadWriteMany
   resources:

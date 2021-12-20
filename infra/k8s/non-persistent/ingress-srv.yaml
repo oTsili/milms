@@ -38,20 +38,6 @@ spec:
                 name: courses-srv
                 port:
                   number: 3000
-          # - path: /api/vtc/?(.*)
-          #   pathType: Prefix
-          #   backend:
-          #     service:
-          #       name: vtc-srv
-          #       port:
-          #         number: 3000
-          # - path: /api/jitsi-meet/?(.*)
-          #   pathType: Prefix
-          #   backend:
-          #     service:
-          #       name: web
-          #       port:
-          #         number: 80
           - path: /?(.*)
             pathType: Prefix
             backend:
@@ -77,20 +63,6 @@ spec:
                 name: courses-srv
                 port:
                   number: 3000
-          # - path: /api/vtc/?(.*)
-          #   pathType: Prefix
-          #   backend:
-          #     service:
-          #       name: vtc-srv
-          #       port:
-          #         number: 3000
-          # - path: /api/jitsi-meet/?(.*)
-          #   pathType: Prefix
-          #   backend:
-          #     service:
-          #       name: web
-          #       port:
-          #         number: 80
           - path: /?(.*)
             pathType: Prefix
             backend:
@@ -122,11 +94,11 @@ metadata:
 spec:
   tls:
     - hosts:
-        - 'dashboard.milms.tech'
-        - 'www.dashboard.milms.tech'
-      secretName: dashboard-milms-tech-tls
+        - dsb.milms.tech
+        - www.dsb.milms.tech
+      secretName: dsb-milms-tech
   rules:
-    - host: 'dashboard.milms.tech'
+    - host: dsb.milms.tech
       http:
         paths:
           - path: /
@@ -136,7 +108,7 @@ spec:
                 name: kubernetes-dashboard
                 port:
                   number: 443
-    - host: 'www.dashboard.milms.tech'
+    - host: www.dsb.milms.tech
       http:
         paths:
           - path: /
@@ -159,10 +131,11 @@ metadata:
 spec:
   tls:
     - hosts:
-        - ji.milms.tech
-      secretName: tls-jitsi
+        - meet.milms.tech
+        - www.meet.milms.tech
+      secretName: meet-milms-tech
   rules:
-    - host: ji.milms.tech
+    - host: meet.milms.tech
       http:
         paths:
           - path: /
@@ -172,7 +145,7 @@ spec:
                 name: web
                 port:
                   number: 80
-    - host: www.ji.milms.tech
+    - host: www.meet.milms.tech
       http:
         paths:
           - path: /

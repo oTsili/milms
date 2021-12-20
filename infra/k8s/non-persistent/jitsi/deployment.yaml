@@ -37,21 +37,17 @@ spec:
         - name: jicofo
           image: jitsi/jicofo:stable-6726
           imagePullPolicy: IfNotPresent
-          volumeMounts:
-            - name: jitsi-accounts-storage
-              # mountPath: /config/data/ji%2emilms%2etech/accounts
-              mountPath: /config/data/
           env:
             - name: XMPP_SERVER
               value: localhost
             - name: XMPP_DOMAIN
-              value: ji.milms.tech
+              value: meet.milms.tech
             - name: XMPP_AUTH_DOMAIN
-              value: auth.ji.milms.tech
+              value: auth.meet.milms.tech
             - name: XMPP_MUC_DOMAIN
-              value: muc.ji.milms.tech
+              value: muc.meet.milms.tech
             - name: XMPP_INTERNAL_MUC_DOMAIN
-              value: internal-muc.ji.milms.tech
+              value: internal-muc.meet.milms.tech
             - name: JICOFO_COMPONENT_SECRET
               valueFrom:
                 secretKeyRef:
@@ -71,6 +67,10 @@ spec:
         - name: prosody
           image: jitsi/prosody:stable-6726
           imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - name: jitsi-accounts-storage
+              # mountPath: /config/data/jitsi%2emilms%2etech/accounts
+              mountPath: /config/data/
           env:
             - name: ENABLE_AUTH
               value: '1'
@@ -79,15 +79,15 @@ spec:
             - name: AUTH_TYPE
               value: 'internal'
             - name: PUBLIC_URL
-              value: 'https://ji.milms.tech'
+              value: 'https://meet.milms.tech'
             - name: XMPP_DOMAIN
-              value: ji.milms.tech
+              value: meet.milms.tech
             - name: XMPP_AUTH_DOMAIN
-              value: auth.ji.milms.tech
+              value: auth.meet.milms.tech
             - name: XMPP_MUC_DOMAIN
-              value: muc.ji.milms.tech
+              value: muc.meet.milms.tech
             - name: XMPP_INTERNAL_MUC_DOMAIN
-              value: internal-muc.ji.milms.tech
+              value: internal-muc.meet.milms.tech
             - name: JICOFO_COMPONENT_SECRET
               valueFrom:
                 secretKeyRef:
@@ -112,26 +112,26 @@ spec:
             - name: JVB_TCP_HARVESTER_DISABLED
               value: 'true'
         - name: web
-          image: jitsi/web:stable-6726
-          # image: otsili/jitsi-meet
+          # image: jitsi/web:stable-6726
+          image: otsili/jitsi-meet
           imagePullPolicy: IfNotPresent
           env:
             - name: PUBLIC_URL
-              value: 'https://ji.milms.tech'
+              value: 'https://jjitsii.milms.tech'
             - name: XMPP_SERVER
               value: localhost
             - name: JICOFO_AUTH_USER
               value: focus
             - name: XMPP_DOMAIN
-              value: ji.milms.tech
+              value: meet.milms.tech
             - name: XMPP_AUTH_DOMAIN
-              value: auth.ji.milms.tech
+              value: auth.meet.milms.tech
             - name: XMPP_INTERNAL_MUC_DOMAIN
-              value: internal-muc.ji.milms.tech
+              value: internal-muc.meet.milms.tech
             - name: XMPP_BOSH_URL_BASE
               value: http://127.0.0.1:5280
             - name: XMPP_MUC_DOMAIN
-              value: muc.ji.milms.tech
+              value: muc.meet.milms.tech
             - name: TZ
               value: Europe/Athens
             - name: JVB_TCP_HARVESTER_DISABLED
@@ -145,11 +145,11 @@ spec:
             - name: DOCKER_HOST_ADDRESS
               value: localhost
             - name: XMPP_DOMAIN
-              value: ji.milms.tech
+              value: meet.milms.tech
             - name: XMPP_AUTH_DOMAIN
-              value: auth.ji.milms.tech
+              value: auth.meet.milms.tech
             - name: XMPP_INTERNAL_MUC_DOMAIN
-              value: internal-muc.ji.milms.tech
+              value: internal-muc.meet.milms.tech
             - name: JVB_STUN_SERVERS
               value: stun.l.google.com:19302,stun1.l.google.com:19302,stun2.l.google.com:19302
             - name: JICOFO_AUTH_USER
