@@ -1,0 +1,22 @@
+# Create namespaces
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kubernetes-dashboard
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: jitsi
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+    name: monitoring
+
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+    name: gitlab-managed-apps

@@ -279,7 +279,7 @@ spec:
   type: LoadBalancer
   externalIPs:
     - 65.108.88.0
-    - 135.181.153.207
+    - 65.108.152.16
   ipFamilyPolicy: SingleStack
   ipFamilies:
     - IPv4

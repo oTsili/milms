@@ -155,3 +155,41 @@ spec:
                 name: web
                 port:
                   number: 80
+
+---
+# kind: Ingress
+# apiVersion: networking.k8s.io/v1
+# metadata:
+#   name: prometheus
+#   namespace: gitlab-managed-apps
+#   annotations:
+#     cert-manager.io/cluster-issuer: 'letsencrypt-prod'
+#     kubernetes.io/ingress.class: nginx
+#     nginx.ingress.kubernetes.io/use-regex: 'true'
+# spec:
+#   tls:
+#     - hosts:
+#         - prometheus.milms.tech
+#         - www.prometheus.milms.tech
+#       secretName: prometheus-milms-tech
+#   rules:
+#     - host: prometheus.milms.tech
+#       http:
+#         paths:
+#           - path: /
+#             pathType: Prefix
+#             backend:
+#               service:
+#                 name: web
+#                 port:
+#                   number: 80
+#     - host: www.prometheus.milms.tech
+#       http:
+#         paths:
+#           - path: /
+#             pathType: Prefix
+#             backend:
+#               service:
+#                 name: web
+#                 port:
+#                   number: 80
