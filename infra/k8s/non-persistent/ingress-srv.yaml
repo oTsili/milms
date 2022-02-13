@@ -44,8 +44,8 @@ spec:
               service:
                 name: frontend-srv
                 port:
-                  # number: 80
-                  number: 4200
+                  number: 80
+                  # number: 4200
     - host: www.milms.tech
       http:
         paths:
@@ -69,8 +69,8 @@ spec:
               service:
                 name: frontend-srv
                 port:
-                  # number: 80
-                  number: 4200
+                  number: 80
+                  # number: 4200
 # ---
 # kind: ConfigMap
 # apiVersion: v1

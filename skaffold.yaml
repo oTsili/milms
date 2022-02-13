@@ -18,13 +18,6 @@ build:
         manual:
           - src: 'src/**/*.ts'
             dest: .
-    - image: otsili/frontend_dev
-      context: frontend
-      docker:
-        dockerfile: Dockerfile.dev
-      sync:
-        infer:
-          - src/**/*
     - image: otsili/courses
       context: backend/courses
       docker:
@@ -33,16 +26,23 @@ build:
         manual:
           - src: 'src/**/*.ts'
             dest: .
-    # - image: otsili/frontend_prod
+    # - image: otsili/frontend_dev
     #   context: frontend
     #   docker:
-    #     dockerfile: Dockerfile.prod
+    #     dockerfile: Dockerfile.dev
     #   sync:
-    #     manual:
-    #       - src: '/dist/frontend/*.js'
-    #         dest: .
-    #       - src: 'src/**/*.ts'
-    #         dest: .
+    #     infer:
+    #       - src/**/*
+    - image: otsili/frontend_prod
+      context: frontend
+      docker:
+        dockerfile: Dockerfile.prod
+      sync:
+        manual:
+          - src: '/dist/frontend/*.js'
+            dest: .
+          - src: 'src/**/*.ts'
+            dest: .
     # - image: otsili/conference
     #   context: backend/conference
     #   docker:

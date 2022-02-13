@@ -1,5 +1,5 @@
 # stage 1
-FROM node:latest As builder
+FROM node:16-alpine As builder
 
 WORKDIR /app
 COPY package.json package-lock.json ./
