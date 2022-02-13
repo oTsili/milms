@@ -7,8 +7,8 @@ deploy:
     manifests:
       - ./infra/k8s/non-persistent/*
 build:
-  local:
-    push: false
+  # local:
+  #   push: false
   artifacts:
     - image: otsili/auth
       context: backend/auth
