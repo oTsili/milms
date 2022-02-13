@@ -11,9 +11,9 @@ spec:
   commonName: milms.tech
   dnsNames:
     - milms.tech
-    - www.milms.tech
+    # - www.milms.tech
 ---
-# jitsi-meet page certificate
+# jitsi page certificate
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
@@ -26,7 +26,7 @@ spec:
   commonName: meet.milms.tech
   dnsNames:
     - meet.milms.tech
-    - www.meet.milms.tech
+    # - www.meet.milms.tech
 ---
 # dashboard page certificate
 apiVersion: cert-manager.io/v1
@@ -41,20 +41,20 @@ spec:
   commonName: dsb.milms.tech
   dnsNames:
     - dsb.milms.tech
-    - www.dsb.milms.tech
+    # - www.dsb.milms.tech
 
 ---
-# dashboard page certificate
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  name: prometheus-milms-tech-tls
-spec:
-  secretName: prometheus-milms-tech
-  issuerRef:
-    name: letsencrypt-prod
-    kind: ClusterIssuer
-  commonName: prometheus.milms.tech
-  dnsNames:
-    - prometheus.milms.tech
-    - www.prometheus.milms.tech
+# # prometheus page certificate
+# apiVersion: cert-manager.io/v1
+# kind: Certificate
+# metadata:
+#   name: prometheus-milms-tech-tls
+# spec:
+#   secretName: prometheus-milms-tech
+#   issuerRef:
+#     name: letsencrypt-prod
+#     kind: ClusterIssuer
+#   commonName: prometheus.milms.tech
+#   dnsNames:
+#     - prometheus.milms.tech
+#     - www.prometheus.milms.tech

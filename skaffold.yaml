@@ -26,23 +26,23 @@ build:
         manual:
           - src: 'src/**/*.ts'
             dest: .
-    # - image: otsili/frontend_dev
-    #   context: frontend
-    #   docker:
-    #     dockerfile: Dockerfile.dev
-    #   sync:
-    #     infer:
-    #       - src/**/*
-    - image: otsili/frontend_prod
+    - image: otsili/frontend_dev
       context: frontend
       docker:
-        dockerfile: Dockerfile.prod
+        dockerfile: Dockerfile.dev
       sync:
-        manual:
-          - src: '/dist/frontend/*.js'
-            dest: .
-          - src: 'src/**/*.ts'
-            dest: .
+        infer:
+          - src/**/*
+    # - image: otsili/frontend_prod
+    #   context: frontend
+    #   docker:
+    #     dockerfile: Dockerfile.prod
+    #   sync:
+    #     manual:
+    #       - src: '/dist/frontend/*.js'
+    #         dest: .
+    #       - src: 'src/**/*.ts'
+    #         dest: .
     # - image: otsili/conference
     #   context: backend/conference
     #   docker:
@@ -73,12 +73,32 @@ deploy:
     manifests:
       - ./infra/k8s/persistent-volumes/*
 
+# ---
+# apiVersion: skaffold/v2beta11
+# kind: Config
+# metadata:
+#   name: tls
+# deploy:
+#   kubectl:
+#     manifests:
+#       - ./infra/k8s/tls/*
+
 ---
 apiVersion: skaffold/v2beta11
 kind: Config
 metadata:
-  name: tls
+  name: ns
 deploy:
   kubectl:
     manifests:
-      - ./infra/k8s/tls/*
+      - ./infra/k8s/namespaces/*
+
+---
+apiVersion: skaffold/v2beta11
+kind: Config
+metadata:
+  name: kms
+deploy:
+  kubectl:
+    manifests:
+      - ./infra/k8s/kms/*

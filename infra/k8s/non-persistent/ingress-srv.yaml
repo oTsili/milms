@@ -13,12 +13,17 @@ metadata:
     # nginx.ingress.kubernetes.io/enable-cors: "true"
     # nginx.ingress.kubernetes.io/cors-allow-methods: "PUT, GET, POST, OPTIONS"
     cert-manager.io/cluster-issuer: 'letsencrypt-prod'
-    nginx.ingress.kubernetes.io/ssl-redirect: 'true'
+    # nginx.ingress.kubernetes.io/ssl-redirect: 'true'
 spec:
+  defaultBackend:
+    service:
+      name: frontend-srv
+      port:
+        number: 80
   tls:
     - hosts:
         - milms.tech
-        - www.milms.tech
+        # - www.milms.tech
       secretName: milms-tech
   rules:
     - host: milms.tech
@@ -44,33 +49,33 @@ spec:
               service:
                 name: frontend-srv
                 port:
-                  number: 80
-                  # number: 4200
-    - host: www.milms.tech
-      http:
-        paths:
-          - path: /api/users/?(.*)
-            pathType: Prefix
-            backend:
-              service:
-                name: auth-srv
-                port:
-                  number: 3000
-          - path: /api/courses/?(.*)
-            pathType: Prefix
-            backend:
-              service:
-                name: courses-srv
-                port:
-                  number: 3000
-          - path: /?(.*)
-            pathType: Prefix
-            backend:
-              service:
-                name: frontend-srv
-                port:
-                  number: 80
-                  # number: 4200
+                  # number: 80
+                  number: 4200
+    # - host: www.milms.tech
+    #   http:
+    #     paths:
+    #       - path: /api/users/?(.*)
+    #         pathType: Prefix
+    #         backend:
+    #           service:
+    #             name: auth-srv
+    #             port:
+    #               number: 3000
+    #       - path: /api/courses/?(.*)
+    #         pathType: Prefix
+    #         backend:
+    #           service:
+    #             name: courses-srv
+    #             port:
+    #               number: 3000
+    #       - path: /?(.*)
+    #         pathType: Prefix
+    #         backend:
+    #           service:
+    #             name: frontend-srv
+    #             port:
+    #               number: 80
+    #               # number: 4200
 # ---
 # kind: ConfigMap
 # apiVersion: v1
@@ -92,10 +97,15 @@ metadata:
     cert-manager.io/cluster-issuer: 'letsencrypt-prod'
     nginx.ingress.kubernetes.io/ssl-redirect: 'true'
 spec:
+  defaultBackend:
+    service:
+      name: kubernetes-dashboard
+      port:
+        number: 80
   tls:
     - hosts:
         - dsb.milms.tech
-        - www.dsb.milms.tech
+        # - www.dsb.milms.tech
       secretName: dsb-milms-tech
   rules:
     - host: dsb.milms.tech
@@ -108,16 +118,16 @@ spec:
                 name: kubernetes-dashboard
                 port:
                   number: 443
-    - host: www.dsb.milms.tech
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: kubernetes-dashboard
-                port:
-                  number: 443
+    # - host: www.dsb.milms.tech
+    #   http:
+    #     paths:
+    #       - path: /
+    #         pathType: Prefix
+    #         backend:
+    #           service:
+    #             name: kubernetes-dashboard
+    #             port:
+    #               number: 443
 ---
 kind: Ingress
 apiVersion: networking.k8s.io/v1
@@ -129,10 +139,15 @@ metadata:
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/use-regex: 'true'
 spec:
+  defaultBackend:
+    service:
+      name: web
+      port:
+        number: 80
   tls:
     - hosts:
         - meet.milms.tech
-        - www.meet.milms.tech
+        # - www.meet.milms.tech
       secretName: meet-milms-tech
   rules:
     - host: meet.milms.tech
@@ -145,16 +160,16 @@ spec:
                 name: web
                 port:
                   number: 80
-    - host: www.meet.milms.tech
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: web
-                port:
-                  number: 80
+    # - host: www.meet.milms.tech
+    #   http:
+    #     paths:
+    #       - path: /
+    #         pathType: Prefix
+    #         backend:
+    #           service:
+    #             name: web
+    #             port:
+    #               number: 80
 
 ---
 # kind: Ingress

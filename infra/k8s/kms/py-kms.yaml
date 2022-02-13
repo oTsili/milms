@@ -1,0 +1,46 @@
+# Create namespaces
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: py-kms
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: py-kms
+  name: py-kms-depl
+  namespace: py-kms
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: py-kms
+  template:
+    metadata:
+      labels:
+        app: py-kms
+    spec:
+      containers:
+        - name: py-kms
+          image: ghcr.io/py-kms-organization/py-kms
+          imagePullPolicy: IfNotPresent
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: py-kms
+  name: py-kms-srv
+  namespace: py-kms
+spec:
+  selector:
+    app: courses
+  ports:
+    - name: http-courses
+      protocol: TCP
+      port: 1688
+      targetPort: 1688

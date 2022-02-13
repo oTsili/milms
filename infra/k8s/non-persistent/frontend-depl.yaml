@@ -14,12 +14,12 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: otsili/frontend_prod
-          # image: otsili/frontend_dev
+          # image: otsili/frontend_prod
+          image: otsili/frontend_dev
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 80
-            # - containerPort: 4200
+            # - containerPort: 80
+            - containerPort: 4200
 ---
 apiVersion: v1
 kind: Service
@@ -31,14 +31,14 @@ spec:
     - name: http-frontend
       protocol: TCP
       port: 80
-      targetPort: 80
-      # targetPort:
-      #   4200
+      # targetPort: 80
+      targetPort:
+        4200
         # targetPort: 80
-    - name: https-frontend
-      protocol: TCP
-      port: 443
-      targetPort: 4200
-      # targetPort: 443
+    # - name: https-frontend
+    #   protocol: TCP
+    #   port: 443
+    #   # targetPort: 4200
+    #   targetPort: 443
   selector:
     app: frontend
