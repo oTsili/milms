@@ -72,12 +72,12 @@ spec:
               # mountPath: /config/data/jitsi%2emilms%2etech/accounts
               mountPath: /config/data/
           env:
-            - name: ENABLE_AUTH
-              value: '1'
-            - name: ENABLE_GUESTS
-              value: '1'
-            - name: AUTH_TYPE
-              value: 'internal'
+            # - name: ENABLE_AUTH
+            #   value: '1'
+            # - name: ENABLE_GUESTS
+            #   value: '1'
+            # - name: AUTH_TYPE
+            #   value: 'internal'
             - name: PUBLIC_URL
               value: 'https://meet.milms.tech'
             - name: XMPP_DOMAIN
@@ -117,7 +117,7 @@ spec:
           imagePullPolicy: IfNotPresent
           env:
             - name: PUBLIC_URL
-              value: 'https://jjitsii.milms.tech'
+              value: 'https://meet.milms.tech'
             - name: XMPP_SERVER
               value: localhost
             - name: JICOFO_AUTH_USER
