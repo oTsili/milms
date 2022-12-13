@@ -35,19 +35,19 @@ spec:
             claimName: jitsi-accounts-pvc
       containers:
         - name: jicofo
-          image: jitsi/jicofo:stable-6726
+          image: jitsi/jicofo:stable-6826
           imagePullPolicy: IfNotPresent
           env:
             - name: XMPP_SERVER
               value: localhost
             - name: XMPP_DOMAIN
-              value: meet.milms.tech
+              value: meet.jitsi
             - name: XMPP_AUTH_DOMAIN
-              value: auth.meet.milms.tech
+              value: auth.meet.esite.gr
             - name: XMPP_MUC_DOMAIN
-              value: muc.meet.milms.tech
+              value: muc.meet.esite.gr
             - name: XMPP_INTERNAL_MUC_DOMAIN
-              value: internal-muc.meet.milms.tech
+              value: internal-muc.meet.esite.gr
             - name: JICOFO_COMPONENT_SECRET
               valueFrom:
                 secretKeyRef:
@@ -65,12 +65,12 @@ spec:
             - name: JVB_BREWERY_MUC
               value: jvbbrewery
         - name: prosody
-          image: jitsi/prosody:stable-6726
+          image: jitsi/prosody:stable-6826
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - name: jitsi-accounts-storage
               # mountPath: /config/data/jitsi%2emilms%2etech/accounts
-              mountPath: /config/data/
+              mountPath: /config/data
           env:
             # - name: ENABLE_AUTH
             #   value: '1'
@@ -79,15 +79,15 @@ spec:
             # - name: AUTH_TYPE
             #   value: 'internal'
             - name: PUBLIC_URL
-              value: 'https://meet.milms.tech'
+              value: 'https://meet.milms.esite.gr'
             - name: XMPP_DOMAIN
-              value: meet.milms.tech
+              value: meet.jitsi
             - name: XMPP_AUTH_DOMAIN
-              value: auth.meet.milms.tech
+              value: auth.meet.esite.gr
             - name: XMPP_MUC_DOMAIN
-              value: muc.meet.milms.tech
+              value: muc.meet.esite.gr
             - name: XMPP_INTERNAL_MUC_DOMAIN
-              value: internal-muc.meet.milms.tech
+              value: internal-muc.meet.esite.gr
             - name: JICOFO_COMPONENT_SECRET
               valueFrom:
                 secretKeyRef:
@@ -110,34 +110,32 @@ spec:
             - name: TZ
               value: Europe/Athens
             - name: JVB_TCP_HARVESTER_DISABLED
-              value: 'true'
+              value: "true"
         - name: web
-          # image: jitsi/web:stable-6726
-          image: otsili/jitsi-meet
+          image: jitsi/web:stable-6726
+          # image: otsili/jitsi-meet
           imagePullPolicy: IfNotPresent
           env:
-            - name: PUBLIC_URL
-              value: 'https://meet.milms.tech'
             - name: XMPP_SERVER
               value: localhost
             - name: JICOFO_AUTH_USER
               value: focus
             - name: XMPP_DOMAIN
-              value: meet.milms.tech
+              value: meet.jitsi
             - name: XMPP_AUTH_DOMAIN
-              value: auth.meet.milms.tech
+              value: auth.meet.esite.gr
             - name: XMPP_INTERNAL_MUC_DOMAIN
-              value: internal-muc.meet.milms.tech
+              value: internal-muc.meet.esite.gr
             - name: XMPP_BOSH_URL_BASE
               value: http://127.0.0.1:5280
             - name: XMPP_MUC_DOMAIN
-              value: muc.meet.milms.tech
+              value: muc.meet.esite.gr
             - name: TZ
               value: Europe/Athens
             - name: JVB_TCP_HARVESTER_DISABLED
-              value: 'true'
+              value: "true"
         - name: jvb
-          image: jitsi/jvb:stable-6726
+          image: jitsi/jvb:stable-6826
           imagePullPolicy: IfNotPresent
           env:
             - name: XMPP_SERVER
@@ -145,21 +143,21 @@ spec:
             - name: DOCKER_HOST_ADDRESS
               value: localhost
             - name: XMPP_DOMAIN
-              value: meet.milms.tech
+              value: meet.jitsi
             - name: XMPP_AUTH_DOMAIN
-              value: auth.meet.milms.tech
+              value: auth.meet.esite.gr
             - name: XMPP_INTERNAL_MUC_DOMAIN
-              value: internal-muc.meet.milms.tech
+              value: internal-muc.meet.esite.gr
             - name: JVB_STUN_SERVERS
               value: stun.l.google.com:19302,stun1.l.google.com:19302,stun2.l.google.com:19302
             - name: JICOFO_AUTH_USER
               value: focus
             - name: JVB_TCP_HARVESTER_DISABLED
-              value: 'true'
+              value: "true"
             - name: JVB_AUTH_USER
               value: jvb
             - name: JVB_PORT
-              value: '30300'
+              value: "30300"
             - name: JVB_AUTH_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -175,5 +173,3 @@ spec:
             - name: TZ
               value: Europe/Athens
       serviceAccountName: jitsi
----
-

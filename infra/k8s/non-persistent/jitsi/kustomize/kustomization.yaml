@@ -1,0 +1,13 @@
+# namespace: jitsi
+# bases:
+# - github.com/jitsi-contrib/jitsi-kubernetes/doc//kustomize
+
+# resources:
+# # - deployment.yaml
+# - ingress-jitsi.yaml
+# - jvb-srv.yaml
+# - rbac.yaml
+# - web-srv.yaml
+
+# patchesStrategicMerge:
+# - deployment.yaml

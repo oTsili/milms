@@ -1,0 +1,42 @@
+---
+kind: Ingress
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: jitsi
+  namespace: jitsi
+  annotations:
+    cert-manager.io/cluster-issuer: 'letsencrypt-prod'
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/use-regex: 'true'
+spec:
+  defaultBackend:
+    service:
+      name: web
+      port:
+        number: 80
+  tls:
+    - hosts:
+        - meet.milms.esite.gr
+        # - www.meet.milms.esite.gr
+      secretName: meet-milms-esite.gr
+  rules:
+    - host: meet.milms.esite.gr
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: web
+                port:
+                  number: 80
+    # - host: www.meet.milms.esite.gr
+    #   http:
+    #     paths:
+    #       - path: /
+    #         pathType: Prefix
+    #         backend:
+    #           service:
+    #             name: web
+    #             port:
+    #               number: 80

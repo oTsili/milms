@@ -22,11 +22,11 @@ spec:
         number: 80
   tls:
     - hosts:
-        - milms.tech
-        # - www.milms.tech
-      secretName: milms-tech
+        - milms.esite.gr
+        # - www.milms.esite.gr
+      secretName: milms-esite.gr
   rules:
-    - host: milms.tech
+    - host: milms.esite.gr
       http:
         paths:
           - path: /api/users/?(.*)
@@ -49,9 +49,9 @@ spec:
               service:
                 name: frontend-srv
                 port:
-                  # number: 80
-                  number: 4200
-    # - host: www.milms.tech
+                  number: 80
+                  # number: 4200
+    # - host: www.milms.esite.gr
     #   http:
     #     paths:
     #       - path: /api/users/?(.*)
@@ -104,11 +104,11 @@ spec:
         number: 80
   tls:
     - hosts:
-        - dsb.milms.tech
-        # - www.dsb.milms.tech
-      secretName: dsb-milms-tech
+        - dsb.milms.esite.gr
+        # - www.dsb.milms.esite.gr
+      secretName: dsb-milms-esite.gr
   rules:
-    - host: dsb.milms.tech
+    - host: dsb.milms.esite.gr
       http:
         paths:
           - path: /
@@ -118,7 +118,7 @@ spec:
                 name: kubernetes-dashboard
                 port:
                   number: 443
-    # - host: www.dsb.milms.tech
+    # - host: www.dsb.milms.esite.gr
     #   http:
     #     paths:
     #       - path: /
@@ -128,48 +128,6 @@ spec:
     #             name: kubernetes-dashboard
     #             port:
     #               number: 443
----
-kind: Ingress
-apiVersion: networking.k8s.io/v1
-metadata:
-  name: jitsi
-  namespace: jitsi
-  annotations:
-    cert-manager.io/cluster-issuer: 'letsencrypt-prod'
-    kubernetes.io/ingress.class: nginx
-    nginx.ingress.kubernetes.io/use-regex: 'true'
-spec:
-  defaultBackend:
-    service:
-      name: web
-      port:
-        number: 80
-  tls:
-    - hosts:
-        - meet.milms.tech
-        # - www.meet.milms.tech
-      secretName: meet-milms-tech
-  rules:
-    - host: meet.milms.tech
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: web
-                port:
-                  number: 80
-    # - host: www.meet.milms.tech
-    #   http:
-    #     paths:
-    #       - path: /
-    #         pathType: Prefix
-    #         backend:
-    #           service:
-    #             name: web
-    #             port:
-    #               number: 80
 
 ---
 # kind: Ingress
@@ -184,11 +142,11 @@ spec:
 # spec:
 #   tls:
 #     - hosts:
-#         - prometheus.milms.tech
-#         - www.prometheus.milms.tech
-#       secretName: prometheus-milms-tech
+#         - prometheus.milms.esite.gr
+#         - www.prometheus.milms.esite.gr
+#       secretName: prometheus-milms-esite.gr
 #   rules:
-#     - host: prometheus.milms.tech
+#     - host: prometheus.milms.esite.gr
 #       http:
 #         paths:
 #           - path: /
@@ -198,7 +156,7 @@ spec:
 #                 name: web
 #                 port:
 #                   number: 80
-#     - host: www.prometheus.milms.tech
+#     - host: www.prometheus.milms.esite.gr
 #       http:
 #         paths:
 #           - path: /
