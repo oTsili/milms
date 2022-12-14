@@ -21,6 +21,13 @@ kind: Namespace
 metadata:
     name: gitlab-managed-apps
 
+---
+
+apiVersion: v1
+kind: Namespace
+metadata:
+    name: jitsi-privileged
+
 # ---
 # apiVersion: v1
 # kind: Namespace
