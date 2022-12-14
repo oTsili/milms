@@ -2,59 +2,59 @@
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: milms-esite.gr-tls
+  name: milms-tsilingeridis.eu-tls
 spec:
-  secretName: milms-esite.gr
+  secretName: milms-tsilingeridis.eu
   issuerRef:
     name: letsencrypt-prod
     kind: ClusterIssuer
-  commonName: milms.esite.gr
+  commonName: milms.tsilingeridis.eu
   dnsNames:
-    - milms.esite.gr
-    # - www.milms.esite.gr
+    - milms.tsilingeridis.eu
+    # - www.milms.tsilingeridis.eu
 ---
 # jitsi page certificate
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: meet-milms-esite.gr-tls
+  name: meet-milms-tsilingeridis.eu-tls
 spec:
-  secretName: meet-milms-esite.gr
+  secretName: meet-milms-tsilingeridis.eu
   issuerRef:
     name: letsencrypt-prod
     kind: ClusterIssuer
-  commonName: meet.milms.esite.gr
+  commonName: meet.milms.tsilingeridis.eu
   dnsNames:
-    - meet.milms.esite.gr
-    # - www.meet.milms.esite.gr
+    - meet.milms.tsilingeridis.eu
+    # - www.meet.milms.tsilingeridis.eu
 ---
 # dashboard page certificate
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: dsb-milms-esite.gr-tls
+  name: dsb-milms-tsilingeridis.eu-tls
 spec:
-  secretName: dsb-milms-esite.gr
+  secretName: dsb-milms-tsilingeridis.eu
   issuerRef:
     name: letsencrypt-prod
     kind: ClusterIssuer
-  commonName: dsb.milms.esite.gr
+  commonName: dsb.milms.tsilingeridis.eu
   dnsNames:
-    - dsb.milms.esite.gr
-    # - www.dsb.milms.esite.gr
+    - dsb.milms.tsilingeridis.eu
+    # - www.dsb.milms.tsilingeridis.eu
 
 ---
 # # prometheus page certificate
 # apiVersion: cert-manager.io/v1
 # kind: Certificate
 # metadata:
-#   name: prometheus-milms-esite.gr-tls
+#   name: prometheus-milms-tsilingeridis.eu-tls
 # spec:
-#   secretName: prometheus-milms-esite.gr
+#   secretName: prometheus-milms-tsilingeridis.eu
 #   issuerRef:
 #     name: letsencrypt-prod
 #     kind: ClusterIssuer
-#   commonName: prometheus.milms.esite.gr
+#   commonName: prometheus.milms.tsilingeridis.eu
 #   dnsNames:
-#     - prometheus.milms.esite.gr
-#     - www.prometheus.milms.esite.gr
+#     - prometheus.milms.tsilingeridis.eu
+#     - www.prometheus.milms.tsilingeridis.eu

@@ -16,11 +16,11 @@ spec:
         number: 80
   tls:
     - hosts:
-        - meet.milms.esite.gr
-        # - www.meet.milms.esite.gr
-      secretName: meet-milms-esite.gr
+        - meet.milms.tsilingeridis.eu
+        # - www.meet.milms.tsilingeridis.eu
+      secretName: meet-milms-tsilingeridis.eu
   rules:
-    - host: meet.milms.esite.gr
+    - host: meet.milms.tsilingeridis.eu
       http:
         paths:
           - path: /
@@ -30,7 +30,7 @@ spec:
                 name: web
                 port:
                   number: 80
-    # - host: www.meet.milms.esite.gr
+    # - host: www.meet.milms.tsilingeridis.eu
     #   http:
     #     paths:
     #       - path: /

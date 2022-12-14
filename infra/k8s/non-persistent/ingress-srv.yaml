@@ -22,11 +22,11 @@ spec:
         number: 80
   tls:
     - hosts:
-        - milms.esite.gr
-        # - www.milms.esite.gr
-      secretName: milms-esite.gr
+        - milms.tsilingeridis.eu
+        # - www.milms.tsilingeridis.eu
+      secretName: milms-tsilingeridis.eu
   rules:
-    - host: milms.esite.gr
+    - host: milms.tsilingeridis.eu
       http:
         paths:
           - path: /api/users/?(.*)
@@ -51,7 +51,7 @@ spec:
                 port:
                   number: 80
                   # number: 4200
-    # - host: www.milms.esite.gr
+    # - host: www.milms.tsilingeridis.eu
     #   http:
     #     paths:
     #       - path: /api/users/?(.*)
@@ -104,11 +104,11 @@ spec:
         number: 80
   tls:
     - hosts:
-        - dsb.milms.esite.gr
-        # - www.dsb.milms.esite.gr
-      secretName: dsb-milms-esite.gr
+        - dsb.milms.tsilingeridis.eu
+        # - www.dsb.milms.tsilingeridis.eu
+      secretName: dsb-milms-tsilingeridis.eu
   rules:
-    - host: dsb.milms.esite.gr
+    - host: dsb.milms.tsilingeridis.eu
       http:
         paths:
           - path: /
@@ -118,7 +118,7 @@ spec:
                 name: kubernetes-dashboard
                 port:
                   number: 443
-    # - host: www.dsb.milms.esite.gr
+    # - host: www.dsb.milms.tsilingeridis.eu
     #   http:
     #     paths:
     #       - path: /
@@ -142,11 +142,11 @@ spec:
 # spec:
 #   tls:
 #     - hosts:
-#         - prometheus.milms.esite.gr
-#         - www.prometheus.milms.esite.gr
-#       secretName: prometheus-milms-esite.gr
+#         - prometheus.milms.tsilingeridis.eu
+#         - www.prometheus.milms.tsilingeridis.eu
+#       secretName: prometheus-milms-tsilingeridis.eu
 #   rules:
-#     - host: prometheus.milms.esite.gr
+#     - host: prometheus.milms.tsilingeridis.eu
 #       http:
 #         paths:
 #           - path: /
@@ -156,7 +156,7 @@ spec:
 #                 name: web
 #                 port:
 #                   number: 80
-#     - host: www.prometheus.milms.esite.gr
+#     - host: www.prometheus.milms.tsilingeridis.eu
 #       http:
 #         paths:
 #           - path: /
